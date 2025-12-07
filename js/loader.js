@@ -82,7 +82,7 @@
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        dataCache = JSON.parse(raw);
+        dataCache = normalizeDataset(JSON.parse(raw));
         startRemoteSync();
         return dataCache;
       }
@@ -90,6 +90,7 @@
       console.warn('تعذر قراءة البيانات المخزنة محلياً، سيتم استخدام البيانات الافتراضية.', err);
     }
     dataCache = clone(DEFAULT_DATA);
+    dataCache.events = sanitizeEvents(dataCache.events);
     saveData({ skipRemote: true });
     startRemoteSync();
     return dataCache;
@@ -98,7 +99,7 @@
   function startRemoteSync() {
     if (remoteSyncStarted || !FIREBASE_DB_URL) return;
     remoteSyncStarted = true;
-    fetchRemoteSnapshot();
+    waitForAuthThen(fetchRemoteSnapshot);
   }
 
   function clone(obj) {
@@ -107,6 +108,7 @@
 
   function saveData(options = {}) {
     if (!dataCache) return;
+    dataCache = normalizeDataset(dataCache);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataCache));
     if (!options.skipRemote) {
       queueRemotePush(dataCache);
@@ -124,8 +126,9 @@
   }
 
   function fetchRemoteSnapshot() {
-    if (!FIREBASE_DB_URL) return;
-    fetch(FIREBASE_DB_URL)
+    const url = buildRemoteUrl();
+    if (!url) return;
+    fetch(url)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Firebase fetch failed with status ${res.status}`);
@@ -144,14 +147,24 @@
 
   function queueRemotePush(payload) {
     if (!FIREBASE_DB_URL) return;
-    clearTimeout(remotePushTimer);
-    remotePushTimer = setTimeout(() => {
-      pushRemoteSnapshot(payload);
-    }, 500);
+    const clonedPayload = clone(payload);
+    const schedule = () => {
+      clearTimeout(remotePushTimer);
+      remotePushTimer = setTimeout(() => {
+        pushRemoteSnapshot(clonedPayload);
+      }, 500);
+    };
+    if (window.FIREBASE_ID_TOKEN) {
+      schedule();
+    } else {
+      waitForAuthThen(schedule);
+    }
   }
 
   function pushRemoteSnapshot(payload) {
-    fetch(FIREBASE_DB_URL, {
+    const url = buildRemoteUrl();
+    if (!url) return;
+    fetch(url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -161,7 +174,7 @@
   }
 
   function applyRemoteSnapshot(snapshot) {
-    dataCache = clone(snapshot);
+    dataCache = normalizeDataset(snapshot);
     saveData({ skipRemote: true });
     window.dispatchEvent(
       new CustomEvent(REMOTE_EVENT, {
@@ -177,6 +190,43 @@
       typeof payload.biographies === 'object' &&
       typeof payload.places === 'object'
     );
+  }
+
+  function waitForAuthThen(callback) {
+    if (window.FIREBASE_ID_TOKEN) {
+      callback();
+      return;
+    }
+    const handler = () => {
+      window.removeEventListener('firebase-token', handler);
+      callback();
+    };
+    window.addEventListener('firebase-token', handler);
+  }
+
+  function buildRemoteUrl() {
+    if (!FIREBASE_DB_URL) return '';
+    const token = window.FIREBASE_ID_TOKEN;
+    if (!token) return FIREBASE_DB_URL;
+    const joiner = FIREBASE_DB_URL.includes('?') ? '&' : '?';
+    return `${FIREBASE_DB_URL}${joiner}auth=${token}`;
+  }
+
+  function normalizeDataset(dataset) {
+    const next = dataset || {};
+    next.events = sanitizeEvents(next.events);
+    if (typeof next.biographies !== 'object' || !next.biographies) {
+      next.biographies = {};
+    }
+    if (typeof next.places !== 'object' || !next.places) {
+      next.places = {};
+    }
+    return next;
+  }
+
+  function sanitizeEvents(events) {
+    if (!Array.isArray(events)) return [];
+    return events.filter((event) => event && typeof event === 'object' && event.id);
   }
 
   window.DataStore = {

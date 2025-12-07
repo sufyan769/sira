@@ -36,7 +36,7 @@
     buildTimeline();
     bindSearch();
     if (state.events.length) selectEvent(state.events[0].id);
-    fetchRemoteSnapshot();
+    ensureRemoteSync();
   }
 
   function buildTimeline() {
@@ -219,8 +219,9 @@
   }
 
   function fetchRemoteSnapshot() {
-    if (!FIREBASE_DB_URL) return;
-    fetch(FIREBASE_DB_URL)
+    const url = buildRemoteUrl();
+    if (!url) return;
+    fetch(url)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Firebase fetch failed with status ${res.status}`);
@@ -255,6 +256,27 @@
       typeof payload.biographies === 'object' &&
       typeof payload.places === 'object'
     );
+  }
+
+  function ensureRemoteSync() {
+    if (!FIREBASE_DB_URL) return;
+    if (window.FIREBASE_ID_TOKEN) {
+      fetchRemoteSnapshot();
+    } else {
+      const handler = () => {
+        window.removeEventListener('firebase-token', handler);
+        fetchRemoteSnapshot();
+      };
+      window.addEventListener('firebase-token', handler);
+    }
+  }
+
+  function buildRemoteUrl() {
+    if (!FIREBASE_DB_URL) return '';
+    const token = window.FIREBASE_ID_TOKEN;
+    if (!token) return FIREBASE_DB_URL;
+    const joiner = FIREBASE_DB_URL.includes('?') ? '&' : '?';
+    return `${FIREBASE_DB_URL}${joiner}auth=${token}`;
   }
 
   init();
