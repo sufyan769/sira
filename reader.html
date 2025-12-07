@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>كتاب السيرة - نسخة للقراءة</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/reader.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>كتاب السيرة النبوية (عرض فقط)</h1>
+    <div class="header-search">
+      <input type="search" id="readerSearch" placeholder="ابحث في الأحداث والنصوص والأسماء">
+      <div id="readerSearchResults" class="search-dropdown hidden"></div>
+    </div>
+  </header>
+  <div class="app-shell">
+    <aside class="timeline-panel">
+      <div class="timeline-header">
+        <h2>الخط الزمني</h2>
+      </div>
+      <div id="readerTimeline" class="timeline-list"></div>
+    </aside>
+    <main class="content-panel">
+      <section class="event-overview">
+        <h2 id="readerEventTitle" class="event-title">اختر حدثاً من الخط الزمني</h2>
+      </section>
+      <section class="sources-panel">
+        <div class="sources-header">
+          <h3 id="readerSourcePanelTitle">المصادر</h3>
+          <div id="readerSourceTabs" class="source-tabs"></div>
+        </div>
+        <article id="readerEventText" class="event-text">
+          <p>ستظهر نصوص السيرة هنا</p>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div id="readerPersonModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close="readerPersonModal">×</button>
+      <img id="readerPersonImage" alt="" class="modal-image">
+      <div class="modal-body">
+        <h3 id="readerPersonName">—</h3>
+        <p id="readerPersonBio">—</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="readerPlaceModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close="readerPlaceModal">×</button>
+      <img id="readerPlaceImage" alt="" class="modal-image">
+      <div class="modal-body">
+        <h3 id="readerPlaceName">—</h3>
+        <p id="readerPlaceDesc">—</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="readerTooltip" class="tooltip hidden"></div>
+
+  <script src="js/reader-data.js"></script>
+  <script src="js/reader-ui.js"></script>
+  <script src="js/reader-smartlinks.js"></script>
+  <script src="js/reader-app.js"></script>
+</body>
+</html>

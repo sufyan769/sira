@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>كتاب السيرة التفاعلي</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>كتاب السيرة النبوية</h1>
+    <div class="header-search">
+      <input type="search" id="globalSearch" placeholder="ابحث في الأحداث والنصوص والأماكن">
+      <div id="globalResults" class="search-dropdown hidden"></div>
+    </div>
+    <div class="header-actions">
+      <button id="addEventBtn">+ حدث</button>
+      <button id="manageBiosBtn">التراجم</button>
+      <button id="managePlacesBtn">الأماكن</button>
+      <button id="importExportBtn">استيراد/تصدير</button>
+      <button id="resetDataBtn">إعادة التهيئة</button>
+    </div>
+  </header>
+  <div class="app-shell">
+    <aside class="timeline-panel">
+      <div class="event-form">
+        <input id="formEventId" type="text">
+        <input id="formEventTitle" type="text">
+        <input id="formEventYear" type="number">
+        <div class="form-actions">
+          <button id="saveEventFormBtn" title="حفظ الحدث" aria-label="حفظ الحدث">💾</button>
+          <button type="button" id="clearEventFormBtn" title="تفريغ" aria-label="تفريغ">✖</button>
+          <button type="button" id="loadSelectedEventBtn" title="تحميل الحدث الحالي" aria-label="تحميل الحدث الحالي">⬆</button>
+        </div>
+      </div>
+      <div id="timeline" class="timeline-list"></div>
+    </aside>
+    <main class="content-panel">
+      <section class="event-overview" aria-hidden="true">
+        <h2 id="eventTitle" class="event-title">اختر حدثاً من الخط الزمني</h2>
+      </section>
+      <section class="sources-panel">
+        <div class="sources-header">
+          <h3 id="sourcePanelTitle">المصادر</h3>
+          <div id="sourceTabs" class="source-tabs"></div>
+          <div class="source-actions">
+            <button id="addSourceBtn">+ مصدر</button>
+            <button id="removeSourceBtn">حذف المصدر</button>
+          </div>
+        </div>
+        <div class="source-meta">
+          <label for="sourceBookInput">اسم المصدر الحالي</label>
+          <div class="source-meta-controls">
+            <input type="text" id="sourceBookInput" placeholder="أدخل اسم الكتاب">
+            <button id="saveSourceBookBtn">حفظ الاسم</button>
+          </div>
+        </div>
+        <article class="event-text">
+          <textarea id="eventTextEditor" placeholder="اكتب نص المصدر هنا"></textarea>
+          <div id="eventTextPreview" class="event-preview">
+            <p>ستظهر نصوص السيرة مع الروابط الذكية هنا.</p>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div id="personModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close="personModal">×</button>
+      <img id="personImage" alt="" class="modal-image">
+      <div class="modal-body">
+        <label>الاسم</label>
+        <input type="text" id="personNameInput">
+        <label>نبذة مختصرة</label>
+        <textarea id="personShortInput" rows="2"></textarea>
+        <label>نص كامل</label>
+        <textarea id="personFullInput" rows="4"></textarea>
+        <label>رابط الصورة</label>
+        <input type="text" id="personImageInput">
+        <div class="modal-actions">
+          <button id="savePersonBtn">حفظ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="placeModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close="placeModal">×</button>
+      <img id="placeImage" alt="" class="modal-image">
+      <div class="modal-body">
+        <label>اسم المكان</label>
+        <input type="text" id="placeNameInput">
+        <label>الوصف</label>
+        <textarea id="placeDescInput" rows="3"></textarea>
+        <label>رابط الصورة</label>
+        <input type="text" id="placeImageInput">
+        <div class="modal-actions">
+          <button id="savePlaceBtn">حفظ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="eventModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close="eventModal">×</button>
+      <div class="modal-body">
+        <h3>إضافة / تعديل حدث</h3>
+        <label>المعرف</label>
+        <input type="text" id="eventIdInput" placeholder="مثال: badr">
+        <label>العنوان</label>
+        <input type="text" id="eventTitleInput">
+      <label>السنة الهجرية</label>
+      <input type="number" id="eventYearInput">
+      <label>ترتيب العرض (رقم)</label>
+      <input type="number" id="eventOrderInput">
+      <label>الكلمات المفتاحية (افصلها بفواصل)</label>
+        <input type="text" id="eventTagsInput">
+        <label>الملاحظات</label>
+        <textarea id="eventNotesInput" rows="2"></textarea>
+        <label>اسم المصدر الأول</label>
+        <input type="text" id="eventSourceBookInput">
+        <label>نص المصدر الأول</label>
+        <textarea id="eventSourceTextInput" rows="4"></textarea>
+        <div class="modal-actions">
+          <button id="saveEventModalBtn">حفظ الحدث</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="importExportModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close="importExportModal">×</button>
+      <div class="modal-body">
+        <h3>استيراد / تصدير البيانات</h3>
+        <textarea id="importExportTextarea" rows="10" placeholder="سيظهر هنا JSON البيانات"></textarea>
+        <div class="modal-actions">
+          <button id="exportDataBtn">تصدير</button>
+          <button id="importDataBtn">استيراد</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sourceModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close="sourceModal">×</button>
+      <div class="modal-body">
+        <h3>إضافة مصدر جديد</h3>
+        <label for="sourceTitleInput">عنوان النص (اختياري)</label>
+        <input type="text" id="sourceTitleInput">
+        <label for="sourceTextInput">نص المصدر</label>
+        <textarea id="sourceTextInput" rows="5"></textarea>
+        <div class="modal-actions">
+          <button id="saveNewSourceBtn">حفظ المصدر</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tooltip" class="tooltip hidden"></div>
+
+  <script src="js/loader.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/smartlinks.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

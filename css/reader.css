@@ -1,0 +1,25 @@
+.app-header {
+  background: #fdfcff;
+}
+
+.source-actions,
+.source-meta,
+.header-actions,
+#addSourceBtn,
+#removeSourceBtn,
+#addEventBtn,
+#manageBiosBtn,
+#managePlacesBtn,
+#importExportBtn,
+#resetDataBtn {
+  display: none !important;
+}
+
+.notes-box.read-only {
+  background: #f3f5f8;
+}
+
+.notes-box.read-only p {
+  margin: 0;
+}
+*** End Patch
