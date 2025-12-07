@@ -1,4 +1,6 @@
 (function () {
+  const FIREBASE_DB_URL = window.FIREBASE_DB_URL || '';
+  const STORAGE_KEY = 'sirahOfflineDataV1';
   const timelineEl = document.getElementById('readerTimeline');
   const eventTitleEl = document.getElementById('readerEventTitle');
   const eventTextEl = document.getElementById('readerEventText');
@@ -34,6 +36,7 @@
     buildTimeline();
     bindSearch();
     if (state.events.length) selectEvent(state.events[0].id);
+    fetchRemoteSnapshot();
   }
 
   function buildTimeline() {
@@ -213,6 +216,45 @@
     const diff = getEventOrder(a) - getEventOrder(b);
     if (diff !== 0) return diff;
     return (a.title || '').localeCompare(b.title || '', 'ar');
+  }
+
+  function fetchRemoteSnapshot() {
+    if (!FIREBASE_DB_URL) return;
+    fetch(FIREBASE_DB_URL)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Firebase fetch failed with status ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((remote) => {
+        if (!isValidDataset(remote)) return;
+        state.events = remote.events || [];
+        state.bios = remote.biographies || {};
+        state.places = remote.places || {};
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+        } catch (_) {}
+        ensureEventOrdering();
+        buildTimeline();
+        if (state.currentEventId && state.events.some((evt) => evt.id === state.currentEventId)) {
+          selectEvent(state.currentEventId);
+        } else if (state.events.length) {
+          selectEvent(state.events[0].id);
+        }
+      })
+      .catch((err) => {
+        console.warn('تعذر جلب بيانات Firebase للقراءة', err);
+      });
+  }
+
+  function isValidDataset(payload) {
+    return (
+      payload &&
+      Array.isArray(payload.events) &&
+      typeof payload.biographies === 'object' &&
+      typeof payload.places === 'object'
+    );
   }
 
   init();

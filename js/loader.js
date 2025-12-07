@@ -1,5 +1,7 @@
 (function () {
   const STORAGE_KEY = 'sirahOfflineDataV1';
+  const FIREBASE_DB_URL = window.FIREBASE_DB_URL || '';
+  const REMOTE_EVENT = 'data-store:remote-updated';
   const DEFAULT_DATA = {
     events: [
       {
@@ -69,30 +71,46 @@
   };
 
   let dataCache = null;
+  let remoteSyncStarted = false;
+  let remotePushTimer = null;
 
   function loadData() {
-    if (dataCache) return dataCache;
+    if (dataCache) {
+      startRemoteSync();
+      return dataCache;
+    }
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         dataCache = JSON.parse(raw);
+        startRemoteSync();
         return dataCache;
       }
     } catch (err) {
       console.warn('تعذر قراءة البيانات المخزنة محلياً، سيتم استخدام البيانات الافتراضية.', err);
     }
     dataCache = clone(DEFAULT_DATA);
-    saveData();
+    saveData({ skipRemote: true });
+    startRemoteSync();
     return dataCache;
+  }
+
+  function startRemoteSync() {
+    if (remoteSyncStarted || !FIREBASE_DB_URL) return;
+    remoteSyncStarted = true;
+    fetchRemoteSnapshot();
   }
 
   function clone(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
 
-  function saveData() {
+  function saveData(options = {}) {
     if (!dataCache) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataCache));
+    if (!options.skipRemote) {
+      queueRemotePush(dataCache);
+    }
   }
 
   function resetData() {
@@ -105,11 +123,68 @@
     saveData();
   }
 
+  function fetchRemoteSnapshot() {
+    if (!FIREBASE_DB_URL) return;
+    fetch(FIREBASE_DB_URL)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Firebase fetch failed with status ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((remote) => {
+        if (isValidDataset(remote)) {
+          applyRemoteSnapshot(remote);
+        }
+      })
+      .catch((err) => {
+        console.warn('تعذر مزامنة بيانات Firebase', err);
+      });
+  }
+
+  function queueRemotePush(payload) {
+    if (!FIREBASE_DB_URL) return;
+    clearTimeout(remotePushTimer);
+    remotePushTimer = setTimeout(() => {
+      pushRemoteSnapshot(payload);
+    }, 500);
+  }
+
+  function pushRemoteSnapshot(payload) {
+    fetch(FIREBASE_DB_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch((err) => {
+      console.warn('تعذر حفظ البيانات على Firebase', err);
+    });
+  }
+
+  function applyRemoteSnapshot(snapshot) {
+    dataCache = clone(snapshot);
+    saveData({ skipRemote: true });
+    window.dispatchEvent(
+      new CustomEvent(REMOTE_EVENT, {
+        detail: clone(dataCache)
+      })
+    );
+  }
+
+  function isValidDataset(payload) {
+    return (
+      payload &&
+      Array.isArray(payload.events) &&
+      typeof payload.biographies === 'object' &&
+      typeof payload.places === 'object'
+    );
+  }
+
   window.DataStore = {
     loadData,
     saveData,
     resetData,
     replaceData,
-    getDefault: () => clone(DEFAULT_DATA)
+    getDefault: () => clone(DEFAULT_DATA),
+    syncRemote: fetchRemoteSnapshot
   };
 })();

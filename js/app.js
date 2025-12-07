@@ -38,6 +38,9 @@
     currentSourceIndex: 0,
     pendingInsert: null
   };
+  window.addEventListener('data-store:remote-updated', (event) => {
+    applyRemoteData(event.detail);
+  });
 
   let formAutoSaveTimer = null;
 
@@ -277,6 +280,21 @@
     updateTextPreview(current.text || '');
     if (mutated) {
       DataStore.saveData();
+    }
+  }
+
+  function applyRemoteData(remote) {
+    if (!remote) return;
+    state.data = remote;
+    ensureEventOrdering();
+    buildTimeline();
+    if (state.currentEventId && state.data.events.some((evt) => evt.id === state.currentEventId)) {
+      selectEvent(state.currentEventId);
+    } else if (state.data.events.length) {
+      selectEvent(state.data.events[0].id);
+    } else {
+      state.currentEventId = null;
+      clearEventView();
     }
   }
 
