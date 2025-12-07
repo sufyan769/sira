@@ -38,8 +38,8 @@
     currentSourceIndex: 0,
     pendingInsert: null
   };
-  window.addEventListener('data-store:remote-updated', (event) => {
-    applyRemoteData(event.detail);
+  window.addEventListener('data-store:remote-updated', () => {
+    applyRemoteData();
   });
 
   let formAutoSaveTimer = null;
@@ -274,8 +274,9 @@
   }
 
   function applyRemoteData(remote) {
-    if (!remote) return;
-    state.data = remote;
+    const latest = (typeof DataStore.getData === 'function' && DataStore.getData()) || remote;
+    if (!latest) return;
+    state.data = latest;
     ensureEventOrdering();
     buildTimeline();
     if (state.currentEventId && state.data.events.some((evt) => evt.id === state.currentEventId)) {
@@ -292,14 +293,13 @@
     const event = getCurrentEvent();
     if (!event || !eventTextEditor) return;
     if (ensurePrimarySource(event)) {
-      DataStore.saveData();
-      renderSources(event);
+      syncRemoteAndRender(event);
       return;
     }
     const current = event.sources?.[state.currentSourceIndex];
     if (!current) return;
     current.text = eventTextEditor.value;
-    DataStore.saveData();
+    syncRemoteAndRender(event);
     updateTextPreview(current.text);
   }
 
@@ -436,6 +436,7 @@
     DataStore.saveData();
     buildTimeline();
     selectEvent(targetEvent.id);
+    console.info('[App] تم تحديث الحدث', targetEvent.id);
     return true;
   }
 
@@ -545,9 +546,11 @@
   }
 
   function ensureEventOrdering() {
+    state.data.events = state.data.events.filter((event) => event && typeof event === 'object');
     const groups = new Map();
     state.data.events.forEach((event) => {
-      const key = event.year ?? 'غير محدد';
+      if (!event) return;
+      const key = typeof event.year === 'number' ? event.year : 'غير محدد';
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key).push(event);
     });
@@ -566,6 +569,9 @@
 
   function sortEvents() {
     state.data.events.sort((a, b) => {
+      if (!a && !b) return 0;
+      if (!a) return 1;
+      if (!b) return -1;
       const yearA = typeof a.year === 'number' ? a.year : Number.MAX_SAFE_INTEGER;
       const yearB = typeof b.year === 'number' ? b.year : Number.MAX_SAFE_INTEGER;
       if (yearA !== yearB) return yearA - yearB;
@@ -574,16 +580,22 @@
   }
 
   function getEventOrder(event) {
+    if (!event) return Number.MAX_SAFE_INTEGER;
     return typeof event.order === 'number' && !Number.isNaN(event.order) ? event.order : Number.MAX_SAFE_INTEGER;
   }
 
   function getNextOrder(year) {
-    const eventsForYear = state.data.events.filter((evt) => (evt.year ?? null) === (year ?? null));
+    const eventsForYear = state.data.events.filter(
+      (evt) => evt && (evt.year ?? null) === (year ?? null)
+    );
     if (!eventsForYear.length) return 1;
     return Math.max(...eventsForYear.map(getEventOrder)) + 1;
   }
 
   function compareEventsWithinYear(a, b) {
+    if (!a && !b) return 0;
+    if (!a) return 1;
+    if (!b) return -1;
     const orderDiff = getEventOrder(a) - getEventOrder(b);
     if (orderDiff !== 0) return orderDiff;
     return (a.title || '').localeCompare(b.title || '', 'ar');
@@ -787,6 +799,15 @@
     });
     state.currentSourceIndex = 0;
     return true;
+  }
+
+  function syncRemoteAndRender(event) {
+    const existing = state.data.events.find((evt) => evt.id === event.id);
+    if (!existing && event.id) {
+      state.data.events.push(event);
+    }
+    DataStore.saveData();
+    renderSources(event);
   }
 
   init();
