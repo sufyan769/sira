@@ -9,7 +9,7 @@
   const manageBiosBtn = document.getElementById('manageBiosBtn');
   const managePlacesBtn = document.getElementById('managePlacesBtn');
   const importExportBtn = document.getElementById('importExportBtn');
-  const resetBtn = document.getElementById('resetDataBtn');
+  const manualSaveBtn = document.getElementById('manualSaveBtn');
   const addSourceBtn = document.getElementById('addSourceBtn');
   const removeSourceBtn = document.getElementById('removeSourceBtn');
   const eventTextEditor = document.getElementById('eventTextEditor');
@@ -77,19 +77,9 @@
         onExport: exportDataToTextarea
       });
     });
-    resetBtn?.addEventListener('click', () => {
-      if (confirm('ستتم إعادة البيانات إلى الوضع الافتراضي. هل أنت متأكد؟')) {
-        DataStore.resetData();
-        state.data = DataStore.loadData();
-        state.currentSourceIndex = 0;
-        ensureEventOrdering();
-        buildTimeline();
-        if (state.data.events.length) {
-          selectEvent(state.data.events[0].id);
-        } else {
-          clearEventView();
-        }
-      }
+    manualSaveBtn?.addEventListener('click', () => {
+      DataStore.saveData();
+      alert('تم حفظ البيانات.');
     });
     addSourceBtn?.addEventListener('click', openAddSourceModal);
     removeSourceBtn?.addEventListener('click', removeCurrentSource);
