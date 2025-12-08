@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tarajim: 'sira_tarajim_data'
     };
 
+    const SIDEBAR_WIDTH_KEY = 'sira_sidebar_width';
+
     const state = {
         tarajimData: {},
         eventsCache: {},
@@ -35,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarAddBtn = createSidebarAddButton();
     const sidebarRemoveBtn = createSidebarRemoveButton();
     const sidebarMenu = createSidebarMenu();
+    const sidebarResizer = document.getElementById('sidebar-resizer');
+    const containerEl = document.querySelector('.container');
     const exportBackupBtn = document.getElementById('export-backup-btn');
     const importBackupInput = document.getElementById('import-backup-input');
     const toolbarButtons = document.querySelectorAll('.editor-toolbar button');
@@ -53,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bindSelectionButtonEvents();
         bindSidebarMenuEvents();
         bindBackupControls();
+        bindResizerEvents();
         bindFormattingControls();
         bindGlobalEvents();
         applySmartLinks();
@@ -114,6 +119,111 @@ document.addEventListener('DOMContentLoaded', () => {
                 applyFormatting('hiliteColor', e.target.value);
             });
         }
+    }
+
+    function bindResizerEvents() {
+        if (!sidebarResizer || !elements.sidebar || !containerEl) return;
+        let isDragging = false;
+        let lastTapTime = 0;
+
+        const applyWidth = (width) => {
+            if (width <= 40) {
+                elements.sidebar.classList.add('collapsed');
+                elements.sidebar.style.width = '0px';
+            } else {
+                elements.sidebar.classList.remove('collapsed');
+                elements.sidebar.style.width = `${width}px`;
+            }
+        };
+
+        const persistWidth = () => {
+            const storedValue = elements.sidebar.classList.contains('collapsed')
+                ? 'collapsed'
+                : (elements.sidebar.style.width || `${elements.sidebar.offsetWidth}px`);
+            localStorage.setItem(SIDEBAR_WIDTH_KEY, storedValue);
+        };
+
+        const startDrag = (clientX) => {
+            isDragging = true;
+            sidebarResizer.classList.add('dragging');
+            document.body.classList.add('resizing');
+            updateSidebarWidth(clientX);
+        };
+
+        const moveDrag = (clientX) => {
+            if (!isDragging) return;
+            updateSidebarWidth(clientX);
+        };
+
+        const stopDrag = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            sidebarResizer.classList.remove('dragging');
+            document.body.classList.remove('resizing');
+            persistWidth();
+        };
+
+        const updateSidebarWidth = (clientX) => {
+            const containerRect = containerEl.getBoundingClientRect();
+            const rtlOffset = containerRect.right - clientX;
+            const minWidth = 0;
+            const rawMax = containerRect.width - 150;
+            const maxWidth = Math.min(Math.max(rawMax, 300), 700);
+            const clamped = Math.min(Math.max(rtlOffset, minWidth), maxWidth);
+            applyWidth(clamped);
+        };
+
+        const toggleSidebarState = () => {
+            if (elements.sidebar.classList.contains('collapsed')) {
+                elements.sidebar.classList.remove('collapsed');
+                elements.sidebar.style.width = '280px';
+            } else {
+                elements.sidebar.classList.add('collapsed');
+                elements.sidebar.style.width = '0px';
+            }
+            persistWidth();
+        };
+
+        const storedWidth = localStorage.getItem(SIDEBAR_WIDTH_KEY);
+        if (storedWidth === 'collapsed') {
+            elements.sidebar.classList.add('collapsed');
+            elements.sidebar.style.width = '0px';
+        } else if (storedWidth) {
+            elements.sidebar.classList.remove('collapsed');
+            elements.sidebar.style.width = storedWidth;
+        }
+
+        sidebarResizer.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            startDrag(e.clientX);
+        });
+
+        sidebarResizer.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            toggleSidebarState();
+        });
+
+        sidebarResizer.addEventListener('touchstart', (e) => {
+            const now = Date.now();
+            if (now - lastTapTime < 300) {
+                e.preventDefault();
+                toggleSidebarState();
+                lastTapTime = 0;
+                return;
+            }
+            lastTapTime = now;
+            e.preventDefault();
+            startDrag(e.touches[0].clientX);
+        }, { passive: false });
+
+        document.addEventListener('mousemove', (e) => moveDrag(e.clientX));
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            moveDrag(e.touches[0].clientX);
+        }, { passive: false });
+        document.addEventListener('mouseup', stopDrag);
+        document.addEventListener('touchend', stopDrag);
+        document.addEventListener('touchcancel', stopDrag);
     }
 
     function readFromStorage(key, fallback) {
