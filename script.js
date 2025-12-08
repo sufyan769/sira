@@ -526,16 +526,31 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.editableContent.querySelectorAll('.smart-link').forEach(link => {
             if (link.dataset.bound === 'true') return;
             link.dataset.bound = 'true';
+            let clickTimeout = null;
+
             link.addEventListener('mouseenter', () => showTooltip(link));
             link.addEventListener('mouseleave', hideTooltip);
             link.addEventListener('click', (e) => {
                 e.preventDefault();
+                if (clickTimeout) clearTimeout(clickTimeout);
+                clickTimeout = setTimeout(() => {
+                    clickTimeout = null;
+                    showTooltip(link, true);
+                }, 200);
+            });
+
+            link.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                if (clickTimeout) {
+                    clearTimeout(clickTimeout);
+                    clickTimeout = null;
+                }
                 openPopover(link, { linkId: link.dataset.linkId });
             });
         });
     }
 
-    function showTooltip(link) {
+    function showTooltip(link, fromClick = false) {
         const data = state.tarajimData[link.dataset.linkId];
         if (!data) return;
 
@@ -553,7 +568,8 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.tooltipContent.innerHTML = html || 'لا توجد بيانات.';
         elements.tooltip.classList.remove('hidden');
         const rect = link.getBoundingClientRect();
-        elements.tooltip.style.top = `${rect.bottom + window.scrollY + 5}px`;
+        const offset = fromClick ? 15 : 5;
+        elements.tooltip.style.top = `${rect.bottom + window.scrollY + offset}px`;
         elements.tooltip.style.left = `${rect.left + window.scrollX}px`;
     }
 
