@@ -6,10 +6,16 @@
   --muted: #737b8c;
   --accent: #1f7a8c;
   --accent-light: rgba(31, 122, 140, 0.1);
+  --header-height: 86px;
 }
 
 * {
   box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
@@ -17,6 +23,8 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: "Cairo", system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
 }
 
 .hidden {
@@ -34,6 +42,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 20;
+  min-height: var(--header-height);
 }
 
 .app-header h1 {
@@ -87,7 +96,9 @@ body {
 .app-shell {
   display: grid;
   grid-template-columns: 320px 1fr;
-  min-height: calc(100vh - 76px);
+  height: calc(100vh - var(--header-height));
+  min-height: calc(100vh - var(--header-height));
+  overflow: hidden;
 }
 
 .header-actions {
@@ -109,6 +120,7 @@ body {
   background: #fbfcff;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .timeline-header {
@@ -246,6 +258,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  overflow-y: auto;
 }
 
 .event-overview {
