@@ -178,10 +178,10 @@
 
   function formatYearLabel(yearKey) {
     if (yearKey === 'غير محدد') return 'أحداث بلا تاريخ';
-    if (typeof yearKey !== 'number') return `السنة ${yearKey}`;
-    if (yearKey < 0) return `السنة ${Math.abs(yearKey)} ق هـ`;
+    if (typeof yearKey !== 'number') return ` ${yearKey}`;
+    if (yearKey < 0) return ` ${Math.abs(yearKey)}  `;
     if (yearKey === 0) return 'بداية الهجرة';
-    return `السنة ${yearKey} هـ`;
+    return ` ${yearKey} `;
   }
 
   function selectEvent(id) {
@@ -261,8 +261,11 @@
       sourceTabsEl.appendChild(btn);
     });
     const current = sources[state.currentSourceIndex];
+    if (ensureDefaultBook(current)) {
+      mutated = true;
+    }
     if (sourceBookInput) {
-      sourceBookInput.value = current.book || '';
+      sourceBookInput.value = current.book || 'sira';
     }
     if (eventTextEditor) {
       eventTextEditor.value = current.text || '';
@@ -330,7 +333,7 @@
     const title = newSourceTitleInput.value.trim();
     event.sources = event.sources || [];
     event.sources.push({
-      book: '',
+      book: 'sira',
       title,
       text
     });
@@ -794,10 +797,16 @@
     }
     if (event.sources.length) return false;
     event.sources.push({
-      book: event.title || 'مصدر 1',
+      book: 'sira',
       text: ''
     });
     state.currentSourceIndex = 0;
+    return true;
+  }
+
+  function ensureDefaultBook(source) {
+    if (!source || source.book) return false;
+    source.book = 'sira';
     return true;
   }
 
