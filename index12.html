@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>أوقات الصلاة</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Changa:wght@600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=El+Messiri:wght@400..700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
+  <link rel="shortcut icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>">
+  <style>
+    :root {
+      /* Midnight Gold Palette */
+      --bg-gradient-start: #0f2027;
+      --bg-gradient-mid: #203a43;
+      --bg-gradient-end: #2c5364;
+
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+      --text-primary: #FFFFFF;
+      --text-secondary: #E0E0E0;
+      --text-accent: #F7B42C;
+      /* Gold */
+      --text-dim: rgba(255, 255, 255, 0.6);
+
+      /* Clock Colors (White Theme) */
+      --clock-face-bg: #FFFFFF;
+      --clock-text-color: #1a1a1a;
+      --clock-hand-hour: #1a1a1a;
+      --clock-hand-minute: #1a1a1a;
+      --clock-hand-second: #F7B42C;
+      /* Keep accent for second hand? or make red/black? keeping accent for now */
+      --clock-center-dot: #F7B42C;
+      --hour-marker-color: #1a1a1a;
+      --minute-marker-color: rgba(0, 0, 0, 0.454);
+
+      --font-primary: 'Changa', sans-serif;
+      --font-secondary: 'Almarai', sans-serif;
+      --font-display: 'El Messiri', sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-secondary);
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end));
+      color: var(--text-primary);
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    #root {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .app-container {
+      transform: rotate(90deg);
+      width: min(100vh, 150vw);
+      height: min(200vh, 100vw);
+      padding: 1rem;
+      display: flex;
+    }
+
+    .main-panel {
+      width: 100%;
+      height: 100%;
+      /* No background on panel itself, just the body */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2rem;
+      position: relative;
+    }
+
+    /* Top Section: Header & Clock */
+    .top-section {
+      flex: 1.5;
+      /* Give it more space */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      position: relative;
+      padding-top: 1rem;
+      width: 100%;
+      height: 100%;
+      /* Ensure it fills main panel height */
+    }
+
+    /* Container for the Main Clock to keep it square and centered */
+    .top-section .clock-wrapper {
+      flex: 1;
+      /* Take available space */
+      width: 100%;
+      max-height: 50%;
+      /* Limit height so bottom card has space */
+      display: flex;
+      justify-content: center;
+      align-items: left;
+    }
+
+    .top-section .clock-wrapper .top-card {
+      width: auto;
+      height: 130%;
+      aspect-ratio: 1/1;
+    }
+
+    /* Consolidated Info Card (Bottom) */
+    .top-section .info-wrapper {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .top-section .info-wrapper .top-card {
+      position: absolute;
+      top: 66%;
+      width: 100%;
+      height: 35%;
+      aspect-ratio: auto;
+      /* Rectangle */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      padding: 1rem;
+    }
+
+    /* Make the countdown (which will be the 3rd child now) span both columns? 
+       No, the user requested squares.
+       However, we are removing the 3rd card. So we have 3 cards.
+       1: Clock, 2: Info, 3: Countdown.
+       If we want squares, maybe 3 squares in a row? No, screens are vertical.
+       User approved "Digital Countdown span the full width".
+       If it spans full width, it will be a rectangle.
+       Let's proceed with making it span full width.
+    */
+    .top-section> :nth-child(3) {
+      grid-column: 1 / -1;
+      aspect-ratio: auto;
+      /* Allow rectangle for countdown */
+      height: 80%;
+      /* Fill the row height */
+    }
+
+    /* Cards in Top Section */
+    .top-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 6rem;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 1rem;
+      /* Force Square */
+      width: 80%;
+    }
+
+    /* Quadrant 1: Main Clock (Top Right usually in RTL, but grid items order is 1,2,3,4) */
+    /* We will place them in order: MainClock, Info, NextClock, Countdown */
+
+    .clock-container {
+      width: 100%;
+      height: 100%;
+      /* Removed max-width to allow full fill if needed, or keep it to ensure roundness? 
+         If user wants full card background white, we should apply background to card or make clock fill card.
+         User said "background of the clock... full size of the card". 
+      */
+      max-width: none;
+      aspect-ratio: auto;
+      /* Let it stretch */
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Ghost Hands Style */
+    .hand.ghost {
+      opacity: 0.3;
+      /* Faint */
+      z-index: 5;
+      /* Behind main hands */
+      background-color: #555 !important;
+      /* Force grey */
+      /* Make them slightly thinner/shorter to distinguish? */
+    }
+
+    .hand.ghost-hour {
+      width: 1rem;
+      height: 25%;
+    }
+
+    .hand.ghost-minute {
+      width: 0.6rem;
+      height: 38%;
+    }
+
+    /* Quadrant 2: Info (Date + Weather) */
+    .info-card-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      height: 100%;
+      width: 50%;
+      text-align: center;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    /* Quadrant 4: Digital Countdown */
+    .digital-countdown-large {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      /* Center Vertically */
+      justify-content: center;
+      gap: 0.5rem;
+      direction: ltr;
+      /* Force LTR for numbers 12:45 */
+      width: 100%;
+      height: 100%;
+      /* Fill height */
+    }
+
+    .digital-countdown-large .curr-time {
+      font-size: 10rem;
+      /* Increased from 8rem */
+      font-weight: 700;
+      color: var(--text-accent);
+      font-family: 'Changa';
+      line-height: 0.7;
+      /* Drastically reduced */
+      letter-spacing: -3px;
+    }
+
+    .consolidated-info-row {
+      display: flex;
+      flex-direction: row-reverse;
+      /* Arabic RTL logic for visual balance? Or standard row? standard row. */
+      justify-content: space-around;
+      align-items: center;
+      width: 100%;
+      margin-top: 1rem;
+      border-top: 1px solid var(--glass-border);
+      padding-top: 1rem;
+    }
+
+    .digital-countdown-large .labels-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-left: 1rem;
+    }
+
+
+    .clock-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: var(--clock-face-bg);
+      border-radius: inherit;
+      /* Inherit from card if direct child, or keep its own? Card has 2rem */
+      /* We will set the Card to have the white bg for the main clock, and this to transparent? */
+      /* Or make this fill completely. Let's make this fill completely. */
+      /* If padding is 0, this needs to match card radius */
+      border-radius: 20rem;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+      border: none;
+      /* Border is on the card? Or keep border here? Use border on card. */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Modifiers for specific cards */
+    .top-card.clock-card-full {
+      padding: 0;
+      background: var(--clock-face-bg);
+      /* The card itself is white */
+      border: 4px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+    }
+
+    .top-card.clock-card-full .clock-face {
+      background: transparent;
+      /* Card handles bg */
+      box-shadow: none;
+      /* Card handles shadow */
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Keep internal clock elements mostly same but updated colors */
+    .clock-face .number {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      font-size: 4.5rem;
+      font-weight: 700;
+      color: var(--clock-text-color);
+      font-family: 'Changa';
+      z-index: 5;
+      line-height: 1;
+      text-shadow: none;
+    }
+
+    .number-12 {
+      top: 13%;
+      left: 50%;
+    }
+
+    .number-3 {
+      top: 50%;
+      left: 87%;
+    }
+
+    .number-6 {
+      top: 87%;
+      left: 50%;
+    }
+
+    .number-9 {
+      top: 50%;
+      left: 13%;
+    }
+
+    .marker-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .marker {
+      position: absolute;
+      left: 50%;
+      top: 3%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    .minute-marker {
+      width: 2px;
+      height: 6%;
+      background-color: var(--minute-marker-color);
+    }
+
+    .hour-marker {
+      width: 4px;
+      height: 12%;
+      background-color: var(--hour-marker-color);
+      box-shadow: 0 0 5px rgba(247, 180, 44, 0.5);
+    }
+
+    .hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom;
+      border-radius: 50px;
+      transform: translateX(-50%);
+      z-index: 10;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .hour-hand {
+      width: 1.2rem;
+      height: 28%;
+      background-color: var(--clock-hand-hour);
+    }
+
+    .minute-hand {
+      width: 1rem;
+      height: 38%;
+      background-color: var(--clock-hand-minute);
+    }
+
+    .second-hand {
+      width: 0.4rem;
+      height: 45%;
+      background-color: var(--clock-hand-second);
+      z-index: 12;
+    }
+
+    .center-dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1.8rem;
+      height: 1.8rem;
+      background-color: var(--clock-center-dot);
+      border-radius: 50%;
+      border: 3px solid var(--clock-hand-hour);
+      z-index: 13;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Date & Weather Styling (Side Info) */
+    .info-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 1.5rem;
+      border-radius: 1.5rem;
+      backdrop-filter: blur(5px);
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .date-weekday {
+      position: absolute;
+
+      font-size: 6rem;
+      /* Reduced from 8.5rem to fit card */
+      font-weight: 700;
+      color: var(--text-accent);
+      font-family: var(--font-display);
+      line-height: -0.7;
+      margin-bottom: -0.5rem;
+      margin-top: 0;
+      top: 50%;
+      text-align: center;
+    }
+
+    .date-gregorian {
+      position: absolute;
+      top: 40%;
+      font-size: 5rem;
+      /* Reduced to fit */
+      font-weight: 400;
+      color: var(--text-secondary);
+      line-height: 0.7;
+      margin-top: 0;
+    }
+
+    .date-hijri {
+      position: absolute;
+      top: 15%;
+      font-size: 4rem;
+      /* Reduced to fit */
+      font-weight: 600;
+      color: var(--text-primary);
+      font-family: var(--font-display);
+      line-height: 0.7;
+      margin-top: 0.1rem;
+    }
+
+    .weather-area {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .weather-icon {
+      font-size: 6rem;
+      /* Increased from 5rem */
+      color: var(--text-accent);
+      line-height: 0.7;
+    }
+
+    .weather-temp {
+      font-size: 6rem;
+      /* Increased from 5rem */
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 0.7;
+    }
+
+    /* Countdown */
+    .countdown-container {
+      margin-top: 2rem;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 1rem 2rem;
+      border-radius: 100px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .digital-countdown {
+      flex-direction: row;
+      /* Horizontal now */
+      gap: 1.5rem;
+      direction: ltr;
+      text-align: center;
+    }
+
+    .time-part {
+      align-items: center;
+      color: var(--text-primary);
+    }
+
+    .time-part .value {
+      font-size: 4rem;
+      font-weight: 700;
+      font-family: 'Changa';
+      color: var(--text-accent);
+      line-height: 1;
+      min-width: 2ch;
+    }
+
+    .time-part .label {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Bottom Section: Prayers */
+    .bottom-section {
+      flex: 0.6;
+      /* Reduced from 1.2 to 0.6 (~50%) */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .prayer-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 1.5rem;
+      width: 100%;
+      height: 100%;
+      position: static;
+      /* Reset absolute */
+    }
+
+    .prayer-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0.5rem;
+      /* Reduced from 1.5rem */
+      max-width: none;
+      /* Reset */
+      flex-basis: auto;
+      /* Reset */
+      flex-grow: 1;
+      transition: transform 0.2s, background 0.2s;
+      backdrop-filter: blur(8px);
+    }
+
+    .prayer-card.next-prayer {
+      background: rgba(247, 180, 44, 0.15);
+      border-color: var(--text-accent);
+      transform: scale(1.02);
+    }
+
+    .prayer-card:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .prayer-card-name {
+      font-size: 2.5rem;
+      /* Larger */
+      font-weight: 600;
+      font-family: var(--font-display);
+      color: #ffd000;
+      margin-bottom: -0.5rem;
+      /* Tight margin */
+      line-height: 1.7;
+    }
+
+    .prayer-card-time {
+      font-size: 4.5rem;
+      /* Larger */
+      font-weight: 800;
+      font-family: var(--font-primary);
+      color: var(--text-primary);
+      direction: ltr;
+      line-height: 0.7;
+    }
+
+    .prayer-card.next-prayer .prayer-card-name {
+      color: var(--text-accent);
+    }
+
+    .prayer-card.next-prayer .prayer-card-time {
+      color: var(--text-accent);
+      text-shadow: 0 0 15px rgba(247, 180, 44, 0.4);
+    }
+
+    /* Settings Button */
+    .settings-button {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-dim);
+      border: 1px solid var(--glass-border);
+      width: 3.5rem;
+      height: 3.5rem;
+    }
+
+    .settings-button:hover {
+      background: var(--text-accent);
+      color: #000;
+      border-color: var(--text-accent);
+    }
+
+    /* 3D Prominent Clock Card */
+    .clock-card-3d {
+      background: var(--clock-face-bg) !important;
+      border: 12px solid #1a1a1a !important;
+      box-shadow:
+        0 12px 0 #000,
+        0 20px 40px rgba(0, 0, 0, 0.7),
+        inset 0 0 20px rgba(0, 0, 0, 0.1) !important;
+      transform: translateY(-8px);
+      z-index: 10;
+    }
+
+    .bid-counter-circle {
+      position: absolute;
+      top: 34rem;
+      right: 0.1rem;
+      width: 5rem;
+      height: 5rem;
+      background: var(--clock-face-bg);
+      border: 8px solid #1a1a1a;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #1a1a1a;
+      box-shadow:
+        0 2px 0 #000,
+        0 10px 10px rgba(0, 0, 0, 0.4),
+        inset 0 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 20;
+    }
+
+    .bid-counter-value {
+      font-weight: 800;
+      font-size: 2rem;
+      line-height: 1;
+      font-family: var(--font-primary);
+    }
+
+    .bid-counter-label {
+      font-size: 0.6rem;
+      color: #999;
+      font-weight: 700;
+      margin-top: -2px;
+    }
+  </style>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+  }
+}
+</script>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root">
+    <div id="offline-loader" style="color: white; font-family: sans-serif; text-align: center; padding-top: 20vh;">
+      <h2 id="loading-text">جاري التحميل...</h2>
+      <p id="connectivity-status" style="opacity: 0.6; margin-top: 1rem;"></p>
+      <script>
+        const loadingText = document.getElementById('loading-text');
+        const statusText = document.getElementById('connectivity-status');
+
+        // Only show error if React fails to load after 8 seconds
+        setTimeout(() => {
+          if (!window.React) {
+            loadingText.innerText = "تعذر تحميل ملفات التشغيل";
+            statusText.innerText = "يرجى التحقق من الاتصال بالإنترنت.";
+          }
+        }, 8000);
+
+        // Don't reload the whole page when online, React components handle their own data retry
+        if (!navigator.onLine) {
+          statusText.innerText = "أنت غير متصل بالإنترنت. سيتم عرض البيانات المخزنة مسبقاً.";
+        }
+      </script>
+    </div>
+  </div>
+  <script>
+    // --- SERVICE WORKER REGISTRATION ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const swCode = `
+          const CACHE_NAME = 'prayer-times-v1';
+          const ASSETS = [
+            '${window.location.href}',
+            'https://cdn.tailwindcss.com',
+            'https://unpkg.com/react@18/umd/react.development.js',
+            'https://unpkg.com/react-dom@18/umd/react-dom.development.js',
+            'https://unpkg.com/babel-standalone@6/babel.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css'
+          ];
+
+          self.addEventListener('install', (event) => {
+            event.waitUntil(
+              caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+            );
+          });
+
+          self.addEventListener('fetch', (event) => {
+            event.respondWith(
+              caches.match(event.request).then((response) => {
+                return response || fetch(event.request);
+              })
+            );
+          });
+        `;
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(url).catch(err => console.log('SW failed', err));
+      });
+    }
+  </script>
+  <script type="text/babel">
+    // --- START OF COMBINED CODE ---
+
+    // from constants.ts
+    const prayerNamesArabic = {
+      Fajr: 'الفجر',
+      Sunrise: 'الشروق',
+      Dhuhr: 'الظهر',
+      Asr: 'العصر',
+      Maghrib: 'المغرب',
+      Isha: 'العشاء',
+    };
+    const prayerOrder = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+    const prayerOrderForList = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+
+    // from utils/time.ts
+    const getTodaysDateKey = (date = new Date()) => {
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${month}-${day}`;
+    };
+    const formatTo12Hour = (timeString) => {
+      if (!timeString || !timeString.includes(':')) return timeString;
+      const [hour, minute] = timeString.split(':');
+      let h = parseInt(hour, 10);
+      h = h % 12;
+      h = h ? h : 12; // The hour '0' should be '12'
+      const hourStr = String(h).padStart(1, '0');
+      return `${hourStr}:${minute}`;
+    };
+
+    // from hooks/usePrayerTimes.ts
+    const usePrayerTimes = (currentTime) => {
+      // Initialize state from cache to prevent blank screen
+      const [prayerTimes, setPrayerTimes] = React.useState(() => {
+        const todayKey = getTodaysDateKey(currentTime);
+        const customData = localStorage.getItem(`customPrayerTimes_${todayKey}`);
+        const cachedData = localStorage.getItem(`cachedPrayerTimes_${todayKey}`);
+        return customData ? JSON.parse(customData) : (cachedData ? JSON.parse(cachedData) : null);
+      });
+      const [loading, setLoading] = React.useState(!prayerTimes);
+      const [error, setError] = React.useState(null);
+      const [nextPrayerCountdown, setNextPrayerCountdown] = React.useState(0);
+
+      const todayKey = React.useMemo(() => getTodaysDateKey(currentTime), [currentTime]);
+
+      const fetchPrayerTimes = React.useCallback(async () => {
+        const cacheKey = `cachedPrayerTimes_${todayKey}`;
+        try {
+          if (!navigator.onLine) return; // Removed prayerTimes from here to break infinite loop
+
+          const response = await fetch(`https://api.aladhan.com/v1/timings/${Math.floor(Date.now() / 1000)}?latitude=40.9724707&longitude=28.7327375&method=13`);
+          if (!response.ok) throw new Error('Network error');
+
+          const data = await response.json();
+          if (data.code === 200 && data.data && data.data.timings) {
+            setPrayerTimes(data.data.timings);
+            localStorage.setItem(cacheKey, JSON.stringify(data.data.timings));
+            setError(null);
+          }
+        } catch (err) {
+          console.warn("Prayer times fetch failed:", err);
+          // Only show error if we have NO data at all
+          if (!localStorage.getItem(`customPrayerTimes_${todayKey}`) && !localStorage.getItem(`cachedPrayerTimes_${todayKey}`)) {
+            setError("يرجى الاتصال بالإنترنت.");
+          }
+        } finally {
+          setLoading(false);
+        }
+      }, [todayKey]);
+
+      React.useEffect(() => {
+        fetchPrayerTimes();
+
+        // Auto-retry when connection returns
+        window.addEventListener('online', fetchPrayerTimes);
+        return () => window.removeEventListener('online', fetchPrayerTimes);
+      }, [fetchPrayerTimes]);
+
+      React.useEffect(() => {
+        if (!prayerTimes) return;
+
+        const now = currentTime;
+        let nextPrayerTime = null;
+
+        const prayerDates = prayerOrderForList.map(name => {
+          const timeStr = prayerTimes[name];
+          if (!timeStr) return null;
+          const [h, m] = timeStr.split(':').map(Number);
+          const date = new Date(now);
+          date.setHours(h, m, 0, 0);
+          return { name, date };
+        }).filter(p => p !== null);
+
+        for (const prayer of prayerDates) {
+          if (prayer.date > now) {
+            nextPrayerTime = prayer.date;
+            break;
+          }
+        }
+
+        if (!nextPrayerTime && prayerDates.length > 0) {
+          nextPrayerTime = new Date(prayerDates[0].date);
+          nextPrayerTime.setDate(nextPrayerTime.getDate() + 1);
+        }
+
+        if (nextPrayerTime) {
+          const diff = nextPrayerTime.getTime() - now.getTime();
+          setNextPrayerCountdown(diff > 0 ? diff : 0);
+        }
+
+      }, [currentTime, prayerTimes]);
+
+      const handleSavePrayerTimes = React.useCallback((newTimes) => {
+        setPrayerTimes(newTimes);
+        localStorage.setItem(`customPrayerTimes_${todayKey}`, JSON.stringify(newTimes));
+      }, [todayKey]);
+
+      const countdownParts = React.useMemo(() => {
+        const totalSeconds = Math.max(0, Math.floor(nextPrayerCountdown / 1000));
+        return {
+          hours: String(Math.floor(totalSeconds / 3600)).padStart(2, '0'),
+          minutes: String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0'),
+          seconds: String(totalSeconds % 60).padStart(2, '0'),
+        };
+      }, [nextPrayerCountdown]);
+
+      return {
+        prayerTimes,
+        loading,
+        error,
+        countdownParts,
+        handleSavePrayerTimes,
+        todayKey
+      };
+    };
+
+    // from components/icons/SettingsIcon.tsx
+    const SettingsIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
+      </svg>
+    );
+
+    // from components/AnalogClock.tsx
+    const AnalogClock = ({ time, showSeconds = true, secondaryTime = null, bidRemaining = null }) => {
+      const seconds = time.getSeconds();
+      const minutes = time.getMinutes();
+      const hours = time.getHours();
+
+      const secondsRotation = (seconds / 60) * 360;
+      const minutesRotation = (minutes / 60) * 360 + (seconds / 60) * 6;
+      const hoursRotation = ((hours % 12) / 12) * 360 + (minutes / 60) * 30;
+
+      // Secondary Time (Ghost Hands) - Frozen time
+      let ghostMinutesRotation = 0;
+      let ghostHoursRotation = 0;
+      if (secondaryTime) {
+        // No seconds usually for prayer times
+        const sm = secondaryTime.getMinutes();
+        const sh = secondaryTime.getHours();
+
+        ghostMinutesRotation = (sm / 60) * 360;
+        ghostHoursRotation = ((sh % 12) / 12) * 360 + (sm / 60) * 30;
+      }
+
+      return (
+        <div className="clock-face">
+
+          {/* Markers */}
+          {Array.from({ length: 60 }).map((_, i) => {
+            const isHourMark = i % 5 === 0;
+            // The positions of numbers (12, 3, 6, 9) correspond to markers 0, 15, 30, 45
+            const isNumberedHour = i === 0 || i === 15 || i === 30 || i === 45;
+
+            // Don't render a line for the numbered hours
+            if (isNumberedHour) {
+              return null;
+            }
+
+            return (
+              <div
+                key={`marker-${i}`}
+                className="marker-container"
+                style={{ transform: `rotate(${i * 6}deg)` }}
+              >
+                <div className={isHourMark ? "marker hour-marker" : "marker minute-marker"} />
+              </div>
+            );
+          })}
+
+          {/* Numbers */}
+          <div className="number number-12"> 12</div>
+          <div className="number number-3">3</div>
+          <div className="number number-6">6</div>
+          <div className="number number-9">9</div>
+
+          {/* Ghost Hands (Next Prayer) */}
+          {secondaryTime && (
+            <React.Fragment>
+              <div
+                className="hand ghost ghost-hour"
+                style={{ transform: `translateX(-50%) rotate(${ghostHoursRotation}deg)` }}
+              />
+              <div
+                className="hand ghost ghost-minute"
+                style={{ transform: `translateX(-50%) rotate(${ghostMinutesRotation}deg)` }}
+              />
+            </React.Fragment>
+          )}
+
+          {/* Hands */}
+          <div
+            className="hand hour-hand"
+            style={{ transform: `translateX(-50%) rotate(${hoursRotation}deg)` }}
+          ></div>
+          <div
+            className="hand minute-hand"
+            style={{ transform: `translateX(-50%) rotate(${minutesRotation}deg)` }}
+          ></div>
+          {showSeconds && (
+            <div
+              className="hand second-hand"
+              style={{ transform: `translateX(-50%) rotate(${secondsRotation}deg)` }}
+            ></div>
+          )}
+          <div className="center-dot"></div>
+        </div>
+      );
+    };
+
+    // from components/PrayerList.tsx
+    const PrayerList = ({ prayerTimes, prayerOrder, nextPrayer }) => {
+      return (
+        <div className="prayer-list">
+          {prayerOrder.map(name => {
+            const isNext = nextPrayer === name;
+            return (
+              <div key={name} className={`prayer-card ${isNext ? 'next-prayer' : ''}`}>
+                <span className="prayer-card-name">{prayerNamesArabic[name]}</span>
+                <span className="prayer-card-time">
+                  {formatTo12Hour(prayerTimes[name])}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    };
+
+    // from components/Countdown.tsx
+    const Countdown = ({ countdownParts, large = false }) => {
+      // Format: H:MM 
+      // User requested: "Only hours and minutes without seconds and without zero for the hour on the left"
+
+      const h = parseInt(countdownParts.hours, 10);
+      const m = countdownParts.minutes; // keep padding for minutes usually? "1:05"
+
+      const timeString = `${h}:${m}`;
+
+      if (large) {
+        return (
+          <div className="digital-countdown-large">
+            <span className="curr-time">{timeString}</span>
+          </div>
+        );
+      }
+
+      return (
+        <div className="countdown-container">
+          <div className="digital-countdown">
+            <div className="time-part hours">
+              <span className="value">{countdownParts.hours}</span>
+              <span className="label">ساعة</span>
+            </div>
+            <div className="time-part minutes">
+              <span className="value">{countdownParts.minutes}</span>
+              <span className="label">دقيقة</span>
+            </div>
+            <div className="time-part seconds">
+              <span className="value">{countdownParts.seconds}</span>
+              <span className="label">ثانية</span>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // from components/DateDisplay.tsx
+    const DateDisplay = ({ dateInfo }) => {
+      return (
+        <React.Fragment>
+          <div className="date-weekday">{dateInfo.weekday}</div>
+          <div className="date-gregorian">{dateInfo.gregorian}</div>
+          <div className="date-hijri">{dateInfo.hijri}</div>
+        </React.Fragment>
+      );
+    };
+
+    // Weather Component
+    const WeatherDisplay = () => {
+      const cacheKey = 'cachedWeather';
+      const [weather, setWeather] = React.useState(() => {
+        const cached = localStorage.getItem(cacheKey);
+        return cached ? JSON.parse(cached) : null;
+      });
+
+      const fetchWeather = React.useCallback(async () => {
+        try {
+          if (!navigator.onLine && weather) return;
+
+          const res = await fetch(
+            "https://api.open-meteo.com/v1/forecast?latitude=40.9724707&longitude=28.7327375&current=temperature_2m,weather_code&timezone=auto"
+          );
+          if (!res.ok) throw new Error('Weather fetch failed');
+          const data = await res.json();
+          setWeather(data.current);
+          localStorage.setItem(cacheKey, JSON.stringify(data.current));
+        } catch (error) {
+          console.warn("Using offline weather data:", error);
+        }
+      }, [weather]);
+
+      React.useEffect(() => {
+        fetchWeather();
+        const timer = setInterval(fetchWeather, 1800000); // 30 mins
+        window.addEventListener('online', fetchWeather);
+        return () => {
+          clearInterval(timer);
+          window.removeEventListener('online', fetchWeather);
+        };
+      }, [fetchWeather]);
+
+      if (!weather) return null;
+
+      // WMO Weather interpretation codes (simplified)
+      const getWeatherIcon = (code) => {
+        if (code === 0) return "wi wi-day-sunny";
+        if (code <= 3) return "wi wi-day-cloudy";
+        if (code <= 48) return "wi wi-fog";
+        if (code <= 67) return "wi wi-rain";
+        if (code <= 77) return "wi wi-snow";
+        if (code <= 82) return "wi wi-showers";
+        if (code <= 99) return "wi wi-thunderstorm";
+        return "wi wi-day-sunny";
+      };
+
+      return (
+        <div className="weather-area">
+          <i className={`weather-icon ${getWeatherIcon(weather.weather_code)}`}></i>
+          <div className="weather-temp">{Math.round(weather.temperature_2m)}°</div>
+        </div>
+      );
+    };
+
+    // from components/EditTimesModal.tsx
+    const EditTimesModal = ({ isOpen, onClose, initialTimes, onSave, todayKey, hijriAdjustment, onSaveAdjustment }) => {
+      const [editedTimes, setEditedTimes] = React.useState(initialTimes);
+      const [editedAdjustment, setEditedAdjustment] = React.useState(hijriAdjustment);
+
+      React.useEffect(() => {
+        if (isOpen) {
+          setEditedTimes(initialTimes);
+          setEditedAdjustment(hijriAdjustment);
+        }
+      }, [isOpen]);
+
+      if (!isOpen) return null;
+
+      const handleInputChange = (prayerName, value) => {
+        setEditedTimes(prev => ({ ...prev, [prayerName]: value }));
+      };
+
+      const handleSave = () => {
+        onSave(editedTimes);
+        onSaveAdjustment(editedAdjustment);
+        onClose();
+      };
+
+      return (
+        <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-[1000] text-base" onClick={onClose}>
+          <div className="bg-white p-10 rounded-2xl border-4 border-[#2C2C2C] text-[#2C2C2C] w-[min(90vw,400px)] text-center max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <header className="text-2xl font-bold mb-8">الإعدادات</header>
+
+            <div className="mb-8">
+              <h3 className="text-xl font-bold mb-4 border-b pb-2">أوقات الصلاة</h3>
+              <div className="space-y-4">
+                {prayerOrder.map(name => (
+                  <div key={name} className="flex justify-between items-center">
+                    <label htmlFor={`time-${name}`} className="text-lg font-semibold">{prayerNamesArabic[name]}</label>
+                    <input
+                      type="time"
+                      id={`time-${name}`}
+                      value={editedTimes[name]}
+                      onChange={(e) => handleInputChange(name, e.target.value)}
+                      className="font-['Changa'] text-lg p-3 border-2 border-gray-300 rounded-xl"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-8 border-t pt-6">
+              <h3 className="text-xl font-bold mb-4">تعديل التاريخ الهجري</h3>
+              <p className="text-gray-600 mb-4 text-sm">يمكنك زيادة أو نقصان أيام من التاريخ الهجري</p>
+              <div className="flex justify-center items-center gap-6">
+                <button
+                  onClick={() => setEditedAdjustment(prev => prev - 1)}
+                  className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full text-2xl font-bold transition-colors"
+                >
+                  -
+                </button>
+                <div className="flex flex-col">
+                  <span className="text-3xl font-bold text-[#3A5A40]">
+                    {editedAdjustment > 0 ? `+${editedAdjustment}` : editedAdjustment}
+                  </span>
+                  <span className="text-xs text-gray-500">يوم</span>
+                </div>
+                <button
+                  onClick={() => setEditedAdjustment(prev => prev + 1)}
+                  className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full text-2xl font-bold transition-colors"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-center gap-4">
+              <button onClick={handleSave} className="flex-1 py-4 font-['Changa'] text-lg rounded-2xl cursor-pointer border-none bg-[#3A5A40] text-white font-bold hover:bg-[#2F4934] transition-colors">حفظ التغييرات</button>
+              <button onClick={onClose} className="flex-1 py-4 font-['Changa'] text-lg rounded-2xl cursor-pointer border-none bg-gray-200 text-gray-800 font-bold hover:bg-gray-300 transition-colors">إلغاء</button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // from App.tsx
+    const App = () => {
+      const [time, setTime] = React.useState(new Date());
+      const [isModalOpen, setIsModalOpen] = React.useState(false);
+      const [hijriAdjustment, setHijriAdjustment] = React.useState(() => {
+        return parseInt(localStorage.getItem('hijriAdjustment') || '0', 10);
+      });
+
+      const [hijriInfo, setHijriInfo] = React.useState(() => {
+        const cached = localStorage.getItem('cachedHijri');
+        if (cached) return JSON.parse(cached);
+        const today = new Date();
+        const adj = parseInt(localStorage.getItem('hijriAdjustment') || '0', 10);
+        const adjustedDate = new Date(today);
+        adjustedDate.setDate(adjustedDate.getDate() + adj);
+        const formatted = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { day: 'numeric', month: 'long' }).format(adjustedDate);
+        return { formatted, day: adjustedDate.getDate(), bidRemaining: null };
+      });
+
+      const fetchHijri = React.useCallback(async () => {
+        try {
+          if (!navigator.onLine && hijriInfo.day) return;
+          const adjustedDate = new Date();
+          adjustedDate.setDate(adjustedDate.getDate() + hijriAdjustment);
+          const dateStr = adjustedDate.toLocaleDateString('en-GB').replace(/\//g, '-');
+          const res = await fetch("https://api.aladhan.com/v1/gToH?date=" + dateStr);
+          const data = await res.json();
+          if (data.code === 200) {
+            const h = data.data.hijri;
+            const currentDay = parseInt(h.day, 10);
+            const daysInMonth = parseInt(h.month.days, 10);
+
+            // Calculate Bid Days Counter (Days until 13th)
+            // If day 13, 14, 15: we are IN them.
+            // Let's show "Now" or just 0? User said "number only". 
+            // I'll show 1, 2, 3 for the sequence or just days until start.
+            let bidRem = null;
+            if (currentDay < 13) {
+              bidRem = 13 - currentDay;
+            } else if (currentDay >= 13 && currentDay <= 15) {
+              bidRem = 0; // Currently in Bid days
+            } else {
+              // After the 15th, count until next month's 13th
+              bidRem = (daysInMonth - currentDay) + 13;
+            }
+
+            const info = {
+              formatted: `${h.day} ${h.month.ar}`, // Removed year/هـ as requested
+              day: currentDay,
+              bidRemaining: bidRem
+            };
+            setHijriInfo(info);
+            localStorage.setItem('cachedHijri', JSON.stringify(info));
+          }
+        } catch (e) {
+          console.warn("Hijri API failed");
+        }
+      }, [hijriInfo.day, hijriAdjustment]);
+
+      const handleSaveAdjustment = React.useCallback((newAdjustment) => {
+        setHijriAdjustment(newAdjustment);
+        localStorage.setItem('hijriAdjustment', newAdjustment.toString());
+        localStorage.removeItem('cachedHijri');
+      }, []);
+
+      const {
+        prayerTimes,
+        loading: prayerLoading,
+        error,
+        countdownParts,
+        handleSavePrayerTimes,
+        todayKey,
+      } = usePrayerTimes(time);
+
+      React.useEffect(() => {
+        const timerId = setInterval(() => setTime(new Date()), 1000);
+        fetchHijri();
+        window.addEventListener('online', fetchHijri);
+        return () => {
+          clearInterval(timerId);
+          window.removeEventListener('online', fetchHijri);
+        };
+      }, [fetchHijri]);
+
+      const dateInfo = React.useMemo(() => {
+        const today = time;
+        return {
+          weekday: new Intl.DateTimeFormat('ar-EG', { weekday: 'long' }).format(today),
+          hijri: hijriInfo.formatted,
+          gregorian: new Intl.DateTimeFormat('ar-EG-u-nu-latn', { day: 'numeric', month: 'numeric' }).format(today),
+        };
+      }, [time, hijriInfo]);
+
+      // Identify next prayer
+      const nextPrayerInfo = React.useMemo(() => {
+        if (!prayerTimes) return null;
+        const now = time;
+        const times = prayerOrderForList.map(name => {
+          const t = prayerTimes[name];
+          if (!t) return null;
+          const [h, m] = t.split(':').map(Number);
+          const d = new Date(now);
+          d.setHours(h, m, 0, 0);
+          return { name, date: d };
+        }).filter(x => x);
+
+        // Find first prayer that is after now
+        const next = times.find(p => p.date > now);
+
+        if (next) return next;
+
+        // If none found, return Fajr (conceptually tomorrow, but for clock display today's Fajr time is fine)
+        const fajr = times.find(p => p.name === 'Fajr');
+        return fajr;
+      }, [time, prayerTimes]);
+
+      const nextPrayerName = nextPrayerInfo ? nextPrayerInfo.name : null;
+      const nextPrayerDate = nextPrayerInfo ? nextPrayerInfo.date : new Date();
+
+      // NEVER return null/black screen if we have prayerTimes (from cache or previous state)
+      // This prevents the "refresh" feeling when internet status changes
+      if (!prayerTimes && prayerLoading) return <div id="app-loading">جاري التحميل...</div>;
+      if (!prayerTimes && error) return <div className="text-white text-center">خطأ: {error}</div>;
+
+      return (
+        <div className="app-container">
+          <main className="main-panel">
+            {/* Top Section: Vertical Flex */}
+            <div className="top-section">
+
+              {/* Top: Main Clock */}
+              <div className="clock-wrapper">
+                <div className="top-card clock-card-full clock-card-3d">
+                  <div className="clock-container">
+                    <AnalogClock
+                      time={time}
+                      showSeconds={true}
+                      secondaryTime={nextPrayerDate}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom: Consolidated Info (Countdown + Date + Weather) */}
+              <div className="info-wrapper">
+                <div className="top-card">
+
+                  {/* Info Row: Countdown/Weather (Left) & Day/Date (Right) */}
+                  <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'stretch', padding: '1rem 2rem' }}>
+
+                    {/* Left: Countdown & Weather Stack */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Countdown countdownParts={countdownParts} large={true} />
+                      <WeatherDisplay />
+                    </div>
+
+                    {/* Right: Day & Date Stack */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', justifyContent: 'space-between' }}>
+                      <div className="date-weekday">{dateInfo.weekday}</div>
+                      <div className="date-gregorian">{dateInfo.gregorian}</div>
+                      <div className="date-hijri">{dateInfo.hijri}</div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+            {/* Bottom Section */}
+            <div className="bottom-section">
+              {prayerTimes && (
+                <PrayerList
+                  prayerTimes={prayerTimes}
+                  prayerOrder={prayerOrderForList}
+                  nextPrayer={nextPrayerName}
+                />
+              )}
+            </div>
+
+            {hijriInfo.bidRemaining !== null && (
+              <div className="bid-counter-circle">
+                <span className="bid-counter-value">{hijriInfo.bidRemaining}</span>
+                <span className="bid-counter-label">البيض</span>
+              </div>
+            )}
+
+            <button
+              className="settings-button"
+              onClick={() => setIsModalOpen(true)}
+              aria-label="Settings"
+            >
+              <SettingsIcon />
+            </button>
+
+            {prayerTimes && (
+              <EditTimesModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                initialTimes={prayerTimes}
+                onSave={handleSavePrayerTimes}
+                todayKey={todayKey}
+                hijriAdjustment={hijriAdjustment}
+                onSaveAdjustment={handleSaveAdjustment}
+              />
+            )}
+          </main>
+        </div>
+      );
+    };
+
+    // from index.tsx
+    const rootElement = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+  </script>
+</body>
+
+</html>
