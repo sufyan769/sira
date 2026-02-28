@@ -18,9 +18,9 @@
   <style>
     :root {
       /* Ramadan Premium Palette - Emerald & Gold */
-      --bg-gradient-start: #064e3b;
+      --bg-gradient-start: #62ffd6;
       /* Deep Emerald */
-      --bg-gradient-mid: #022c22;
+      --bg-gradient-mid: #62ffd6;
       --bg-gradient-end: #01120f;
 
       --glass-bg: rgba(255, 255, 255, 0.03);
@@ -1285,20 +1285,28 @@
                   <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
 
                     {/* Countdown Section */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                      <div style={{ color: 'var(--text-dim)', fontSize: '1.5rem', fontFamily: 'var(--font-display)' }}>الوقت المتبقي للأذان</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0' }}>
+                      <div style={{ color: 'var(--text-dim)', fontSize: '1.4rem', fontFamily: 'var(--font-display)', marginBottom: '-1rem' }}>الوقت المتبقي للأذان</div>
                       <Countdown countdownParts={countdownParts} large={true} />
                     </div>
 
-                    {/* Date Section */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                      <div className="date-weekday" style={{ position: 'static', fontSize: '4.5rem' }}>{dateInfo.weekday}</div>
-                      <div className="date-hijri" style={{ position: 'static', fontSize: '3rem' }}>{dateInfo.hijri}</div>
-                      <div className="date-gregorian" style={{ position: 'static', fontSize: '2rem' }}>{dateInfo.gregorian}</div>
-                    </div>
+                    {/* Date & Weather Section */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginTop: '-1rem' }}>
 
-                    {/* Weather Section */}
-                    <WeatherDisplay />
+                      {/* Weekday */}
+                      <div className="date-weekday" style={{ fontSize: '5.5rem', marginBottom: '0' }}>{dateInfo.weekday}</div>
+
+                      {/* Dates Row */}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '2rem' }}>
+                        <div className="date-gregorian" style={{ fontSize: '3.5rem', margin: 0 }}>{dateInfo.gregorian}</div>
+                        <div className="date-hijri" style={{ fontSize: '3.5rem', margin: 0 }}>{dateInfo.hijri}</div>
+                      </div>
+
+                      {/* Weather Section */}
+                      <div style={{ marginTop: '1rem' }}>
+                        <WeatherDisplay />
+                      </div>
+                    </div>
                   </div>
 
                 </div>
