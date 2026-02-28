@@ -17,31 +17,32 @@
     href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>">
   <style>
     :root {
-      /* Midnight Gold Palette */
-      --bg-gradient-start: #0f2027;
-      --bg-gradient-mid: #203a43;
-      --bg-gradient-end: #2c5364;
+      /* Ramadan Premium Palette - Emerald & Gold */
+      --bg-gradient-start: #064e3b;
+      /* Deep Emerald */
+      --bg-gradient-mid: #022c22;
+      --bg-gradient-end: #01120f;
 
-      --glass-bg: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(245, 158, 11, 0.2);
+      /* Golden border */
+      --glass-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.6);
 
       --text-primary: #FFFFFF;
-      --text-secondary: #E0E0E0;
-      --text-accent: #F7B42C;
-      /* Gold */
-      --text-dim: rgba(255, 255, 255, 0.6);
+      --text-secondary: #d1d5db;
+      --text-accent: #f59e0b;
+      /* Vibrant Gold */
+      --text-dim: rgba(255, 255, 255, 0.5);
 
-      /* Clock Colors (White Theme) */
-      --clock-face-bg: #FFFFFF;
-      --clock-text-color: #1a1a1a;
-      --clock-hand-hour: #1a1a1a;
-      --clock-hand-minute: #1a1a1a;
-      --clock-hand-second: #F7B42C;
-      /* Keep accent for second hand? or make red/black? keeping accent for now */
-      --clock-center-dot: #F7B42C;
-      --hour-marker-color: #1a1a1a;
-      --minute-marker-color: rgba(0, 0, 0, 0.454);
+      /* Clock Colors (Ramadan Theme) */
+      --clock-face-bg: #f8fafc;
+      --clock-text-color: #064e3b;
+      --clock-hand-hour: #064e3b;
+      --clock-hand-minute: #064e3b;
+      --clock-hand-second: #f59e0b;
+      --clock-center-dot: #f59e0b;
+      --hour-marker-color: #064e3b;
+      --minute-marker-color: rgba(6, 78, 59, 0.2);
 
       --font-primary: 'Changa', sans-serif;
       --font-secondary: 'Almarai', sans-serif;
@@ -58,7 +59,10 @@
 
     body {
       font-family: var(--font-secondary);
-      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end));
+      background-color: var(--bg-gradient-mid);
+      background-image:
+        radial-gradient(circle at 50% 50%, var(--bg-gradient-start), var(--bg-gradient-end)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23f59e0b' fill-opacity='0.03'%3E%3Cpath d='M40 0l10 30h30L55 50l10 30-25-20-25 20 10-30L0 30h30z'/%3E%3C/g%3E%3C/svg%3E");
       color: var(--text-primary);
       height: 100vh;
       width: 100vw;
@@ -66,6 +70,68 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 100%);
+      pointer-events: none;
+    }
+
+    .floating-decor {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.2;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .lantern {
+      width: 60px;
+      height: 80px;
+      filter: drop-shadow(0 0 10px var(--text-accent));
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    .decor-1 {
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+
+    .decor-2 {
+      top: 15%;
+      right: 5%;
+      animation-delay: 2s;
+    }
+
+    .decor-3 {
+      bottom: 20%;
+      left: 8%;
+      animation-delay: 4s;
+    }
+
+    .decor-4 {
+      bottom: 15%;
+      right: 10%;
+      animation-delay: 1s;
     }
 
     #root {
@@ -77,78 +143,72 @@
     }
 
     .app-container {
-      transform: rotate(90deg);
-      width: min(100vh, 150vw);
-      height: min(200vh, 100vw);
+      width: 100vw;
+      height: 100vh;
       padding: 1rem;
       display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .main-panel {
       width: 100%;
       height: 100%;
-      /* No background on panel itself, just the body */
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 2rem;
+      justify-content: center;
+      align-items: center;
       position: relative;
     }
 
     /* Top Section: Header & Clock */
     .top-section {
-      flex: 1.5;
-      /* Give it more space */
+      width: 100%;
+      height: 98%;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      /* Horizontal side-by-side */
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       gap: 1.5rem;
       position: relative;
-      padding-top: 1rem;
-      width: 100%;
-      height: 100%;
-      /* Ensure it fills main panel height */
     }
 
     /* Container for the Main Clock to keep it square and centered */
     .top-section .clock-wrapper {
       flex: 1;
-      /* Take available space */
-      width: 100%;
-      max-height: 50%;
-      /* Limit height so bottom card has space */
+      height: 100%;
       display: flex;
       justify-content: center;
-      align-items: left;
+      align-items: center;
     }
 
     .top-section .clock-wrapper .top-card {
-      width: auto;
-      height: 130%;
+      width: 100%;
+      height: auto;
       aspect-ratio: 1/1;
+      max-width: 90vh;
+      /* Maximize size */
     }
 
     /* Consolidated Info Card (Bottom) */
     .top-section .info-wrapper {
       flex: 1;
-      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      align-items: center;
     }
 
     .top-section .info-wrapper .top-card {
-      position: absolute;
-      top: 66%;
       width: 100%;
-      height: 35%;
-      aspect-ratio: auto;
-      /* Rectangle */
+      height: 100%;
+      max-height: 90vh;
       display: flex;
       flex-direction: column;
-      justify-content: space-evenly;
-      padding: 1rem;
+      justify-content: center;
+      padding: 3rem;
     }
 
     /* Make the countdown (which will be the 3rd child now) span both columns? 
@@ -184,6 +244,18 @@
       padding: 1rem;
       /* Force Square */
       width: 80%;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .ramadan-banner {
+      position: absolute;
+      top: 1rem;
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--text-accent);
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+      z-index: 50;
+      opacity: 0.8;
     }
 
     /* Quadrant 1: Main Clock (Top Right usually in RTL, but grid items order is 1,2,3,4) */
@@ -447,41 +519,27 @@
     }
 
     .date-weekday {
-      position: absolute;
-
-      font-size: 6rem;
-      /* Reduced from 8.5rem to fit card */
+      font-size: 5rem;
       font-weight: 700;
       color: var(--text-accent);
       font-family: var(--font-display);
-      line-height: -0.7;
-      margin-bottom: -0.5rem;
-      margin-top: 0;
-      top: 50%;
+      margin-bottom: 0.5rem;
       text-align: center;
     }
 
     .date-gregorian {
-      position: absolute;
-      top: 40%;
-      font-size: 5rem;
-      /* Reduced to fit */
+      font-size: 2.5rem;
       font-weight: 400;
       color: var(--text-secondary);
-      line-height: 0.7;
-      margin-top: 0;
+      margin-bottom: 0.5rem;
     }
 
     .date-hijri {
-      position: absolute;
-      top: 15%;
-      font-size: 4rem;
-      /* Reduced to fit */
+      font-size: 3.5rem;
       font-weight: 600;
       color: var(--text-primary);
       font-family: var(--font-display);
-      line-height: 0.7;
-      margin-top: 0.1rem;
+      margin-bottom: 0.5rem;
     }
 
     .weather-area {
@@ -547,86 +605,7 @@
       letter-spacing: 1px;
     }
 
-    /* Bottom Section: Prayers */
-    .bottom-section {
-      flex: 0.6;
-      /* Reduced from 1.2 to 0.6 (~50%) */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .prayer-list {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      gap: 1.5rem;
-      width: 100%;
-      height: 100%;
-      position: static;
-      /* Reset absolute */
-    }
-
-    .prayer-card {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 0.5rem;
-      /* Reduced from 1.5rem */
-      max-width: none;
-      /* Reset */
-      flex-basis: auto;
-      /* Reset */
-      flex-grow: 1;
-      transition: transform 0.2s, background 0.2s;
-      backdrop-filter: blur(8px);
-    }
-
-    .prayer-card.next-prayer {
-      background: rgba(247, 180, 44, 0.15);
-      border-color: var(--text-accent);
-      transform: scale(1.02);
-    }
-
-    .prayer-card:hover {
-      transform: translateY(-3px);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .prayer-card-name {
-      font-size: 2.5rem;
-      /* Larger */
-      font-weight: 600;
-      font-family: var(--font-display);
-      color: #ffd000;
-      margin-bottom: -0.5rem;
-      /* Tight margin */
-      line-height: 1.7;
-    }
-
-    .prayer-card-time {
-      font-size: 4.5rem;
-      /* Larger */
-      font-weight: 800;
-      font-family: var(--font-primary);
-      color: var(--text-primary);
-      direction: ltr;
-      line-height: 0.7;
-    }
-
-    .prayer-card.next-prayer .prayer-card-name {
-      color: var(--text-accent);
-    }
-
-    .prayer-card.next-prayer .prayer-card-time {
-      color: var(--text-accent);
-      text-shadow: 0 0 15px rgba(247, 180, 44, 0.4);
-    }
+    /* Removed Prayer Styles */
 
     /* Settings Button */
     .settings-button {
@@ -647,51 +626,17 @@
     }
 
     /* 3D Prominent Clock Card */
-    .clock-card-3d {
-      background: var(--clock-face-bg) !important;
-      border: 12px solid #1a1a1a !important;
+    .card-3d-black {
+      border: 15px solid #1a1a1a !important;
       box-shadow:
-        0 12px 0 #000,
-        0 20px 40px rgba(0, 0, 0, 0.7),
-        inset 0 0 20px rgba(0, 0, 0, 0.1) !important;
+        0 15px 0 #000,
+        0 25px 50px rgba(0, 0, 0, 0.8),
+        inset 0 0 25px rgba(0, 0, 0, 0.2) !important;
       transform: translateY(-8px);
       z-index: 10;
     }
 
-    .bid-counter-circle {
-      position: absolute;
-      top: 34rem;
-      right: 0.1rem;
-      width: 5rem;
-      height: 5rem;
-      background: var(--clock-face-bg);
-      border: 8px solid #1a1a1a;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: #1a1a1a;
-      box-shadow:
-        0 2px 0 #000,
-        0 10px 10px rgba(0, 0, 0, 0.4),
-        inset 0 0 10px rgba(0, 0, 0, 0.1);
-      z-index: 20;
-    }
-
-    .bid-counter-value {
-      font-weight: 800;
-      font-size: 2rem;
-      line-height: 1;
-      font-family: var(--font-primary);
-    }
-
-    .bid-counter-label {
-      font-size: 0.6rem;
-      color: #999;
-      font-weight: 700;
-      margin-top: -2px;
-    }
+    /* Bid Counter Removed */
   </style>
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
@@ -1203,7 +1148,6 @@
       );
     };
 
-    // from App.tsx
     const App = () => {
       const [time, setTime] = React.useState(new Date());
       const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -1235,22 +1179,17 @@
             const currentDay = parseInt(h.day, 10);
             const daysInMonth = parseInt(h.month.days, 10);
 
-            // Calculate Bid Days Counter (Days until 13th)
-            // If day 13, 14, 15: we are IN them.
-            // Let's show "Now" or just 0? User said "number only". 
-            // I'll show 1, 2, 3 for the sequence or just days until start.
             let bidRem = null;
             if (currentDay < 13) {
               bidRem = 13 - currentDay;
             } else if (currentDay >= 13 && currentDay <= 15) {
-              bidRem = 0; // Currently in Bid days
+              bidRem = 0;
             } else {
-              // After the 15th, count until next month's 13th
               bidRem = (daysInMonth - currentDay) + 13;
             }
 
             const info = {
-              formatted: `${h.day} ${h.month.ar}`, // Removed year/هـ as requested
+              formatted: `${h.day} ${h.month.ar}`,
               day: currentDay,
               bidRemaining: bidRem
             };
@@ -1296,7 +1235,6 @@
         };
       }, [time, hijriInfo]);
 
-      // Identify next prayer
       const nextPrayerInfo = React.useMemo(() => {
         if (!prayerTimes) return null;
         const now = time;
@@ -1309,12 +1247,8 @@
           return { name, date: d };
         }).filter(x => x);
 
-        // Find first prayer that is after now
         const next = times.find(p => p.date > now);
-
         if (next) return next;
-
-        // If none found, return Fajr (conceptually tomorrow, but for clock display today's Fajr time is fine)
         const fajr = times.find(p => p.name === 'Fajr');
         return fajr;
       }, [time, prayerTimes]);
@@ -1322,20 +1256,17 @@
       const nextPrayerName = nextPrayerInfo ? nextPrayerInfo.name : null;
       const nextPrayerDate = nextPrayerInfo ? nextPrayerInfo.date : new Date();
 
-      // NEVER return null/black screen if we have prayerTimes (from cache or previous state)
-      // This prevents the "refresh" feeling when internet status changes
       if (!prayerTimes && prayerLoading) return <div id="app-loading">جاري التحميل...</div>;
       if (!prayerTimes && error) return <div className="text-white text-center">خطأ: {error}</div>;
 
       return (
         <div className="app-container">
           <main className="main-panel">
-            {/* Top Section: Vertical Flex */}
             <div className="top-section">
 
               {/* Top: Main Clock */}
               <div className="clock-wrapper">
-                <div className="top-card clock-card-full clock-card-3d">
+                <div className="top-card clock-card-full card-3d-black">
                   <div className="clock-container">
                     <AnalogClock
                       time={time}
@@ -1348,24 +1279,26 @@
 
               {/* Bottom: Consolidated Info (Countdown + Date + Weather) */}
               <div className="info-wrapper">
-                <div className="top-card">
+                <div className="top-card card-3d-black">
 
-                  {/* Info Row: Countdown/Weather (Left) & Day/Date (Right) */}
-                  <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'stretch', padding: '1rem 2rem' }}>
+                  {/* Info Row: Side-by-side components */}
+                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
 
-                    {/* Left: Countdown & Weather Stack */}
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between' }}>
+                    {/* Countdown Section */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ color: 'var(--text-dim)', fontSize: '1.5rem', fontFamily: 'var(--font-display)' }}>الوقت المتبقي للأذان</div>
                       <Countdown countdownParts={countdownParts} large={true} />
-                      <WeatherDisplay />
                     </div>
 
-                    {/* Right: Day & Date Stack */}
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', justifyContent: 'space-between' }}>
-                      <div className="date-weekday">{dateInfo.weekday}</div>
-                      <div className="date-gregorian">{dateInfo.gregorian}</div>
-                      <div className="date-hijri">{dateInfo.hijri}</div>
+                    {/* Date Section */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                      <div className="date-weekday" style={{ position: 'static', fontSize: '4.5rem' }}>{dateInfo.weekday}</div>
+                      <div className="date-hijri" style={{ position: 'static', fontSize: '3rem' }}>{dateInfo.hijri}</div>
+                      <div className="date-gregorian" style={{ position: 'static', fontSize: '2rem' }}>{dateInfo.gregorian}</div>
                     </div>
 
+                    {/* Weather Section */}
+                    <WeatherDisplay />
                   </div>
 
                 </div>
@@ -1373,23 +1306,9 @@
 
             </div>
 
-            {/* Bottom Section */}
-            <div className="bottom-section">
-              {prayerTimes && (
-                <PrayerList
-                  prayerTimes={prayerTimes}
-                  prayerOrder={prayerOrderForList}
-                  nextPrayer={nextPrayerName}
-                />
-              )}
-            </div>
+            {/* Removed Bottom Section */}
 
-            {hijriInfo.bidRemaining !== null && (
-              <div className="bid-counter-circle">
-                <span className="bid-counter-value">{hijriInfo.bidRemaining}</span>
-                <span className="bid-counter-label">البيض</span>
-              </div>
-            )}
+            {/* Bid Counter Removed */}
 
             <button
               className="settings-button"
