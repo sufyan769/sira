@@ -296,13 +296,13 @@
     }
 
     .digital-time {
-      font-family: 'Roboto Mono', monospace;
+      font-family: 'Roboto Mono', ;
       font-size: 3.5rem;
       color: #ffcc00;
       /* Gold as requested by user manual edit */
       margin-top: 1.5rem;
       font-variant-numeric: tabular-nums;
-      min-width: 300px;
+      min-width: 900px;
       text-align: center;
       text-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
     }
@@ -666,7 +666,7 @@
       document.getElementById('min').style.transform = `translateX(-50%) rotate(${m * 6}deg)`;
       document.getElementById('hour').style.transform = `translateX(-50%) rotate(${h * 30 + m / 2}deg)`;
 
-      document.getElementById('digitalTime').textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('digitalTime').textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
       updateCountdown(now);
     }
@@ -882,7 +882,6 @@
 
     // Immediate fetch
     fetchData().then(() => {
-      // Force a redraw or second check if needed
       console.log("Initial data loaded");
     });
 
