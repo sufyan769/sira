@@ -471,7 +471,7 @@
     }
 
     .date-gregorian {
-      font-size: 2.5rem;
+      font-size: 0rem;
       font-weight: 400;
       color: var(--text-secondary);
       margin-bottom: 0.5rem;
@@ -591,7 +591,7 @@
       }
 
       .date-gregorian {
-        font-size: 1.5rem !important;
+        font-size: 0rem !important;
       }
 
 
@@ -4061,8 +4061,9 @@
 
       const dateInfo = React.useMemo(() => {
         const today = time;
+        const dayNumber = today.getDate();
         return {
-          weekday: new Intl.DateTimeFormat('ar-EG', { weekday: 'long' }).format(today),
+          weekday: new Intl.DateTimeFormat('ar-EG', { weekday: 'long' }).format(today) + ' ' + dayNumber,
           hijri: hijriInfo.formatted,
           gregorian: new Intl.DateTimeFormat('ar-EG-u-nu-latn', { day: 'numeric', month: 'numeric' }).format(today),
         };
@@ -4137,7 +4138,6 @@
                     {/* Countdown Section */}
                     {prayerTimes ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                        <div style={{ color: 'var(--text-dim)', fontSize: '1.5rem', fontFamily: 'var(--font-display)' }}>الوقت المتبقي للأذان</div>
                         <Countdown countdownParts={countdownParts} large={true} />
                       </div>
                     ) : (
@@ -4150,7 +4150,6 @@
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                       <div className="date-weekday" style={{ position: 'static', fontSize: '4.5rem' }}>{dateInfo.weekday}</div>
                       <div className="date-hijri" style={{ position: 'static', fontSize: '3rem' }}>{dateInfo.hijri}</div>
-                      <div className="date-gregorian" style={{ position: 'static', fontSize: '2rem' }}>{dateInfo.gregorian}</div>
                     </div>
                   </div>
 
