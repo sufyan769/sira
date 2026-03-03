@@ -1164,10 +1164,9 @@
       const nextPrayerName = nextPrayerInfo ? nextPrayerInfo.name : null;
       const nextPrayerDate = nextPrayerInfo ? nextPrayerInfo.date : new Date();
 
-      // NEVER return null/black screen if we have prayerTimes (from cache or previous state)
-      // This prevents the "refresh" feeling when internet status changes
-      if (!prayerTimes && prayerLoading) return <div id="app-loading">جاري التحميل...</div>;
-      if (!prayerTimes && error) return <div className="text-white text-center">خطأ: {error}</div>;
+      // Show loading indicator only if we have NO data and are still loading
+      const showLoading = !prayerTimes && prayerLoading;
+      const showError = !prayerTimes && error;
 
       return (
         <div className="app-container">
@@ -1178,6 +1177,16 @@
               {/* Top: Main Clock */}
               <div className="clock-wrapper">
                 <div className="top-card clock-card-full clock-card-3d">
+                  {showLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50 rounded-inherit">
+                      <div className="text-emerald-900 font-bold">جاري التحميل...</div>
+                    </div>
+                  )}
+                  {showError && (
+                    <div className="absolute inset-x-0 top-0 p-4 bg-red-500/20 text-red-200 text-xs text-center z-50">
+                      {error} - سيتم العرض عند توفر الاتصال
+                    </div>
+                  )}
                   <div className="clock-container">
                     <AnalogClock
                       time={time}
@@ -1196,10 +1205,16 @@
                   <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
 
                     {/* Countdown Section */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                      <div style={{ color: 'var(--text-dim)', fontSize: '1.5rem', fontFamily: 'var(--font-display)' }}>الوقت المتبقي للأذان</div>
-                      <Countdown countdownParts={countdownParts} large={true} />
-                    </div>
+                    {prayerTimes ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                        <div style={{ color: 'var(--text-dim)', fontSize: '1.5rem', fontFamily: 'var(--font-display)' }}>الوقت المتبقي للأذان</div>
+                        <Countdown countdownParts={countdownParts} large={true} />
+                      </div>
+                    ) : (
+                      <div style={{ color: 'var(--text-dim)', fontSize: '1rem', textAlign: 'center' }}>
+                        المواقيت غير متوفرة حالياً
+                      </div>
+                    )}
 
                     {/* Date Section */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
