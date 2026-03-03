@@ -4007,8 +4007,15 @@
         const adj = parseInt(localStorage.getItem('hijriAdjustment') || '0', 10);
         const adjustedDate = new Date(today);
         adjustedDate.setDate(adjustedDate.getDate() + adj);
-        const formatted = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { day: 'numeric', month: 'long' }).format(adjustedDate);
-        return { formatted, day: adjustedDate.getDate() };
+
+        // Formatter for fallback (client-side)
+        const day = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-nu-latn', { day: 'numeric' }).format(adjustedDate);
+        const month = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { month: 'long' }).format(adjustedDate);
+
+        return {
+          formatted: `${day} ${month}`,
+          day: adjustedDate.getDate()
+        };
       });
 
       const fetchHijri = React.useCallback(async () => {
@@ -4032,12 +4039,26 @@
         } catch (e) {
           console.warn("Hijri API failed");
         }
-      }, [hijriInfo.day, hijriAdjustment]);
+      }, [hijriAdjustment]); // Removed hijriInfo.day to focus on adjustment changes
 
       const handleSaveAdjustment = React.useCallback((newAdjustment) => {
         setHijriAdjustment(newAdjustment);
         localStorage.setItem('hijriAdjustment', newAdjustment.toString());
-        localStorage.removeItem('cachedHijri');
+
+        // Recalculate Hijri immediately without waiting for effect/API
+        const today = new Date();
+        const adjustedDate = new Date(today);
+        adjustedDate.setDate(adjustedDate.getDate() + newAdjustment);
+
+        const day = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-nu-latn', { day: 'numeric' }).format(adjustedDate);
+        const month = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { month: 'long' }).format(adjustedDate);
+
+        const info = {
+          formatted: `${day} ${month}`,
+          day: adjustedDate.getDate()
+        };
+        setHijriInfo(info);
+        localStorage.setItem('cachedHijri', JSON.stringify(info));
       }, []);
 
       const {
@@ -4135,9 +4156,13 @@
                   {/* Info Row: Side-by-side components */}
                   <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
 
-                    {/* Countdown Section */}
+                    {/* Countdown Section - Now clickable for settings */}
                     {prayerTimes ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                      <div
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', zIndex: 100 }}
+                        onClick={() => setIsModalOpen(true)}
+                        title="إعدادات"
+                      >
                         <Countdown countdownParts={countdownParts} large={true} />
                       </div>
                     ) : (
@@ -4161,9 +4186,10 @@
             {/* Removed Bottom Section */}
 
 
+            {/* Hidden settings button for accessibility, primary access is via countdown click */}
             <button
-              className="settings-button"
               onClick={() => setIsModalOpen(true)}
+              style={{ display: 'none' }}
               aria-label="Settings"
             >
               <SettingsIcon />
