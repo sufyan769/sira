@@ -280,11 +280,11 @@
     }
 
     .digital-countdown-large .curr-time {
-      font-size: 12rem;
-      /* Increased from 8rem */
+      font-size: 13rem;
+      /* Increasedfrom 8rem */
       font-weight: 700;
       color: var(--text-accent);
-      font-family: 'snell roundhand';
+      font-family: var(--font-display);
       line-height: 0.7;
       /* Drastically reduced */
       letter-spacing: -3px;
@@ -3904,7 +3904,23 @@
         return (
           <div className="digital-countdown-large">
             <span className="curr-time" style={{ color: isRed ? '#ef4444' : 'var(--text-accent)' }}>
-              {timeString}
+              {h > 0 && (
+                <React.Fragment>
+                  <span style={{ display: 'inline-block', minWidth: '1.2ch', textAlign: 'center' }}>{h}</span>
+                  <span style={{ margin: '0 -0.1rem', opacity: 0.8 }}>:</span>
+                </React.Fragment>
+              )}
+              <span style={{ display: 'inline-block', minWidth: (h > 0 || totalSeconds > 300) ? '2.2ch' : '1.2ch', textAlign: 'center' }}>
+                {h > 0 || totalSeconds > 300 ? String(m).padStart(2, '0') : m}
+              </span>
+              {totalSeconds <= 300 && (
+                <React.Fragment>
+                  <span style={{ margin: '0 -0.1rem', opacity: 0.8 }}>:</span>
+                  <span style={{ display: 'inline-block', minWidth: '2.2ch', textAlign: 'center' }}>
+                    {String(s).padStart(2, '0')}
+                  </span>
+                </React.Fragment>
+              )}
             </span>
           </div>
         );
@@ -4234,7 +4250,7 @@
             {prayerTimes && (
               <EditTimesModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+       onClose={() => setIsModalOpen(false)}
                 initialTimes={prayerTimes}
                 onSave={handleSavePrayerTimes}
                 todayKey={todayKey}
