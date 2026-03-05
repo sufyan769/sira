@@ -280,11 +280,11 @@
     }
 
     .digital-countdown-large .curr-time {
-      font-size: 14rem;
+      font-size: 12rem;
       /* Increased from 8rem */
       font-weight: 700;
       color: var(--text-accent);
-      font-family: 'luminari';
+      font-family: 'snell roundhand';
       line-height: 0.7;
       /* Drastically reduced */
       letter-spacing: -3px;
@@ -351,10 +351,10 @@
     .clock-face .number {
       position: absolute;
       transform: translate(-50%, -50%);
-      font-size: 5.5rem;
+      font-size: 3.5rem;
       font-weight: 700;
       color: var(--clock-text-color);
-      font-family: 'luminari';
+      font-family: 'skia';
       z-index: 5;
       line-height: 1;
       text-shadow: none;
@@ -3753,6 +3753,7 @@
           hours: String(Math.floor(totalSeconds / 3600)).padStart(2, '0'),
           minutes: String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0'),
           seconds: String(totalSeconds % 60).padStart(2, '0'),
+          totalSeconds
         };
       }, [nextPrayerCountdown]);
 
@@ -3880,44 +3881,54 @@
     // from components/Countdown.tsx
     const Countdown = ({ countdownParts, large = false }) => {
       const h = parseInt(countdownParts.hours, 10);
-      const m = countdownParts.minutes;
-      const s = countdownParts.seconds;
+      const m = parseInt(countdownParts.minutes, 10);
+      const s = parseInt(countdownParts.seconds, 10);
+      const totalSeconds = countdownParts.totalSeconds;
 
-      // When hours is 0, format is M:SS (Minutes:Seconds)
-      // Otherwise, format is H:MM (Hours:Minutes)
-      let timeString;
-      if (h === 0) {
-        const mInt = parseInt(m, 10);
-        timeString = `${mInt}:${s}`;
+      let timeString = '';
+      let isRed = false;
+
+      if (totalSeconds <= 300) {
+        // Less than or equal to 5 minutes
+        timeString = `${m}:${String(s).padStart(2, '0')}`;
+        isRed = true;
       } else {
-        timeString = `${h}:${m}`;
+        if (h > 0) {
+          timeString = `${h}:${String(m).padStart(2, '0')}`;
+        } else {
+          timeString = `${m}`;
+        }
       }
 
       if (large) {
         return (
           <div className="digital-countdown-large">
-            <span className="curr-time">{timeString}</span>
+            <span className="curr-time" style={{ color: isRed ? '#ef4444' : 'var(--text-accent)' }}>
+              {timeString}
+            </span>
           </div>
         );
       }
 
       return (
         <div className="countdown-container">
-          <div className="digital-countdown">
+          <div className="digital-countdown" style={{ color: isRed ? '#ef4444' : 'inherit' }}>
             {h > 0 && (
               <div className="time-part hours">
-                <span className="value">{h}</span>
+                <span className="value" style={{ color: isRed ? '#ef4444' : 'var(--text-accent)' }}>{countdownParts.hours}</span>
                 <span className="label">ساعة</span>
               </div>
             )}
             <div className="time-part minutes">
-              <span className="value">{h === 0 ? parseInt(m, 10) : m}</span>
+              <span className="value" style={{ color: isRed ? '#ef4444' : 'var(--text-accent)' }}>{countdownParts.minutes}</span>
               <span className="label">دقيقة</span>
             </div>
-            <div className="time-part seconds">
-              <span className="value">{s}</span>
-              <span className="label">ثانية</span>
-            </div>
+            {totalSeconds <= 300 && (
+              <div className="time-part seconds">
+                <span className="value" style={{ color: isRed ? '#ef4444' : 'var(--text-accent)' }}>{countdownParts.seconds}</span>
+                <span className="label">ثانية</span>
+              </div>
+            )}
           </div>
         </div>
       );
