@@ -5,6 +5,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>أوقات الصلاة</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#064e3b">
+  <link rel="manifest" href="manifest.json">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -36,13 +40,13 @@
 
       /* Clock Colors (Ramadan Theme) */
       --clock-face-bg: #f8fafc;
-      --clock-text-color: #064e3b;
-      --clock-hand-hour: #064e3b;
-      --clock-hand-minute: #064e3b;
+      --clock-text-color: #030404;
+      --clock-hand-hour: #010f0b;
+      --clock-hand-minute: #0b2921;
       --clock-hand-second: #f59e0b;
       --clock-center-dot: #f59e0b;
-      --hour-marker-color: #064e3b;
-      --minute-marker-color: rgba(6, 78, 59, 0.2);
+      --hour-marker-color: #000000;
+      --minute-marker-color: rgb(5, 5, 5);
 
       --font-primary: 'Changa', sans-serif;
       --font-secondary: 'Almarai', sans-serif;
@@ -125,7 +129,7 @@
 
     /* Container for the Main Clock to keep it square and centered */
     .top-section .clock-wrapper {
-      flex: 1.2;
+      flex: 1.5;
       height: 100%;
       display: flex;
       justify-content: center;
@@ -226,18 +230,18 @@
       /* Faint */
       z-index: 5;
       /* Behind main hands */
-      background-color: #555 !important;
+      background-color: #98959561 !important;
       /* Force grey */
       /* Make them slightly thinner/shorter to distinguish? */
     }
 
     .hand.ghost-hour {
-      width: 1rem;
+      width: 0.5rem;
       height: 25%;
     }
 
     .hand.ghost-minute {
-      width: 0.6rem;
+      width: 0.3rem;
       height: 38%;
     }
 
@@ -347,10 +351,10 @@
     .clock-face .number {
       position: absolute;
       transform: translate(-50%, -50%);
-      font-size: 4.5rem;
+      font-size: 3.5rem;
       font-weight: 700;
       color: var(--clock-text-color);
-      font-family: 'Changa';
+      font-family: 'aril';
       z-index: 5;
       line-height: 1;
       text-shadow: none;
@@ -387,11 +391,11 @@
       left: 50%;
       top: 3%;
       transform: translateX(-50%);
-      border-radius: 2px;
+      border-radius: 0;
     }
 
     .minute-marker {
-      width: 2px;
+      width: 1px;
       height: 6%;
       background-color: var(--minute-marker-color);
     }
@@ -415,19 +419,19 @@
     }
 
     .hour-hand {
-      width: 1.2rem;
+      width: 0.8rem;
       height: 28%;
       background-color: var(--clock-hand-hour);
     }
 
     .minute-hand {
-      width: 1rem;
+      width: 0.5rem;
       height: 38%;
       background-color: var(--clock-hand-minute);
     }
 
     .second-hand {
-      width: 0.4rem;
+      width: 0.1rem;
       height: 45%;
       background-color: var(--clock-hand-second);
       z-index: 12;
@@ -650,27 +654,41 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swCode = `
-          const CACHE_NAME = 'prayer-times-v1';
+          const CACHE_NAME = 'prayer-app-v2';
           const ASSETS = [
-            '${window.location.href}',
+            './',
+            './index.html',
+            './manifest.json',
             'https://cdn.tailwindcss.com',
-            'https://unpkg.com/react@18/umd/react.development.js',
-            'https://unpkg.com/react-dom@18/umd/react-dom.development.js',
+            'https://unpkg.com/react@18/umd/react.production.min.js',
+            'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
             'https://unpkg.com/babel-standalone@6/babel.min.js',
-            'https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css'
+            'https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css',
+            'https://fonts.googleapis.com/css2?family=Changa:wght@600;700&display=swap',
+            'https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=El+Messiri:wght@400..700&display=swap'
           ];
 
           self.addEventListener('install', (event) => {
             event.waitUntil(
-              caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+              caches.open(CACHE_NAME).then((cache) => {
+                return cache.addAll(ASSETS).catch(err => console.log('Caching assets failed', err));
+              })
             );
           });
 
           self.addEventListener('fetch', (event) => {
             event.respondWith(
               caches.match(event.request).then((response) => {
-                return response || fetch(event.request);
-              })
+                return response || fetch(event.request).then(fetchRes => {
+                  return caches.open(CACHE_NAME).then(cache => {
+                    // Cache new external requests on the fly (like fonts)
+                    if (event.request.url.startsWith('http')) {
+                      cache.put(event.request, fetchRes.clone());
+                    }
+                    return fetchRes;
+                  });
+                });
+              }).catch(() => caches.match('./index.html'))
             );
           });
         `;
@@ -3785,18 +3803,16 @@
             // The positions of numbers (12, 3, 6, 9) correspond to markers 0, 15, 30, 45
             const isNumberedHour = i === 0 || i === 15 || i === 30 || i === 45;
 
-            // Don't render a line for the numbered hours
-            if (isNumberedHour) {
-              return null;
-            }
-
             return (
               <div
                 key={`marker-${i}`}
                 className="marker-container"
                 style={{ transform: `rotate(${i * 6}deg)` }}
               >
-                <div className={isHourMark ? "marker hour-marker" : "marker minute-marker"} />
+                <div
+                  className={isHourMark ? "marker hour-marker" : "marker minute-marker"}
+                  style={{ borderRadius: 0, ...(isNumberedHour ? { height: '6%' } : {}) }}
+                />
               </div>
             );
           })}
