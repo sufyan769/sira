@@ -280,11 +280,11 @@
     }
 
     .digital-countdown-large .curr-time {
-      font-size: 12rem;
+      font-size: 14rem;
       /* Increased from 8rem */
       font-weight: 700;
       color: var(--text-accent);
-      font-family: 'futura';
+      font-family: 'luminari';
       line-height: 0.7;
       /* Drastically reduced */
       letter-spacing: -3px;
@@ -351,10 +351,10 @@
     .clock-face .number {
       position: absolute;
       transform: translate(-50%, -50%);
-      font-size: 3.5rem;
+      font-size: 5.5rem;
       font-weight: 700;
       color: var(--clock-text-color);
-      font-family: 'aril';
+      font-family: 'luminari';
       z-index: 5;
       line-height: 1;
       text-shadow: none;
@@ -3879,13 +3879,19 @@
 
     // from components/Countdown.tsx
     const Countdown = ({ countdownParts, large = false }) => {
-      // Format: H:MM 
-      // User requested: "Only hours and minutes without seconds and without zero for the hour on the left"
-
       const h = parseInt(countdownParts.hours, 10);
-      const m = countdownParts.minutes; // keep padding for minutes usually? "1:05"
+      const m = countdownParts.minutes;
+      const s = countdownParts.seconds;
 
-      const timeString = `${h}:${m}`;
+      // When hours is 0, format is M:SS (Minutes:Seconds)
+      // Otherwise, format is H:MM (Hours:Minutes)
+      let timeString;
+      if (h === 0) {
+        const mInt = parseInt(m, 10);
+        timeString = `${mInt}:${s}`;
+      } else {
+        timeString = `${h}:${m}`;
+      }
 
       if (large) {
         return (
@@ -3898,16 +3904,18 @@
       return (
         <div className="countdown-container">
           <div className="digital-countdown">
-            <div className="time-part hours">
-              <span className="value">{countdownParts.hours}</span>
-              <span className="label">ساعة</span>
-            </div>
+            {h > 0 && (
+              <div className="time-part hours">
+                <span className="value">{h}</span>
+                <span className="label">ساعة</span>
+              </div>
+            )}
             <div className="time-part minutes">
-              <span className="value">{countdownParts.minutes}</span>
+              <span className="value">{h === 0 ? parseInt(m, 10) : m}</span>
               <span className="label">دقيقة</span>
             </div>
             <div className="time-part seconds">
-              <span className="value">{countdownParts.seconds}</span>
+              <span className="value">{s}</span>
               <span className="label">ثانية</span>
             </div>
           </div>
