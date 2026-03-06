@@ -114,73 +114,45 @@
       position: relative;
     }
 
-    /* Top Section: Responsive Layout */
+    /* Top Section: Header & Clock */
     .top-section {
       width: 100%;
       height: 100%;
       display: flex;
-      flex-direction: column;
-      /* Stack vertically for mobile portrait */
+      flex-direction: row;
+      /* Horizontal side-by-side */
       align-items: center;
       justify-content: center;
-      gap: 1rem;
+      gap: 0.1rem;
       position: relative;
-      padding: 0.5rem;
-    }
-
-    /* Side-by-side for tablets and landscape */
-    @media screen and (min-width: 768px),
-    screen and (orientation: landscape) {
-      .top-section {
-        flex-direction: row;
-        gap: 0.1rem;
-        padding: 0;
-      }
     }
 
     /* Container for the Main Clock to keep it square and centered */
     .top-section .clock-wrapper {
-      flex: 1;
-      width: 100%;
+      flex: 0 0 auto;
+      /* Only take the space needed for the square */
+      height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 0;
-    }
-
-    @media screen and (min-width: 768px),
-    screen and (orientation: landscape) {
-      .top-section .clock-wrapper {
-        flex: 0 0 auto;
-        height: 100%;
-        width: auto;
-      }
     }
 
     .top-section .clock-wrapper .top-card {
-      height: auto;
-      max-height: 100%;
+      height: 100%;
       aspect-ratio: 1 / 1;
       width: auto;
-      max-width: 100%;
+      max-width: 100vw;
     }
 
     /* Consolidated Info Card (Bottom) */
     .top-section .info-wrapper {
       flex: 1;
-      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       min-width: 0;
-    }
-
-    @media screen and (min-width: 768px),
-    screen and (orientation: landscape) {
-      .top-section .info-wrapper {
-        height: 100%;
-      }
     }
 
     .top-section .info-wrapper .top-card {
@@ -308,19 +280,14 @@
     }
 
     .digital-countdown-large .curr-time {
-      font-size: min(13rem, 12vw);
-      /* Responsive font size */
+      font-size: 10rem;
+      /* Increased from 8rem */
       font-weight: 700;
       color: var(--text-accent);
-      font-family: var(--font-display);
+      font-family: 'Changa';
       line-height: 0.7;
+      /* Drastically reduced */
       letter-spacing: -3px;
-      white-space: nowrap;
-      /* Prevent vertical stacking/wrapping */
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
     }
 
     .consolidated-info-row {
@@ -387,7 +354,7 @@
       font-size: 3.5rem;
       font-weight: 700;
       color: var(--clock-text-color);
-      font-family: 'skia';
+      font-family: 'aril';
       z-index: 5;
       line-height: 1;
       text-shadow: none;
@@ -533,18 +500,14 @@
     }
 
     .digital-countdown {
-      display: flex;
       flex-direction: row;
-      justify-content: center;
-      align-items: center;
+      /* Horizontal now */
       gap: 1.5rem;
       direction: ltr;
       text-align: center;
     }
 
     .time-part {
-      display: flex;
-      flex-direction: column;
       align-items: center;
       color: var(--text-primary);
     }
@@ -620,7 +583,7 @@
       }
 
       .digital-countdown-large .curr-time {
-        font-size: 9rem;
+        font-size: 6rem;
       }
 
       .date-weekday {
@@ -3790,7 +3753,6 @@
           hours: String(Math.floor(totalSeconds / 3600)).padStart(2, '0'),
           minutes: String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0'),
           seconds: String(totalSeconds % 60).padStart(2, '0'),
-          totalSeconds
         };
       }, [nextPrayerCountdown]);
 
@@ -3917,71 +3879,37 @@
 
     // from components/Countdown.tsx
     const Countdown = ({ countdownParts, large = false }) => {
+      // Format: H:MM 
+      // User requested: "Only hours and minutes without seconds and without zero for the hour on the left"
+
       const h = parseInt(countdownParts.hours, 10);
-      const m = parseInt(countdownParts.minutes, 10);
-      const s = parseInt(countdownParts.seconds, 10);
-      const totalSeconds = countdownParts.totalSeconds;
+      const m = countdownParts.minutes; // keep padding for minutes usually? "1:05"
 
-      let timeString = '';
-      let isRed = false;
-
-      if (totalSeconds <= 300) {
-        // Less than or equal to 5 minutes
-        timeString = `${m}:${String(s).padStart(2, '0')}`;
-        isRed = true;
-      } else {
-        if (h > 0) {
-          timeString = `${h}:${String(m).padStart(2, '0')}`;
-        } else {
-          timeString = `${m}`;
-        }
-      }
+      const timeString = `${h}:${m}`;
 
       if (large) {
         return (
           <div className="digital-countdown-large">
-            <span className="curr-time" style={{ color: isRed ? '#ef4444' : 'var(--text-accent)' }}>
-              {h > 0 && (
-                <React.Fragment>
-                  <span style={{ display: 'inline-block', minWidth: '1.2ch', textAlign: 'center' }}>{h}</span>
-                  <span style={{ margin: '0 -0.1rem', opacity: 0.8 }}>:</span>
-                </React.Fragment>
-              )}
-              <span style={{ display: 'inline-block', minWidth: (h > 0 || totalSeconds > 300) ? '2.2ch' : '1.2ch', textAlign: 'center' }}>
-                {h > 0 || totalSeconds > 300 ? String(m).padStart(2, '0') : m}
-              </span>
-              {totalSeconds <= 300 && (
-                <React.Fragment>
-                  <span style={{ margin: '0 -0.1rem', opacity: 0.8 }}>:</span>
-                  <span style={{ display: 'inline-block', minWidth: '2.2ch', textAlign: 'center' }}>
-                    {String(s).padStart(2, '0')}
-                  </span>
-                </React.Fragment>
-              )}
-            </span>
+            <span className="curr-time">{timeString}</span>
           </div>
         );
       }
 
       return (
         <div className="countdown-container">
-          <div className="digital-countdown" style={{ color: isRed ? '#ef4444' : 'inherit' }}>
-            {h > 0 && (
-              <div className="time-part hours">
-                <span className="value" style={{ color: isRed ? '#ef4444' : 'var(--text-accent)' }}>{countdownParts.hours}</span>
-                <span className="label">ساعة</span>
-              </div>
-            )}
+          <div className="digital-countdown">
+            <div className="time-part hours">
+              <span className="value">{countdownParts.hours}</span>
+              <span className="label">ساعة</span>
+            </div>
             <div className="time-part minutes">
-              <span className="value" style={{ color: isRed ? '#ef4444' : 'var(--text-accent)' }}>{countdownParts.minutes}</span>
+              <span className="value">{countdownParts.minutes}</span>
               <span className="label">دقيقة</span>
             </div>
-            {totalSeconds <= 300 && (
-              <div className="time-part seconds">
-                <span className="value" style={{ color: isRed ? '#ef4444' : 'var(--text-accent)' }}>{countdownParts.seconds}</span>
-                <span className="label">ثانية</span>
-              </div>
-            )}
+            <div className="time-part seconds">
+              <span className="value">{countdownParts.seconds}</span>
+              <span className="label">ثانية</span>
+            </div>
           </div>
         </div>
       );
