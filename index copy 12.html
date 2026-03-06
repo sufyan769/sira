@@ -127,10 +127,10 @@
       position: relative;
     }
 
-    /* Container for the Main Clock to keep it square and centered */
+    /* Container for the Main Clock - Stable width on Android */
     .top-section .clock-wrapper {
-      flex: 0 0 auto;
-      /* Only take the space needed for the square */
+      flex: 0 0 45%;
+      /* Give it a slice of the width */
       height: 100%;
       display: flex;
       justify-content: center;
@@ -138,10 +138,12 @@
     }
 
     .top-section .clock-wrapper .top-card {
-      height: 100%;
+      width: 100%;
+      /* Fill the 45% */
+      max-width: 90vw;
       aspect-ratio: 1 / 1;
-      width: auto;
-      max-width: 100vw;
+      height: auto;
+      max-height: 100%;
     }
 
     /* Consolidated Info Card (Bottom) */
@@ -157,11 +159,12 @@
 
     .top-section .info-wrapper .top-card {
       width: 100%;
-      height: 100%;
+      height: auto;
+      max-height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 1rem;
+      padding: 0.5rem;
     }
 
     /* Make the countdown (which will be the 3rd child now) span both columns? 
@@ -280,14 +283,17 @@
     }
 
     .digital-countdown-large .curr-time {
-      font-size: 10rem;
-      /* Increased from 8rem */
+      font-size: min(10rem, 12vw);
       font-weight: 700;
       color: var(--text-accent);
       font-family: 'Changa';
-      line-height: 0.7;
-      /* Drastically reduced */
+      line-height: 1;
       letter-spacing: -3px;
+      white-space: nowrap;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
     }
 
     .consolidated-info-row {
