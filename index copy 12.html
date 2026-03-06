@@ -357,33 +357,12 @@
     .clock-face .number {
       position: absolute;
       transform: translate(-50%, -50%);
-      font-size: 3.5rem;
-      font-weight: 700;
+      font-size: 2.2rem;
+      font-weight: 500;
       color: var(--clock-text-color);
-      font-family: 'aril';
+      font-family: var(--font-secondary);
       z-index: 5;
       line-height: 1;
-      text-shadow: none;
-    }
-
-    .number-12 {
-      top: 13%;
-      left: 50%;
-    }
-
-    .number-3 {
-      top: 50%;
-      left: 87%;
-    }
-
-    .number-6 {
-      top: 87%;
-      left: 50%;
-    }
-
-    .number-9 {
-      top: 50%;
-      left: 13%;
     }
 
     .marker-container {
@@ -395,22 +374,21 @@
     .marker {
       position: absolute;
       left: 50%;
-      top: 3%;
+      top: 1.5%;
       transform: translateX(-50%);
-      border-radius: 0;
     }
 
     .minute-marker {
       width: 1px;
-      height: 6%;
-      background-color: var(--minute-marker-color);
+      height: 2.5%;
+      background-color: var(--hour-marker-color);
+      opacity: 0.4;
     }
 
     .hour-marker {
-      width: 4px;
-      height: 12%;
+      width: 3.5px;
+      height: 7.5%;
       background-color: var(--hour-marker-color);
-      box-shadow: 0 0 5px rgba(247, 180, 44, 0.5);
     }
 
     .hand {
@@ -418,29 +396,30 @@
       bottom: 50%;
       left: 50%;
       transform-origin: bottom;
-      border-radius: 50px;
+      border-radius: 10px;
       transform: translateX(-50%);
       z-index: 10;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      /* removed box-shadow for cleaner Apple look */
     }
 
     .hour-hand {
-      width: 0.8rem;
-      height: 28%;
+      width: 0.7rem;
+      height: 25%;
       background-color: var(--clock-hand-hour);
     }
 
     .minute-hand {
-      width: 0.5rem;
+      width: 0.45rem;
       height: 38%;
       background-color: var(--clock-hand-minute);
     }
 
     .second-hand {
-      width: 0.1rem;
-      height: 45%;
+      width: 2px;
+      height: 48%;
       background-color: var(--clock-hand-second);
       z-index: 12;
+      border-radius: 2px;
     }
 
     .center-dot {
@@ -448,13 +427,12 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 1.8rem;
-      height: 1.8rem;
-      background-color: var(--clock-center-dot);
+      width: 0.8rem;
+      height: 0.8rem;
+      background-color: var(--clock-hand-second);
+      /* often red in apple icons */
       border-radius: 50%;
-      border: 3px solid var(--clock-hand-hour);
       z-index: 13;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     }
 
     /* Date & Weather Styling (Side Info) */
@@ -3824,11 +3802,23 @@
             );
           })}
 
-          {/* Numbers */}
-          <div className="number number-12"> 12</div>
-          <div className="number number-3">3</div>
-          <div className="number number-6">6</div>
-          <div className="number number-9">9</div>
+          {/* Numbers 1-12 in Apple Style */}
+          {Array.from({ length: 12 }).map((_, i) => {
+            const num = i + 1;
+            const angle = (num * 30) * (Math.PI / 180);
+            const radius = 38; // percentage radius from center
+            const x = 50 + radius * Math.sin(angle);
+            const y = 50 - radius * Math.cos(angle);
+            return (
+              <div
+                key={`num-${num}`}
+                className="number"
+                style={{ left: `${x}%`, top: `${y}%` }}
+              >
+                {num}
+              </div>
+            );
+          })}
 
           {/* Ghost Hands (Next Prayer) */}
           {secondaryTime && (
@@ -3859,7 +3849,21 @@
               style={{ transform: `translateX(-50%) rotate(${secondsRotation}deg)` }}
             ></div>
           )}
+          {/* Center Dot - Small Apple style */}
           <div className="center-dot"></div>
+
+          {/* Subtle center axis pin */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '4px',
+            height: '4px',
+            backgroundColor: '#000',
+            borderRadius: '50%',
+            zIndex: 14
+          }}></div>
         </div>
       );
     };
