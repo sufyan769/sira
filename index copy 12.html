@@ -38,15 +38,17 @@
       /* Vibrant Gold */
       --text-dim: rgba(255, 255, 255, 0.5);
 
-      /* Clock Colors (Ramadan Theme) */
-      --clock-face-bg: #f8fafc00;
-      --clock-text-color: #f59e0b;
-      --clock-hand-hour: #ffffff;
-      --clock-hand-minute: #f2ebde;
-      --clock-hand-second: #ff0000;
-      --clock-center-dot: #ff0000;
-      --hour-marker-color: #c7b79c;
-      --minute-marker-color: rgb(255, 255, 255);
+      /* Clock Colors (Apple/iPad Style) */
+      --clock-face-bg: #ffffff;
+      --clock-text-color: #000000;
+      --clock-hand-hour: #000000;
+      --clock-hand-minute: #000000;
+      --clock-hand-second: #FF3B30;
+      /* Apple Red */
+      --clock-center-dot: #FF3B30;
+      --hour-marker-color: #000000;
+      --minute-marker-color: #8E8E93;
+      /* Apple Silver/Grey */
 
       --font-primary: 'Changa', sans-serif;
       --font-secondary: 'Almarai', sans-serif;
@@ -339,16 +341,16 @@
     .top-card.clock-card-full {
       padding: 0;
       background: var(--clock-face-bg);
-      /* The card itself is white */
-      border: 4px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
+      /* Pure White */
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      /* Subtle edge */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      /* Soft shadow */
     }
 
     .top-card.clock-card-full .clock-face {
       background: transparent;
-      /* Card handles bg */
       box-shadow: none;
-      /* Card handles shadow */
       width: 100%;
       height: 100%;
     }
@@ -357,10 +359,11 @@
     .clock-face .number {
       position: absolute;
       transform: translate(-50%, -50%);
-      font-size: 2.2rem;
-      font-weight: 500;
+      font-size: 2.8rem;
+      font-weight: 400;
+      /* Regular Apple font weight */
       color: var(--clock-text-color);
-      font-family: var(--font-secondary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       z-index: 5;
       line-height: 1;
     }
@@ -386,8 +389,8 @@
     }
 
     .hour-marker {
-      width: 3.5px;
-      height: 7.5%;
+      width: 2px;
+      height: 6%;
       background-color: var(--hour-marker-color);
     }
 
@@ -396,30 +399,42 @@
       bottom: 50%;
       left: 50%;
       transform-origin: bottom;
-      border-radius: 10px;
       transform: translateX(-50%);
       z-index: 10;
-      /* removed box-shadow for cleaner Apple look */
     }
 
     .hour-hand {
-      width: 0.7rem;
+      width: 0.6rem;
       height: 25%;
       background-color: var(--clock-hand-hour);
+      border-radius: 10px;
     }
 
     .minute-hand {
-      width: 0.45rem;
+      width: 0.4rem;
       height: 38%;
       background-color: var(--clock-hand-minute);
+      border-radius: 10px;
     }
 
     .second-hand {
-      width: 2px;
+      width: 1.5px;
       height: 48%;
       background-color: var(--clock-hand-second);
       z-index: 12;
       border-radius: 2px;
+    }
+
+    /* Small counter-weight for second hand */
+    .second-hand::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      height: 15%;
+      /* Tail */
+      background-color: var(--clock-hand-second);
     }
 
     .center-dot {
@@ -427,10 +442,9 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 0.8rem;
-      height: 0.8rem;
-      background-color: var(--clock-hand-second);
-      /* often red in apple icons */
+      width: 0.6rem;
+      height: 0.6rem;
+      background-color: var(--clock-center-dot);
       border-radius: 50%;
       z-index: 13;
     }
@@ -534,17 +548,7 @@
       border-color: var(--text-accent);
     }
 
-    /* 3D Prominent Clock Card */
-    .clock-card-3d {
-      background: var(--clock-face-bg) !important;
-      border: 12px solid #1a1a1a !important;
-      box-shadow:
-        0 12px 0 #000,
-        0 20px 40px rgba(0, 0, 0, 0.7),
-        inset 0 0 20px rgba(0, 0, 0, 0.1) !important;
-      transform: translateY(-8px);
-      z-index: 10;
-    }
+    /* Standard settings button, no heavy Ramadan themes for this part */
 
 
     /* Mobile Landscape Optimization */
@@ -3782,22 +3786,16 @@
       return (
         <div className="clock-face">
 
-          {/* Markers */}
+          {/* 60 Markers (Apple Style) */}
           {Array.from({ length: 60 }).map((_, i) => {
             const isHourMark = i % 5 === 0;
-            // The positions of numbers (12, 3, 6, 9) correspond to markers 0, 15, 30, 45
-            const isNumberedHour = i === 0 || i === 15 || i === 30 || i === 45;
-
             return (
               <div
                 key={`marker-${i}`}
                 className="marker-container"
                 style={{ transform: `rotate(${i * 6}deg)` }}
               >
-                <div
-                  className={isHourMark ? "marker hour-marker" : "marker minute-marker"}
-                  style={{ borderRadius: 0, ...(isNumberedHour ? { height: '6%' } : {}) }}
-                />
+                <div className={isHourMark ? "marker hour-marker" : "marker minute-marker"} />
               </div>
             );
           })}
