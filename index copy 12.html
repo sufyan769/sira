@@ -287,7 +287,7 @@
       font-size: min(10rem, 12vw);
       font-weight: 700;
       color: var(--text-accent);
-      font-family: 'Changa';
+      font-family: 'ariel';
       line-height: 1;
       letter-spacing: -3px;
       white-space: nowrap;
@@ -358,7 +358,7 @@
     .clock-face .number {
       position: absolute;
       transform: translate(-50%, -50%);
-      font-size: 1rem;
+      font-size: 2rem;
       font-weight: 400;
       /* Regular Apple font weight */
       color: var(--clock-text-color);
@@ -3691,6 +3691,7 @@
       const [loading, setLoading] = React.useState(!prayerTimes);
       const [error, setError] = React.useState(null);
       const [nextPrayerCountdown, setNextPrayerCountdown] = React.useState(0);
+      const [countdownMode, setCountdownMode] = React.useState('normal'); // 'normal', 'imminent', 'elapsed'
 
       const todayKey = React.useMemo(() => getTodaysDateKey(currentTime), [currentTime]);
 
@@ -3731,8 +3732,6 @@
         if (!prayerTimes) return;
 
         const now = currentTime;
-        let nextPrayerTime = null;
-
         const prayerDates = prayerOrderForList.map(name => {
           const timeStr = prayerTimes[name];
           if (!timeStr) return null;
@@ -3742,6 +3741,24 @@
           return { name, date };
         }).filter(p => p !== null);
 
+        // 1. Check if we are in "Elapsed" mode (0 to 20 mins after ANY prayer)
+        let elapsedPrayer = null;
+        for (const prayer of prayerDates) {
+          const diff = now.getTime() - prayer.date.getTime();
+          if (diff >= 0 && diff <= 20 * 60 * 1000) {
+            elapsedPrayer = diff;
+            break;
+          }
+        }
+
+        if (elapsedPrayer !== null) {
+          setCountdownMode('elapsed');
+          setNextPrayerCountdown(elapsedPrayer);
+          return;
+        }
+
+        // 2. Otherwise, find NEXT prayer for countdown
+        let nextPrayerTime = null;
         for (const prayer of prayerDates) {
           if (prayer.date > now) {
             nextPrayerTime = prayer.date;
@@ -3756,9 +3773,14 @@
 
         if (nextPrayerTime) {
           const diff = nextPrayerTime.getTime() - now.getTime();
-          setNextPrayerCountdown(diff > 0 ? diff : 0);
-        }
+          setNextPrayerCountdown(diff);
 
+          if (diff <= 5 * 60 * 1000) {
+            setCountdownMode('imminent');
+          } else {
+            setCountdownMode('normal');
+          }
+        }
       }, [currentTime, prayerTimes]);
 
       const handleSavePrayerTimes = React.useCallback((newTimes) => {
@@ -3768,12 +3790,18 @@
 
       const countdownParts = React.useMemo(() => {
         const totalSeconds = Math.max(0, Math.floor(nextPrayerCountdown / 1000));
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+
         return {
-          hours: String(Math.floor(totalSeconds / 3600)).padStart(2, '0'),
-          minutes: String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0'),
-          seconds: String(totalSeconds % 60).padStart(2, '0'),
+          hours: String(hrs),
+          minutes: String(mins).padStart(2, '0'),
+          seconds: String(secs).padStart(2, '0'),
+          totalSeconds,
+          mode: countdownMode
         };
-      }, [nextPrayerCountdown]);
+      }, [nextPrayerCountdown, countdownMode]);
 
       return {
         prayerTimes,
@@ -3918,37 +3946,47 @@
 
     // from components/Countdown.tsx
     const Countdown = ({ countdownParts, large = false }) => {
-      // Format: H:MM 
-      // User requested: "Only hours and minutes without seconds and without zero for the hour on the left"
+      const { mode, hours, minutes, seconds } = countdownParts;
 
-      const h = parseInt(countdownParts.hours, 10);
-      const m = countdownParts.minutes; // keep padding for minutes usually? "1:05"
+      let color = 'var(--text-accent)';
+      let displayTime = '';
 
-      const timeString = `${h}:${m}`;
+      if (mode === 'imminent') {
+        color = '#ff4444'; // Bright Red
+        const m = parseInt(minutes, 10);
+        displayTime = `${m}:${seconds}`;
+      } else if (mode === 'elapsed') {
+        color = '#22c55e'; // Green
+        const m = parseInt(minutes, 10);
+        displayTime = `${m}:${seconds}`;
+      } else {
+        // Normal
+        const h = parseInt(hours, 10);
+        // Show H:MM
+        displayTime = `${h}:${minutes}`;
+      }
 
       if (large) {
         return (
           <div className="digital-countdown-large">
-            <span className="curr-time">{timeString}</span>
+            <span className="curr-time" style={{ color }}>{displayTime}</span>
           </div>
         );
       }
 
       return (
         <div className="countdown-container">
-          <div className="digital-countdown">
+          <div className="digital-countdown" style={{ color }}>
             <div className="time-part hours">
-              <span className="value">{countdownParts.hours}</span>
-              <span className="label">ساعة</span>
+              <span className="value">{mode === 'normal' ? hours : minutes}</span>
+              <span className="label">{mode === 'normal' ? 'ساعة' : 'دقيقة'}</span>
             </div>
-            <div className="time-part minutes">
-              <span className="value">{countdownParts.minutes}</span>
-              <span className="label">دقيقة</span>
-            </div>
-            <div className="time-part seconds">
-              <span className="value">{countdownParts.seconds}</span>
-              <span className="label">ثانية</span>
-            </div>
+            {(mode === 'normal' || mode === 'elapsed' || mode === 'imminent') && (
+              <div className="time-part minutes">
+                <span className="value">{mode === 'normal' ? minutes : seconds}</span>
+                <span className="label">{mode === 'normal' ? 'دقيقة' : 'ثانية'}</span>
+              </div>
+            )}
           </div>
         </div>
       );
