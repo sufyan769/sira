@@ -38,13 +38,12 @@
       /* Vibrant Gold */
       --text-dim: rgba(255, 255, 255, 0.5);
 
-      /* Clock Colors (Apple/iPad Style) */
-      --clock-face-bg: #ffffff;
+      /* Official Apple/iPad Clock Colors */
+      --clock-face-bg: #FFFFFF;
       --clock-text-color: #000000;
       --clock-hand-hour: #000000;
       --clock-hand-minute: #000000;
       --clock-hand-second: #FF3B30;
-      /* Apple Red */
       --clock-center-dot: #FF3B30;
       --hour-marker-color: #000000;
       --minute-marker-color: #8E8E93;
@@ -403,18 +402,51 @@
       z-index: 10;
     }
 
+    /* iPad Style Two-Layer Hands */
     .hour-hand {
-      width: 0.6rem;
+      width: 2px;
+      /* Thin base line */
       height: 25%;
       background-color: var(--clock-hand-hour);
-      border-radius: 10px;
+      border-radius: 2px;
+    }
+
+    .hour-hand::after {
+      content: "";
+      position: absolute;
+      width: 0.65rem;
+      /* Wider part */
+      height: calc(100% - 15px);
+      /* Leaves 15px gap from center */
+      top: 0;
+      /* Align with tip */
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--clock-hand-hour);
+      border-radius: 3px;
     }
 
     .minute-hand {
-      width: 0.4rem;
+      width: 2px;
+      /* Thin base line */
       height: 38%;
       background-color: var(--clock-hand-minute);
-      border-radius: 10px;
+      border-radius: 2px;
+    }
+
+    .minute-hand::after {
+      content: "";
+      position: absolute;
+      width: 0.45rem;
+      /* Wider part */
+      height: calc(100% - 15px);
+      /* Leaves 15px gap from center */
+      top: 0;
+      /* Align with tip */
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--clock-hand-minute);
+      border-radius: 3px;
     }
 
     .second-hand {
@@ -425,7 +457,7 @@
       border-radius: 2px;
     }
 
-    /* Small counter-weight for second hand */
+    /* Tail for second hand */
     .second-hand::after {
       content: "";
       position: absolute;
@@ -433,7 +465,6 @@
       left: 0;
       width: 100%;
       height: 15%;
-      /* Tail */
       background-color: var(--clock-hand-second);
     }
 
@@ -442,8 +473,8 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 0.6rem;
-      height: 0.6rem;
+      width: 0.5rem;
+      height: 0.5rem;
       background-color: var(--clock-center-dot);
       border-radius: 50%;
       z-index: 13;
