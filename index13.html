@@ -138,24 +138,25 @@
         }
 
         .digital-countdown-large .curr-time {
-            font-size: 100vh;
+            font-size: 95vh;
+            /* Massive but leaves very small gaps */
             font-weight: 950;
             color: var(--text-accent);
             font-family: 'ariel', sans-serif;
-            line-height: 0.75;
+            line-height: 1;
             letter-spacing: -2vw;
             white-space: nowrap;
             text-shadow: 0 0 110px rgba(245, 158, 11, 0.6);
-            margin: -8vh 0 0 0;
+            margin: 0;
             padding: 0;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
+            /* Center vertically for balanced small gaps */
             justify-content: center;
             height: 100vh;
             width: 100%;
-            transform: scaleY(1.35);
-            /* Fit perfectly bottom edge */
-            transform-origin: top;
+            transform: none;
+            /* No scaling to prevent over-bleed */
             overflow: hidden;
         }
 
