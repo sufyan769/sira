@@ -114,7 +114,8 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 2rem;
+            padding: 0.5rem;
+            /* Minimal padding for maximum size */
         }
 
         .countdown-section {
@@ -127,14 +128,15 @@
         }
 
         .digital-countdown-large .curr-time {
-            font-size: min(25rem, 35vw);
-            font-weight: 700;
+            font-size: min(45vw, 60vh);
+            /* Enormous responsive font */
+            font-weight: 800;
             color: var(--text-accent);
             font-family: 'ariel', sans-serif;
-            line-height: 1;
-            letter-spacing: -5px;
+            line-height: 0.9;
+            letter-spacing: -10px;
             white-space: nowrap;
-            text-shadow: 0 0 50px rgba(245, 158, 11, 0.3);
+            text-shadow: 0 0 80px rgba(245, 158, 11, 0.4);
         }
 
         .info-line {
@@ -142,25 +144,28 @@
             flex-direction: row;
             justify-content: center;
             align-items: center;
-            gap: 3rem;
+            gap: 5vw;
             width: 100%;
-            margin-top: 1rem;
-            padding: 2rem;
-            border-top: 1px solid var(--glass-border);
+            margin-top: 0;
+            padding: 1rem 2vw;
+            border-top: 2px solid var(--glass-border);
         }
 
         .date-weekday {
-            font-size: 4rem;
+            font-size: 8vh;
+            /* Large responsive date */
             font-weight: 700;
             color: var(--text-accent);
             font-family: var(--font-display);
+            white-space: nowrap;
         }
 
         .date-hijri {
-            font-size: 3rem;
-            font-weight: 400;
+            font-size: 6vh;
+            font-weight: 500;
             color: var(--text-primary);
             font-family: var(--font-display);
+            white-space: nowrap;
         }
 
         /* Make the countdown (which will be the 3rd child now) span both columns? 
@@ -597,15 +602,16 @@
             }
 
             .digital-countdown-large .curr-time {
-                font-size: 8rem;
+                font-size: 45vh;
+                /* In landscape, use VH to control height */
             }
 
             .date-weekday {
-                font-size: 3rem !important;
+                font-size: 8vh !important;
             }
 
             .date-hijri {
-                font-size: 2.2rem !important;
+                font-size: 6vh !important;
             }
 
             .date-gregorian {
