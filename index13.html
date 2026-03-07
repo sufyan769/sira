@@ -62,18 +62,24 @@
             padding: 0;
         }
 
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
         body {
             font-family: var(--font-secondary);
             background-color: var(--bg-gradient-mid);
             background-image:
                 radial-gradient(circle at 50% 50%, var(--bg-gradient-start), var(--bg-gradient-end));
             color: var(--text-primary);
-            height: 100vh;
-            width: 100vw;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
             position: relative;
         }
 
@@ -99,10 +105,12 @@
         .app-container {
             width: 100vw;
             height: 100vh;
-            padding: 0.1rem;
+            padding: 0;
+            /* No gaps */
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0;
         }
 
         /* Main Panel for Massive Timer Layout */
@@ -111,11 +119,12 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-end;
+            /* Push content to fill from bottom up */
             align-items: center;
             text-align: center;
-            padding: 0.5rem;
-            /* Minimal padding for maximum size */
+            padding: 0;
+            /* Remove all padding */
         }
 
         .countdown-section {
@@ -128,15 +137,28 @@
         }
 
         .digital-countdown-large .curr-time {
-            font-size: min(45vw, 60vh);
-            /* Enormous responsive font */
-            font-weight: 800;
+            font-size: 88vh;
+            /* Massive width-based font */
+            font-weight: 900;
             color: var(--text-accent);
             font-family: 'ariel', sans-serif;
-            line-height: 0.9;
-            letter-spacing: -10px;
+            line-height: 0.7;
+            /* Minimal line height to eliminate space above/below */
+            letter-spacing: -2vw;
             white-space: nowrap;
-            text-shadow: 0 0 80px rgba(245, 158, 11, 0.4);
+            text-shadow: 0 0 100px rgba(245, 158, 11, 0.6);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            /* Fill container height */
+            width: 100%;
+            /* Fill container width */
+            transform: scaleY(1.6);
+            /* Extreme vertical stretch to cover screen */
+            transform-origin: top;
         }
 
         .info-line {
@@ -144,11 +166,17 @@
             flex-direction: row;
             justify-content: center;
             align-items: center;
-            gap: 5vw;
-            width: 100%;
-            margin-top: 0;
-            padding: 1rem 2vw;
-            border-top: 2px solid var(--glass-border);
+            gap: 10vw;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            border-top: 10px solid var(--text-accent);
+            /* Even thicker divider */
+            height: 12vh;
+            /* Slimmer bar for more countdown space */
+            background: #000;
+            position: relative;
+            z-index: 100;
         }
 
         .date-weekday {
@@ -602,8 +630,12 @@
             }
 
             .digital-countdown-large .curr-time {
-                font-size: 45vh;
-                /* In landscape, use VH to control height */
+                font-size: 85vh;
+                margin-top: -5vh;
+            }
+
+            .info-line {
+                height: 15vh;
             }
 
             .date-weekday {
