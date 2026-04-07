@@ -10,7 +10,65 @@
 
 <body>
     <div class="top-bar">
-        <div class="app-version">الإصدار: v0.2.0</div>
+        <div class="sidebar-search-container">
+            <input type="text" id="sidebar-search" placeholder="بحث في العناوين والسنين...">
+        </div>
+
+        <div class="global-search-container">
+            <input type="text" id="global-search" placeholder="بحث في محتوى الأحداث...">
+        </div>
+
+        <div class="editor-toolbar">
+            <div class="toolbar-dropdown">
+                <button type="button" class="dropdown-trigger" title="تنسيق النص">تنسيق ▼</button>
+                <div class="dropdown-content">
+                    <button type="button" data-command="bold" title="عريض"><strong>غ</strong> عريض</button>
+                    <button type="button" data-command="italic" title="مائل"><em>م</em> مائل</button>
+                    <button type="button" data-command="underline" title="تحته خط"><u>خ</u> تحته خط</button>
+                    <span class="dropdown-divider"></span>
+                    <button type="button" data-command="insertOrderedList" title="قائمة رقمية">١. قائمة رقمية</button>
+                    <button type="button" data-command="insertUnorderedList" title="قائمة منقطة">• قائمة منقطة</button>
+                    <span class="dropdown-divider"></span>
+                    <button type="button" data-command="justifyRight" title="محاذاة لليمين">يمين</button>
+                    <button type="button" data-command="justifyCenter" title="محاذاة للوسط">وسط</button>
+                    <button type="button" data-command="justifyLeft" title="محاذاة لليسار">يسار</button>
+                    <span class="dropdown-divider"></span>
+                    <button type="button" data-command="removeFormat" title="مسح التنسيقات">تنظيف</button>
+                    <button type="button" id="remove-diacritics-btn" title="إزالة التشكيل">ـَـِـُ إزالة التشكيل</button>
+                    <button type="button" id="default-format-btn" title="إرجاع الشكل الافتراضي">افتراضي</button>
+                </div>
+            </div>
+
+            <span class="toolbar-divider"></span>
+
+            <label class="toolbar-color" title="لون الخط">
+                <span>🎨</span>
+                <input type="color" id="text-color-picker" value="#000000">
+            </label>
+            <label class="toolbar-color" title="لون التمييز">
+                <span>🖍️</span>
+                <input type="color" id="highlight-color-picker" value="#ffff00">
+            </label>
+
+            <span class="toolbar-divider"></span>
+
+            <select id="font-family-select" title="نوع الخط">
+                <option value="">نوع الخط</option>
+                <option value="Tahoma">Tahoma</option>
+                <option value="Arial">Arial</option>
+                <option value="Amiri">Amiri</option>
+                <option value="Scheherazade New">Scheherazade</option>
+            </select>
+            <select id="font-size-select" title="حجم الخط">
+                <option value="">الحجم</option>
+                <option value="2">صغير</option>
+                <option value="3">متوسط</option>
+                <option value="4">كبير</option>
+                <option value="5">أكبر</option>
+                <option value="6">ضخم</option>
+            </select>
+        </div>
+
         <div class="backup-controls">
             <button id="export-backup-btn">تصدير البيانات</button>
             <label class="import-backup-label">
@@ -32,25 +90,11 @@
         <div class="sidebar-resizer" id="sidebar-resizer" title="اسحب لتغيير العرض"></div>
 
         <main id="content-area">
-            <div class="editor-toolbar">
-                <button type="button" data-command="bold"><strong>غ</strong></button>
-                <button type="button" data-command="italic"><em>م</em></button>
-                <button type="button" data-command="underline"><u>خ</u></button>
-                <button type="button" data-command="insertOrderedList">١.</button>
-                <button type="button" data-command="insertUnorderedList">•</button>
-                <button type="button" data-command="removeFormat">تنظيف</button>
-                <label class="toolbar-color">
-                    لون النص
-                    <input type="color" id="text-color-picker" value="#000000">
-                </label>
-                <label class="toolbar-color">
-                    تمييز
-                    <input type="color" id="highlight-color-picker" value="#ffff00">
-                </label>
-            </div>
-            <!-- منطقة المحتوى الرئيسية القابلة للتحرير -->
-            <div id="editable-content" contenteditable="true" data-storage-key="sira_event_content">
-                <p>اختر حدثاً من القائمة الجانبية للبدء، أو اكتب هنا مباشرة.</p>
+            <div class="editor-canvas">
+                <!-- منطقة المحتوى الرئيسية القابلة للتحرير -->
+                <div id="editable-content" contenteditable="true" data-storage-key="sira_event_content">
+                    <p>اختر حدثاً من القائمة الجانبية للبدء، أو اكتب هنا مباشرة.</p>
+                </div>
             </div>
         </main>
     </div>
@@ -79,7 +123,8 @@
             <div id="popover-img-preview-container"></div>
 
             <div class="popover-footer">
-                <button id="popover-save-btn">حفظ</button>
+                <button id="popover-save-btn">حفظ التعديلات</button>
+                <button id="popover-delete-btn" class="danger-btn">حذف الترجمة</button>
             </div>
         </div>
     </div>
