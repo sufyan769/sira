@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>السيرة النبوية - عرض المخطوطة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #f9f7f2;
+            --sidebar-width: 320px;
+            --accent: #2980b9;
+            --text-main: #2c3e50;
+            --border: #e0dcd0;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Amiri', serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            background: #f1ede4;
+            border-left: 1px solid var(--border);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        #sidebar.collapsed {
+            width: 0;
+            border-left: none;
+        }
+
+        .sidebar-header {
+            padding: 25px;
+            border-bottom: 2px solid var(--border);
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        #sidebar-data {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #sidebar-data h3 {
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            margin: 20px 0 10px;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        #sidebar-data ul {
+            list-style: none;
+        }
+
+        #sidebar-data li {
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            transition: var(--transition);
+            color: #5d4d42;
+        }
+
+        #sidebar-data li.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-nav {
+            padding: 10px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+
+        .nav-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            background: white;
+            border: 1px solid var(--border);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .mode-btn {
+            border: none;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.9rem;
+            background: #eeeae0;
+            color: #8d8479;
+        }
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .manuscript-page {
+            max-width: 850px;
+            margin: 20px auto 40px;
+            background: white;
+            min-height: calc(100% - 100px);
+            padding: 50px 70px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        #editable-content {
+            font-size: 1.45rem;
+            line-height: 2.1;
+            color: #34495e;
+            text-align: justify;
+            outline: none;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .nav-btn {
+            background: #f1ede4;
+            border: 1px solid var(--border);
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--accent);
+            color: white;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        #smart-tooltip {
+            position: fixed;
+            z-index: 10000;
+            background-color: #333;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 280px;
+            font-size: 0.95em;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+            display: none;
+            text-align: right;
+            line-height: 1.6;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        #smart-tooltip img {
+            max-width: 100%;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .smart-link {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 2px solid rgba(41, 128, 185, 0.2);
+            font-weight: bold;
+            cursor: pointer;
+            padding: 2px 4px;
+            position: relative;
+            z-index: 10;
+        }
+
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .manuscript-page {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body class="user-page">
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <div id="loader-text" style="font-family: Tajawal; color: #666;">جاري تحميل المكتبة الضخمة...</div>
+    </div>
+
+    <aside id="sidebar" class="collapsed">
+        <div class="sidebar-header">
+            <h2 style="font-family: Tajawal;">فهرس الجزء</h2>
+        </div>
+        <div id="sidebar-data"></div>
+    </aside>
+
+    <main>
+        <nav class="top-nav">
+            <div class="nav-group">
+                <button class="btn-icon" id="toggle-sidebar">📚</button>
+                <div class="mode-btn-group"
+                    style="display: flex; gap: 5px; background: #eeeae0; padding: 4px; border-radius: 12px;">
+                    <button class="mode-btn active" data-mode="read">قراءة</button>
+                    <button class="mode-btn" data-mode="edit">تعديل</button>
+                </div>
+            </div>
+            <div class="nav-group">
+                <button class="btn-icon" onclick="document.getElementById('file-input').click()">📂</button>
+                <button class="btn-icon" id="export-btn" title="تصدير نسخة احتياطية">💾</button>
+            </div>
+        </nav>
+
+        <div class="scroll-container">
+            <article class="manuscript-page">
+                <div id="editable-content" contenteditable="false">
+                    <div style="text-align: center; margin-top: 20vh; opacity: 0.5;">
+                        <h1 style="font-family: Tajawal;">سيرة المصطفى ﷺ</h1>
+                        <p style="margin-top: 10px;">يرجى رفع ملف البيانات للبدء</p>
+                    </div>
+                </div>
+
+                <div class="footer-nav">
+                    <button id="prev-btn" class="nav-btn" disabled>السابق ⬅️</button>
+                    <button id="next-btn" class="nav-btn">التالي ➡️</button>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <div id="smart-tooltip">
+        <div id="tooltip-content"></div>
+    </div>
+
+    <input type="file" id="file-input" style="display: none;" accept=".json">
+
+    <script>
+    // --- INDEXED DB MANAGER (To handle large files like 8.7MB) ---
+    const DB_NAME = 'SiraReaderDB';
+    const DB_VERSION = 1;
+    let db;
+
+    const dbManager = {
+        init() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('data')) {
+                        db.createObjectStore('data');
+                    }
+                };
+                request.onsuccess = (e) => { db = e.target.result; resolve(); };
+                request.onerror = (e) => reject(e);
+            });
+        },
+        async set(key, value) {
+            const tx = db.transaction('data', 'readwrite');
+            tx.objectStore('data').put(value, key);
+            return new Promise((res) => tx.oncomplete = res);
+        },
+        async get(key) {
+            const tx = db.transaction('data', 'readonly');
+            return new Promise((res) => {
+                const req = tx.objectStore('data').get(key);
+                req.onsuccess = () => res(req.result);
+            });
+        }
+    };
+
+    const elements = {
+        sidebar: document.getElementById('sidebar-data'),
+        content: document.getElementById('editable-content'),
+        tooltip: document.getElementById('smart-tooltip'),
+        tooltipContent: document.getElementById('tooltip-content'),
+        scrollContainer: document.querySelector('.scroll-container'),
+        sidebarParent: document.getElementById('sidebar'),
+        loader: document.getElementById('loader')
+    };
+
+    let eventsCache = {};
+    let tarajimData = {};
+    let currentMode = 'read';
+
+    async function init() {
+        await dbManager.init();
+        
+        const sidebarHtml = await dbManager.get('sidebar');
+        eventsCache = await dbManager.get('events') || {};
+        tarajimData = await dbManager.get('tarajim') || {};
+
+        if (sidebarHtml) {
+            elements.sidebar.innerHTML = sidebarHtml;
+            const first = elements.sidebar.querySelector('li[data-event-id]');
+            if (first) loadEvent(first);
+        }
+
+        elements.loader.style.display = 'none';
+        bindEvents();
+    }
+
+    function bindEvents() {
+        document.getElementById('toggle-sidebar').onclick = (e) => {
+            e.stopPropagation();
+            elements.sidebarParent.classList.toggle('collapsed');
+        };
+
+        elements.sidebar.onclick = (e) => {
+            const li = e.target.closest('li[data-event-id]');
+            if (li) loadEvent(li);
+        };
+
+        elements.scrollContainer.onclick = (e) => {
+            if (currentMode === 'read' && !e.target.closest('.nav-btn')) {
+                elements.sidebarParent.classList.add('collapsed');
+            }
+        };
+
+        document.getElementById('next-btn').onclick = () => navigate(1);
+        document.getElementById('prev-btn').onclick = () => navigate(-1);
+
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.onclick = () => {
+                currentMode = btn.dataset.mode;
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                elements.content.contentEditable = (currentMode === 'edit');
+            };
+        });
+
+        document.getElementById('file-input').onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            elements.loader.style.display = 'flex';
+            document.getElementById('loader-text').innerText = 'جاري معالجة الملف الضخم وبناء المكتبة...';
+            
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                try {
+                    const b = JSON.parse(ev.target.result);
+                    if (b.sidebar) await dbManager.set('sidebar', b.sidebar);
+                    
+                    const evData = b.events || {};
+                    await dbManager.set('events', typeof evData === 'string' ? JSON.parse(evData) : evData);
+                    
+                    const tData = b.tarajim || b.links || {};
+                    await dbManager.set('tarajim', typeof tData === 'string' ? JSON.parse(tData) : tData);
+                    
+                    location.reload();
+                } catch (err) {
+                    alert('خطأ في قراءة الملف: ' + err.message);
+                    elements.loader.style.display = 'none';
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        document.getElementById('export-btn').onclick = async () => {
+            const data = {
+                sidebar: await dbManager.get('sidebar'),
+                events: await dbManager.get('events'),
+                tarajim: await dbManager.get('tarajim')
+            };
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'sira_backup_updated.json'; a.click();
+        };
+
+        // --- HYPER-ROBUST TOOLTIP LOGIC ---
+        let lastTouch = 0;
+        elements.content.addEventListener('pointerdown', (e) => {
+            if (currentMode !== 'read') return;
+            const link = e.target.closest('.smart-link, a[data-link-id]');
+            if (link) {
+                if (Date.now() - lastTouch < 100) return;
+                lastTouch = Date.now();
+                e.preventDefault(); e.stopPropagation();
+                showTooltipHyper(link, e.clientX, e.clientY);
+            } else {
+                hideTooltip();
+            }
+        });
+
+        elements.content.addEventListener('mousemove', (e) => {
+            if (currentMode !== 'read' || 'ontouchstart' in window) return;
+            const link = e.target.closest('.smart-link, a[data-link-id]');
+            if (link) showTooltipHyper(link, e.clientX, e.clientY);
+            else hideTooltip();
+        });
+
+        elements.scrollContainer.addEventListener('scroll', hideTooltip);
+        document.body.addEventListener('pointerdown', (e) => {
+            if (!e.target.closest('.smart-link, a[data-link-id]')) hideTooltip();
+        }, true);
+    }
+
+    function loadEvent(li) {
+        const id = li.dataset.eventId;
+        elements.sidebar.querySelectorAll('li').forEach(l => l.classList.remove('active'));
+        li.classList.add('active');
+        elements.content.innerHTML = eventsCache[id] || '<p>المحتوى غير متوفر لهذه الصفحة.</p>';
+        elements.scrollContainer.scrollTop = 0;
+        elements.sidebarParent.classList.add('collapsed');
+        updateNavButtons();
+    }
+
+    function navigate(dir) {
+        const lis = Array.from(elements.sidebar.querySelectorAll('li[data-event-id]'));
+        const active = elements.sidebar.querySelector('li.active');
+        const idx = lis.indexOf(active);
+        const next = lis[idx + dir];
+        if (next) loadEvent(next);
+    }
+
+    function updateNavButtons() {
+        const lis = Array.from(elements.sidebar.querySelectorAll('li[data-event-id]'));
+        const active = elements.sidebar.querySelector('li.active');
+        const idx = lis.indexOf(active);
+        document.getElementById('prev-btn').disabled = (idx <= 0);
+        document.getElementById('next-btn').disabled = (idx >= lis.length - 1);
+    }
+
+    function showTooltipHyper(link, x, y) {
+        const lid = link.dataset.linkId;
+        const txt = link.textContent.trim();
+        
+        let data = tarajimData[lid];
+        if (!data) {
+            for (let k in tarajimData) {
+                if (tarajimData[k].العنوان === txt || tarajimData[k].كلمة_مفتاحية === txt) {
+                    data = tarajimData[k]; break;
+                }
+            }
+        }
+        if (!data) {
+            for (let k in tarajimData) {
+                if (tarajimData[k].العنوان && tarajimData[k].العنوان.includes(txt)) {
+                    data = tarajimData[k]; break;
+                }
+            }
+        }
+        if (!data) return;
+
+        let h = '';
+        if (data.صورة) h += `<img src="${data.صورة}">`;
+        if (data.العنوان) h += `<strong style="color:var(--accent); display:block; margin-bottom:4px; font-family:Tajawal;">${data.العنوان}</strong>`;
+        if (data.المحتوى || data.المحوى) h += `<div style="font-size:0.95em; line-height:1.5;">${data.المحتوى || data.المحوى}</div>`;
+        
+        elements.tooltipContent.innerHTML = h;
+        elements.tooltip.style.display = 'block';
+
+        requestAnimationFrame(() => {
+            const pW = elements.tooltip.offsetWidth || 280;
+            const pH = elements.tooltip.offsetHeight || 100;
+            let finalX = x + 10;
+            let finalY = y + 10;
+            if (finalX + pW > window.innerWidth) finalX = window.innerWidth - pW - 15;
+            if (finalY + pH > window.innerHeight) finalY = y - pH - 15;
+            if (finalX < 10) finalX = 10;
+            if (finalY < 10) finalY = 10;
+            elements.tooltip.style.left = finalX + 'px';
+            elements.tooltip.style.top = finalY + 'px';
+            elements.tooltip.style.opacity = '1';
+        });
+    }
+
+    function hideTooltip() { 
+        elements.tooltip.style.display = 'none'; 
+        elements.tooltip.style.opacity = '0';
+    }
+
+    init();
+    </script>
+</body>
+
+</html>
