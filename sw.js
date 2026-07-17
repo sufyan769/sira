@@ -1,7 +1,8 @@
-const CACHE_NAME = 'sira-offline-cache-v1';
+const CACHE_NAME = 'sira-offline-cache-v2';
 const urlsToCache = [
   '/sira/index13k.html',
   '/sira/index12k.html',
+  '/sira/index12.html',
   '/sira/style.css',
   '/sira/script.js'
 ];
