@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>أوقات الصلاة</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#064e3b">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Changa:wght@600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=El+Messiri:wght@400..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
+    <link rel="shortcut icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>">
+    <style>
+        :root {
+            /* Ramadan Premium Palette - Emerald & Gold */
+            --bg-gradient-start: #064e3b;
+            /* Deep Emerald */
+            --bg-gradient-mid: #022c22;
+            --bg-gradient-end: #01120f;
+
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(245, 158, 11, 0.2);
+            /* Golden border */
+            --glass-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.6);
+
+            --text-primary: #FFFFFF;
+            --text-secondary: #d1d5db;
+            --text-accent: #f59e0b;
+            /* Vibrant Gold */
+            --text-dim: rgba(255, 255, 255, 0.5);
+
+            /* Official Apple/iPad Clock Colors */
+            --clock-face-bg: #FFFFFF;
+            --clock-text-color: #000000;
+            --clock-hand-hour: #000000;
+            --clock-hand-minute: #000000;
+            --clock-hand-second: #FF3B30;
+            --clock-center-dot: #FF3B30;
+            --hour-marker-color: #000000;
+            --minute-marker-color: #8E8E93;
+            /* Apple Silver/Grey */
+
+            --font-primary: 'Changa', sans-serif;
+            --font-secondary: 'Almarai', sans-serif;
+            --font-display: 'El Messiri', sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            background-color: var(--bg-gradient-mid);
+            background-image:
+                radial-gradient(circle at 50% 50%, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 100%);
+            pointer-events: none;
+        }
+
+        #root {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            padding: 0;
+            /* No gaps */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        /* Main Panel for Massive Timer Layout */
+        .main-panel {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            /* Start from the very top */
+            align-items: center;
+            text-align: center;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .countdown-section {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .digital-countdown-large .curr-time {
+            font-size: 95vh;
+            /* Massive but leaves very small gaps */
+            font-weight: 950;
+            color: var(--text-accent);
+            font-family: 'ariel', sans-serif;
+            line-height: 1;
+            letter-spacing: -2vw;
+            white-space: nowrap;
+            text-shadow: 0 0 110px rgba(245, 158, 11, 0.6);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            /* Center vertically for balanced small gaps */
+            justify-content: center;
+            height: 100vh;
+            width: 100%;
+            transform: none;
+            /* No scaling to prevent over-bleed */
+            overflow: hidden;
+        }
+
+        .info-line {
+            display: none;
+        }
+
+        .date-weekday {
+            font-size: 8vh;
+            /* Large responsive date */
+            font-weight: 700;
+            color: var(--text-accent);
+            font-family: var(--font-display);
+            white-space: nowrap;
+        }
+
+        .date-hijri {
+            font-size: 6vh;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-family: var(--font-display);
+            white-space: nowrap;
+        }
+
+        /* Make the countdown (which will be the 3rd child now) span both columns? 
+       No, the user requested squares.
+       However, we are removing the 3rd card. So we have 3 cards.
+       1: Clock, 2: Info, 3: Countdown.
+       If we want squares, maybe 3 squares in a row? No, screens are vertical.
+       User approved "Digital Countdown span the full width".
+       If it spans full width, it will be a rectangle.
+       Let's proceed with making it span full width.
+    */
+        .top-section> :nth-child(3) {
+            grid-column: 1 / -1;
+            aspect-ratio: auto;
+            /* Allow rectangle for countdown */
+            height: 80%;
+            /* Fill the row height */
+        }
+
+        /* Cards in Top Section */
+        .top-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            border-radius: 2rem;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 0.2rem;
+            /* Square behavior for clock cards, rectangle for info */
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .top-section> :nth-child(3) {
+            grid-column: 1 / -1;
+            aspect-ratio: auto;
+            height: 80%;
+        }
+
+        /* Quadrant 1: Main Clock (Top Right usually in RTL, but grid items order is 1,2,3,4) */
+        /* We will place them in order: MainClock, Info, NextClock, Countdown */
+
+        .clock-container {
+            width: 100%;
+            height: 100%;
+            /* Removed max-width to allow full fill if needed, or keep it to ensure roundness? 
+         If user wants full card background white, we should apply background to card or make clock fill card.
+         User said "background of the clock... full size of the card". 
+      */
+            max-width: none;
+            aspect-ratio: auto;
+            /* Let it stretch */
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ghost Hands Style */
+        .hand.ghost {
+            opacity: 0.3;
+            /* Faint */
+            z-index: 5;
+            /* Behind main hands */
+            background-color: #98959561 !important;
+            /* Force grey */
+            /* Make them slightly thinner/shorter to distinguish? */
+        }
+
+        .hand.ghost-hour {
+            width: 0.5rem;
+            height: 25%;
+        }
+
+        .hand.ghost-minute {
+            width: 0.3rem;
+            height: 38%;
+        }
+
+        /* Quadrant 2: Info (Date + Weather) */
+        .info-card-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            height: 100%;
+            width: 50%;
+            text-align: center;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* Quadrant 4: Digital Countdown */
+        .digital-countdown-large {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            /* Center Vertically */
+            justify-content: center;
+            gap: 0.5rem;
+            direction: ltr;
+            /* Force LTR for numbers 12:45 */
+            width: 100%;
+            height: 100%;
+            /* Fill height */
+        }
+
+        .digital-countdown-large .curr-time {
+            font-size: min(12rem, 14vw);
+            font-weight: 700;
+            color: var(--text-accent);
+            font-family: 'ariel';
+            line-height: 1;
+            letter-spacing: -3px;
+            white-space: nowrap;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .consolidated-info-row {
+            display: flex;
+            flex-direction: row-reverse;
+            /* Arabic RTL logic for visual balance? Or standard row? standard row. */
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            margin-top: 1rem;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 1rem;
+        }
+
+        .digital-countdown-large .labels-col {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-left: 1rem;
+        }
+
+
+        .clock-face {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--clock-face-bg);
+            border-radius: inherit;
+            /* Inherit from card if direct child, or keep its own? Card has 2rem */
+            /* We will set the Card to have the white bg for the main clock, and this to transparent? */
+            /* Or make this fill completely. Let's make this fill completely. */
+            /* If padding is 0, this needs to match card radius */
+            border-radius: 20rem;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+            border: none;
+            /* Border is on the card? Or keep border here? Use border on card. */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Modifiers for specific cards */
+        .top-card.clock-card-full {
+            padding: 0;
+            background: var(--clock-face-bg);
+            /* Pure White */
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            /* Subtle edge */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            /* Soft shadow */
+        }
+
+        .top-card.clock-card-full .clock-face {
+            background: transparent;
+            box-shadow: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Keep internal clock elements mostly same but updated colors */
+        .clock-face .number {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 400;
+            /* Regular Apple font weight */
+            color: var(--clock-text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            z-index: 5;
+            line-height: 1;
+        }
+
+        .marker-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .marker {
+            position: absolute;
+            left: 50%;
+            top: 1.5%;
+            transform: translateX(-50%);
+        }
+
+        .minute-marker {
+            width: 1px;
+            height: 2.5%;
+            background-color: var(--hour-marker-color);
+            opacity: 0.4;
+        }
+
+        .hour-marker {
+            width: 2px;
+            height: 6%;
+            background-color: var(--hour-marker-color);
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        /* iPad Style Two-Layer Hands */
+        .hour-hand {
+            width: 2px;
+            /* Thin base line */
+            height: 25%;
+            background-color: var(--clock-hand-hour);
+            border-radius: 2px;
+        }
+
+        .hour-hand::after {
+            content: "";
+            position: absolute;
+            width: 0.65rem;
+            /* Wider part */
+            height: calc(100% - 15px);
+            /* Leaves 15px gap from center */
+            top: 0;
+            /* Align with tip */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--clock-hand-hour);
+            border-radius: 3px;
+        }
+
+        .minute-hand {
+            width: 2px;
+            /* Thin base line */
+            height: 38%;
+            background-color: var(--clock-hand-minute);
+            border-radius: 2px;
+        }
+
+        .minute-hand::after {
+            content: "";
+            position: absolute;
+            width: 0.45rem;
+            /* Wider part */
+            height: calc(100% - 15px);
+            /* Leaves 15px gap from center */
+            top: 0;
+            /* Align with tip */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--clock-hand-minute);
+            border-radius: 3px;
+        }
+
+        .second-hand {
+            width: 1.5px;
+            height: 48%;
+            background-color: var(--clock-hand-second);
+            z-index: 12;
+            border-radius: 2px;
+        }
+
+        /* Tail for second hand */
+        .second-hand::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            height: 15%;
+            background-color: var(--clock-hand-second);
+        }
+
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: var(--clock-center-dot);
+            border-radius: 50%;
+            z-index: 13;
+        }
+
+        /* Date & Weather Styling (Side Info) */
+        .info-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            backdrop-filter: blur(5px);
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .date-weekday {
+            font-size: 5rem;
+            font-weight: 700;
+            color: var(--text-accent);
+            font-family: var(--font-display);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .date-gregorian {
+            font-size: 0rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .date-hijri {
+            font-size: 3.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: var(--font-display);
+            margin-bottom: 0.5rem;
+        }
+
+
+        /* Countdown */
+        .countdown-container {
+            margin-top: 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem 2rem;
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .digital-countdown {
+            flex-direction: row;
+            /* Horizontal now */
+            gap: 1.5rem;
+            direction: ltr;
+            text-align: center;
+        }
+
+        .time-part {
+            align-items: center;
+            color: var(--text-primary);
+        }
+
+        .time-part .value {
+            font-size: 4rem;
+            font-weight: 700;
+            font-family: 'Changa';
+            color: var(--text-accent);
+            line-height: 1;
+            min-width: 2ch;
+        }
+
+        .time-part .label {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: var(--text-dim);
+            margin-top: 0.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Removed Prayer Styles */
+
+        /* Settings Button */
+        .settings-button {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-dim);
+            border: 1px solid var(--glass-border);
+            width: 3.5rem;
+            height: 3.5rem;
+        }
+
+        .settings-button:hover {
+            background: var(--text-accent);
+            color: #000;
+            border-color: var(--text-accent);
+        }
+
+        /* Standard settings button, no heavy Ramadan themes for this part */
+
+
+        /* Mobile Landscape Optimization */
+        @media screen and (orientation: landscape) and (max-height: 500px) {
+            .app-container {
+                padding: 0.5rem;
+            }
+
+            .top-section {
+                gap: 0.1rem;
+                height: 100%;
+            }
+
+            .top-section .clock-wrapper .top-card {
+                max-width: none;
+            }
+
+            .top-section .info-wrapper .top-card {
+                padding: 1rem;
+            }
+
+            .digital-countdown-large .curr-time {
+                font-size: 85vh;
+                margin-top: -5vh;
+            }
+
+            .info-line {
+                height: 15vh;
+            }
+
+            .date-weekday {
+                font-size: 8vh !important;
+            }
+
+            .date-hijri {
+                font-size: 6vh !important;
+            }
+
+            .date-gregorian {
+                font-size: 0rem !important;
+            }
+
+
+            .top-card {
+                border-radius: 2rem;
+                width: 100%;
+                height: 100%;
+            }
+
+            .clock-face .number {
+                font-size: 2rem;
+            }
+
+        }
+    </style>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+  }
+}
+</script>
+</head>
+
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root">
+        <div id="offline-loader" style="color: white; font-family: sans-serif; text-align: center; padding-top: 20vh;">
+            <h2 id="loading-text">جاري التحميل...</h2>
+            <p id="connectivity-status" style="opacity: 0.6; margin-top: 1rem;"></p>
+            <script>
+                const loadingText = document.getElementById('loading-text');
+                const statusText = document.getElementById('connectivity-status');
+
+                // Only show error if React fails to load after 8 seconds
+                setTimeout(() => {
+                    if (!window.React) {
+                        loadingText.innerText = "تعذر تحميل ملفات التشغيل";
+                        statusText.innerText = "يرجى التحقق من الاتصال بالإنترنت.";
+                    }
+                }, 8000);
+
+                // Don't reload the whole page when online, React components handle their own data retry
+                if (!navigator.onLine) {
+                    statusText.innerText = "أنت غير متصل بالإنترنت. سيتم عرض البيانات المخزنة مسبقاً.";
+                }
+            </script>
+        </div>
+    </div>
+    <script>
+        // --- SERVICE WORKER REGISTRATION ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+          const CACHE_NAME = 'prayer-app-v3';
+          const ASSETS = [
+            './',
+            './index.html',
+            './manifest.json',
+            'https://cdn.tailwindcss.com',
+            'https://unpkg.com/react@18/umd/react.production.min.js',
+            'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
+            'https://unpkg.com/babel-standalone@6/babel.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css',
+            'https://fonts.googleapis.com/css2?family=Changa:wght@600;700&display=swap',
+            'https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=El+Messiri:wght@400..700&display=swap'
+          ];
+
+          self.addEventListener('install', (event) => {
+            event.waitUntil(
+              caches.open(CACHE_NAME).then((cache) => {
+                return cache.addAll(ASSETS).catch(err => console.log('Caching assets failed', err));
+              })
+            );
+          });
+
+          self.addEventListener('activate', (event) => {
+            event.waitUntil(
+              caches.keys().then((cacheNames) => {
+                return Promise.all(
+                  cacheNames.map((cache) => {
+                    if (cache !== CACHE_NAME) {
+                      console.log('ServiceWorker: Clearing old cache:', cache);
+                      return caches.delete(cache);
+                    }
+                  })
+                );
+              })
+            );
+          });
+
+          self.addEventListener('fetch', (event) => {
+            event.respondWith(
+              caches.match(event.request).then((response) => {
+                return response || fetch(event.request).then(fetchRes => {
+                  return caches.open(CACHE_NAME).then(cache => {
+                    // Cache new external requests on the fly (like fonts)
+                    if (event.request.url.startsWith('http')) {
+                      cache.put(event.request, fetchRes.clone());
+                    }
+                    return fetchRes;
+                  });
+                });
+              }).catch(() => caches.match('./index.html'))
+            );
+          });
+        `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const url = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(url).catch(err => console.log('SW failed', err));
+            });
+        }
+    </script>
+    <script type="text/babel">
+        const App = () => {
+            const [time, setTime] = React.useState(new Date());
+
+            React.useEffect(() => {
+                const timerId = setInterval(() => setTime(new Date()), 1000);
+                return () => clearInterval(timerId);
+            }, []);
+
+            let h = time.getHours();
+            h = h % 12;
+            h = h ? h : 12;
+            const hours = h.toString().padStart(2, '0');
+            const minutes = time.getMinutes().toString().padStart(2, '0');
+            const displayTime = `${hours}:${minutes}`;
+
+            return (
+                <div className="app-container">
+                    <main className="main-panel">
+                        <div className="countdown-section">
+                            <div className="digital-countdown-large">
+                                <span className="curr-time" style={{ color: 'var(--text-accent)' }}>{displayTime}</span>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const rootElement = document.getElementById('root');
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(<App />);
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sira/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
