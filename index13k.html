@@ -3704,18 +3704,63 @@
             return `${hourStr}:${minute}`;
         };
 
+        const timeToMinutes = (timeStr) => {
+            const [h, m] = timeStr.split(':').map(Number);
+            return h * 60 + m;
+        };
+
+        const minutesToTime = (totalMins) => {
+            let m = totalMins % (24 * 60);
+            if (m < 0) m += 24 * 60;
+            const h = Math.floor(m / 60) % 24;
+            const mins = m % 60;
+            return `${String(h).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+        };
+
+        const applyOffsetsToTimes = (baseTimes) => {
+            if (!baseTimes) return null;
+            try {
+                const offsets = JSON.parse(localStorage.getItem('prayerOffsets') || '{}');
+                const result = { ...baseTimes };
+                for (const key in result) {
+                    if (offsets[key]) {
+                        result[key] = minutesToTime(timeToMinutes(result[key]) + offsets[key]);
+                    }
+                }
+                return result;
+            } catch (e) {
+                return baseTimes;
+            }
+        };
+
+        const updateOffsets = (currentTimes, editedTimes) => {
+            try {
+                const offsets = JSON.parse(localStorage.getItem('prayerOffsets') || '{}');
+                for (const key in editedTimes) {
+                    if (currentTimes[key]) {
+                        const diff = timeToMinutes(editedTimes[key]) - timeToMinutes(currentTimes[key]);
+                        if (diff !== 0) {
+                            offsets[key] = (offsets[key] || 0) + diff;
+                        }
+                    }
+                }
+                localStorage.setItem('prayerOffsets', JSON.stringify(offsets));
+            } catch (e) {}
+        };
+
         // from hooks/usePrayerTimes.ts
         const usePrayerTimes = (currentTime) => {
             // Initialize state from local database or cache
             const [prayerTimes, setPrayerTimes] = React.useState(() => {
                 const todayKey = getTodaysDateKey(currentTime);
-                const customData = localStorage.getItem(`customPrayerTimes_${todayKey}`);
-
-                // Priority: 1. Manual edit (localStorage) 2. Embedded Database (Excel)
-                if (customData) return JSON.parse(customData);
 
                 if (typeof PRAYER_DATABASE !== 'undefined' && PRAYER_DATABASE[todayKey]) {
-                    return PRAYER_DATABASE[todayKey];
+                    return applyOffsetsToTimes(PRAYER_DATABASE[todayKey]);
+                }
+
+                const cachedData = localStorage.getItem(`cachedPrayerTimes_${todayKey}`);
+                if (cachedData) {
+                    return applyOffsetsToTimes(JSON.parse(cachedData));
                 }
 
                 return null;
@@ -3728,18 +3773,19 @@
             const todayKey = React.useMemo(() => getTodaysDateKey(currentTime), [currentTime]);
 
             const fetchPrayerTimes = React.useCallback(async () => {
-                // If we already have database times or custom times, we don't need to fetch from Aladhan API
-                if (localStorage.getItem(`customPrayerTimes_${todayKey}`)) {
-                    setLoading(false);
-                    return;
-                }
                 if (typeof PRAYER_DATABASE !== 'undefined' && PRAYER_DATABASE[todayKey]) {
-                    setPrayerTimes(PRAYER_DATABASE[todayKey]);
+                    setPrayerTimes(applyOffsetsToTimes(PRAYER_DATABASE[todayKey]));
                     setLoading(false);
                     return;
                 }
 
                 const cacheKey = `cachedPrayerTimes_${todayKey}`;
+                if (localStorage.getItem(cacheKey)) {
+                    setPrayerTimes(applyOffsetsToTimes(JSON.parse(localStorage.getItem(cacheKey))));
+                    setLoading(false);
+                    return;
+                }
+
                 try {
                     if (!navigator.onLine) return; // Removed prayerTimes from here to break infinite loop
 
@@ -3748,14 +3794,14 @@
 
                     const data = await response.json();
                     if (data.code === 200 && data.data && data.data.timings) {
-                        setPrayerTimes(data.data.timings);
+                        setPrayerTimes(applyOffsetsToTimes(data.data.timings));
                         localStorage.setItem(cacheKey, JSON.stringify(data.data.timings));
                         setError(null);
                     }
                 } catch (err) {
                     console.warn("Prayer times fetch failed:", err);
                     // Only show error if we have NO data at all
-                    if (!localStorage.getItem(`customPrayerTimes_${todayKey}`) && !localStorage.getItem(`cachedPrayerTimes_${todayKey}`)) {
+                    if (!localStorage.getItem(`cachedPrayerTimes_${todayKey}`)) {
                         setError("يرجى الاتصال بالإنترنت.");
                     }
                 } finally {
@@ -3827,9 +3873,9 @@
             }, [currentTime, prayerTimes]);
 
             const handleSavePrayerTimes = React.useCallback((newTimes) => {
+                updateOffsets(prayerTimes, newTimes);
                 setPrayerTimes(newTimes);
-                localStorage.setItem(`customPrayerTimes_${todayKey}`, JSON.stringify(newTimes));
-            }, [todayKey]);
+            }, [prayerTimes]);
 
             const countdownParts = React.useMemo(() => {
                 const totalSeconds = Math.max(0, Math.floor(nextPrayerCountdown / 1000));
