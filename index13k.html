@@ -692,7 +692,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-          const CACHE_NAME = 'prayer-app-v3';
+          const CACHE_NAME = 'prayer-app-v4';
           const ASSETS = [
             './',
             './index.html',
@@ -3705,15 +3705,18 @@
         };
 
         const timeToMinutes = (timeStr) => {
+            if (!timeStr) return NaN;
+            timeStr = timeStr.toString().split(' ')[0]; // Remove timezone strings like (AST)
             const [h, m] = timeStr.split(':').map(Number);
-            return h * 60 + m;
+            return (isNaN(h) ? 0 : h) * 60 + (isNaN(m) ? 0 : m);
         };
 
         const minutesToTime = (totalMins) => {
+            if (isNaN(totalMins)) return "00:00";
             let m = totalMins % (24 * 60);
             if (m < 0) m += 24 * 60;
             const h = Math.floor(m / 60) % 24;
-            const mins = m % 60;
+            const mins = Math.floor(m % 60);
             return `${String(h).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
         };
 
