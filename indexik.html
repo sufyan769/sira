@@ -3908,11 +3908,11 @@
             alignItems: 'baseline'
           }}>
             <span>{displayHours.toString()}</span>
-            <span style={{ margin: '0 0.2rem' }}>:</span>
+            <span style={{ margin: '0 1.9rem' }}>:</span>
             <span>{formatNumber(minutes)}</span>
           </div>
           <div style={{
-            fontSize: '1.5rem',
+            fontSize: '0rem',
             fontWeight: '600',
             opacity: 0.8,
             marginTop: '0.5rem',
@@ -3921,7 +3921,7 @@
             gap: '0.8rem'
           }}>
             {showSeconds && <span>{formatNumber(seconds)}</span>}
-            <span style={{ fontSize: '1rem', background: 'var(--bg-accent)', color: 'var(--text-main)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
+            <span style={{ fontSize: '0rem', background: 'var(--bg-accent)', color: 'var(--text-main)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
               {isPM ? 'PM' : 'AM'}
             </span>
           </div>
