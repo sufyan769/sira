@@ -8,9 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Changa:wght@600;700&display=swap" rel="stylesheet">
   <link
-    href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=El+Messiri:wght@400..700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=El+Messiri:wght@400..700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
   <link rel="shortcut icon"
@@ -1000,23 +999,25 @@
           justifyContent: 'center',
           height: '100%',
           width: '100%',
-          fontFamily: "'Changa', sans-serif",
-          color: 'var(--text-accent)',
+          fontFamily: "'Share Tech Mono', 'Orbitron', monospace",
+          color: '#0e180e',
           direction: 'ltr'
         }}>
           <div style={{
-            fontSize: 'clamp(8rem, 20vw, 15rem)',
+            fontSize: 'clamp(6.5rem, 16vw, 12rem)',
             fontWeight: 'bold',
-            lineHeight: '0.8',
+            lineHeight: '0.85',
             display: 'flex',
-            alignItems: 'baseline'
+            alignItems: 'baseline',
+            letterSpacing: '2px',
+            textShadow: '0 1px 1px rgba(0,0,0,0.15)'
           }}>
             <span>{displayHours.toString()}</span>
-            <span style={{ margin: '0 0.8rem' }}>:</span>
+            <span style={{ margin: '0 0.5rem', opacity: seconds % 2 === 0 ? 1 : 0.2 }}>:</span>
             <span>{formatNumber(minutes)}</span>
           </div>
           <div style={{
-            fontSize: '0rem',
+            fontSize: 'clamp(1.5rem, 4vw, 3rem)',
             fontWeight: '600',
             opacity: 0.8,
             marginTop: '0.5rem',
@@ -1025,11 +1026,10 @@
             gap: '0.8rem'
           }}>
             {showSeconds && <span>{formatNumber(seconds)}</span>}
-            <span style={{ fontSize: '0rem', background: 'var(--bg-accent)', color: 'var(--text-main)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
+            <span style={{ fontSize: '1rem', background: 'var(--bg-accent)', color: 'var(--text-main)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
               {isPM ? 'PM' : 'AM'}
             </span>
           </div>
-          {/* Clean time display inside DigitalClock */}
         </div>
       );
     };
@@ -1439,9 +1439,21 @@
             {/* Top Section: Vertical Flex */}
             <div className="top-section">
 
-              {/* Top: Main Clock */}
+              {/* Top: Main Clock (Classic Casio Digital Watch Style) */}
               <div className="clock-wrapper" style={{ flex: '1', width: '100%' }}>
-                <div className="top-card" style={{ width: '100%', height: '100%', borderRadius: '16px', padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', background: 'rgba(247, 180, 44, 0.15)', borderColor: 'var(--text-accent)' }}>
+                <div className="top-card" style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '16px',
+                  padding: '1rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  background: 'linear-gradient(180deg, #7c8b7b 0%, #6d7b6c 100%)',
+                  border: '3px solid #4a544a',
+                  boxShadow: 'inset 0 3px 8px rgba(0,0,0,0.4), 0 4px 15px rgba(0,0,0,0.3)'
+                }}>
                   <DigitalClock
                     time={time}
                     dateInfo={dateInfo}
