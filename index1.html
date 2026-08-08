@@ -101,56 +101,51 @@
       position: relative;
     }
 
-        /* Top Section: Header & Clock */
+            /* Top Section: Header & Clock */
     .top-section {
       flex: 1.5;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
       gap: 1.5rem;
-      padding: 1.5rem;
+      position: relative;
+      padding-top: 1rem;
       width: 100%;
       height: 100%;
     }
 
-    .top-section > .clock-wrapper {
-      grid-column: 1 / -1;
+    .top-section .clock-wrapper {
+      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 100%;
-      min-height: 35vh;
-    }
-    
-    .top-section > .countdown-wrapper {
-      grid-column: 1 / -1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
+      padding: 0 1.5rem;
     }
 
-    .top-section > .date-wrapper,
-    .top-section > .weather-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-      width: 100%;
-    }
 
-    .grid-card {
-      background: var(--glass-bg);
-      border: 2px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: 2rem;
-      backdrop-filter: blur(10px);
+
+    .top-section .info-wrapper {
+      flex: 0.8;
+      width: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: center;
+      padding: 0 1.5rem;
+    }
+
+    .info-card-premium {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+      border-radius: 4rem;
+      backdrop-filter: blur(25px);
       width: 100%;
-      padding: 2rem;
-      text-align: center;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      padding: 1.5rem;
       position: relative;
     }
 
@@ -160,7 +155,7 @@
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
+      gap: 1.5rem;
       direction: ltr;
       width: 100%;
     }
@@ -168,58 +163,68 @@
     .digital-countdown-large .curr-time {
       font-size: 8rem;
       font-weight: 800;
-      color: var(--text-accent);
+      color: #fff;
       font-family: 'Changa';
       line-height: 1;
+      text-shadow: 0 0 30px rgba(247, 180, 44, 0.8);
     }
     
     /* Date & Weather Styling (Side Info) */
+    .premium-text {
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .premium-text-gold {
+      color: #F7B42C;
+      text-shadow: 0 2px 15px rgba(247, 180, 44, 0.6);
+    }
+
     .date-weekday {
-      font-size: 4.5rem;
+      font-size: 5rem;
       font-weight: 700;
-      color: var(--text-accent);
+      color: var(--text-primary);
       font-family: var(--font-display);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0rem;
+      line-height: 1;
     }
 
     .date-gregorian {
-      font-size: 3.5rem;
+      font-size: 4rem;
       font-weight: 400;
       color: var(--text-secondary);
       margin-bottom: 0.5rem;
     }
 
     .date-hijri {
-      font-size: 3rem;
+      font-size: 3.5rem;
       font-weight: 600;
-      color: var(--text-primary);
       font-family: var(--font-display);
     }
 
     .weather-area {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
+      gap: 2rem;
     }
 
     .weather-icon {
-      font-size: 7rem;
-      color: var(--text-accent);
+      font-size: 6.5rem;
+      color: #00d2ff;
+      text-shadow: 0 0 25px rgba(0, 210, 255, 0.6);
     }
 
     .weather-temp {
-      font-size: 6rem;
+      font-size: 6.5rem;
       font-weight: 800;
       color: var(--text-primary);
       line-height: 1;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
 
     /* Bottom Section: Prayers */
     .bottom-section {
       flex: 0.6;
-      /* Reduced from 1.2 to 0.6 (~50%) */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -229,72 +234,68 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(2, 1fr);
-      gap: 2rem;
+      gap: 1.5rem;
       width: 100%;
       height: 100%;
       position: static;
-      /* Reset absolute */
     }
 
     .prayer-card {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: 1.5rem;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      border-radius: 2rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 1.5rem;
-      /* Increased */
+      padding: 0.5rem;
       max-width: none;
-      /* Reset */
       flex-basis: auto;
-      /* Reset */
       flex-grow: 1;
-      transition: transform 0.2s, background 0.2s;
-      backdrop-filter: blur(8px);
+      transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+      backdrop-filter: blur(15px);
     }
 
     .prayer-card.next-prayer {
-      background: rgba(247, 180, 44, 0.15);
-      border-color: var(--text-accent);
-      transform: scale(1.02);
+      background: linear-gradient(135deg, rgba(247, 180, 44, 0.4), rgba(247, 180, 44, 0.15));
+      border-color: #F7B42C;
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(247, 180, 44, 0.5);
     }
 
     .prayer-card:hover {
       transform: translateY(-3px);
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.2);
     }
 
     .prayer-card-name {
-      font-size: 3.5rem;
-      /* Larger */
-      font-weight: 600;
+      font-size: 2.8rem;
+      font-weight: 700;
       font-family: var(--font-display);
       color: #ffd000;
       margin-bottom: -0.5rem;
-      /* Tight margin */
       line-height: 1.7;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
 
     .prayer-card-time {
-      font-size: 5.5rem;
-      /* Larger */
+      font-size: 4.8rem;
       font-weight: 800;
       font-family: var(--font-primary);
       color: var(--text-primary);
       direction: ltr;
       line-height: 0.7;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
 
     .prayer-card.next-prayer .prayer-card-name {
-      color: var(--text-accent);
+      color: #fff;
     }
 
     .prayer-card.next-prayer .prayer-card-time {
-      color: var(--text-accent);
-      text-shadow: 0 0 15px rgba(247, 180, 44, 0.4);
+      color: #fff;
+      text-shadow: 0 0 20px #F7B42C;
     }
 
     /* Settings Button */
@@ -3570,14 +3571,14 @@
           direction: 'ltr'
         }}>
           <div style={{
-            fontSize: '18rem',
+            fontSize: '12rem',
             fontWeight: 'bold',
             lineHeight: '1',
             display: 'flex',
             alignItems: 'baseline'
           }}>
             <span>{displayHours.toString()}</span>
-            <span style={{ margin: '0 2.5rem' }}>:</span>
+            <span style={{ margin: '0 1.5rem' }}>:</span>
             <span>{formatNumber(minutes)}</span>
           </div>
           <div style={{
@@ -3984,30 +3985,42 @@
       return (
         <div className={`app-container ${isRotated ? 'rotated-90' : ''}`}>
           <main className="main-panel">
-            {/* Top Section */}
+            {/* Top Section: Vertical Flex */}
             <div className="top-section">
 
-              {/* Main Clock Card */}
-              <div className="clock-wrapper grid-card">
-                <DigitalClock
-                  time={time}
-                  showSeconds={true}
-                />
+              {/* Top: Main Clock */}
+              <div className="clock-wrapper">
+                <div className="main-clock-card">
+                  <DigitalClock
+                    time={time}
+                    showSeconds={true}
+                  />
+                </div>
               </div>
 
-              {/* Countdown Card */}
-              <div className="countdown-wrapper grid-card">
-                <Countdown countdownParts={countdownParts} large={true} />
-              </div>
+              {/* Bottom: Consolidated Info (Countdown + Date + Weather) */}
+              <div className="info-wrapper">
+                <div className="info-card-premium">
 
-              {/* Date Card */}
-              <div className="date-wrapper grid-card">
-                <DateDisplay dateInfo={dateInfo} />
-              </div>
+                  {/* Info Row: Countdown/Weather (Left) & Day/Date (Right) */}
+                  <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'stretch', padding: '1rem 2rem' }}>
 
-              {/* Weather Card */}
-              <div className="weather-wrapper grid-card">
-                <WeatherDisplay />
+                    {/* Left: Countdown & Weather Stack */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Countdown countdownParts={countdownParts} large={true} />
+                      <WeatherDisplay />
+                    </div>
+
+                    {/* Right: Day & Date Stack */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', justifyContent: 'space-between' }}>
+                      <div className="date-weekday premium-text">{dateInfo.weekday}</div>
+                      <div className="date-gregorian premium-text">{dateInfo.gregorian}</div>
+                      <div className="date-hijri premium-text-gold">{dateInfo.hijri}</div>
+                    </div>
+
+                  </div>
+
+                </div>
               </div>
 
             </div>
