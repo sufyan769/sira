@@ -916,7 +916,7 @@
 
     // Weather Component
     const WeatherDisplay = () => {
-      const cacheKey = 'cachedWeather';
+      const cacheKey = 'cachedWeather_kirkuk_v2';
       const [weather, setWeather] = React.useState(() => {
         const cached = localStorage.getItem(cacheKey);
         return cached ? JSON.parse(cached) : null;
@@ -926,8 +926,9 @@
         try {
           if (!navigator.onLine && weather) return;
 
+          // Kirkuk, Iraq (Latitude: 35.4681, Longitude: 44.3922)
           const res = await fetch(
-            "https://api.open-meteo.com/v1/forecast?latitude=40.9724707&longitude=28.7327375&current=temperature_2m,weather_code&timezone=auto"
+            "https://api.open-meteo.com/v1/forecast?latitude=35.4681&longitude=44.3922&current=temperature_2m,weather_code&timezone=Asia%2FBaghdad"
           );
           if (!res.ok) throw new Error('Weather fetch failed');
           const data = await res.json();
