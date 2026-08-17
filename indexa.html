@@ -78,10 +78,14 @@
        حاوية التصغير التلقائي (لمنع خروج المحتوى)
        ======================================== */
     .fit-content {
-        display: flex; flex-direction: column; flex: 1 1 auto;
-        min-height: 0; width: 100%;
-        transform-origin: top center;
-    }
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    justify-content: space-between;
+    container-type: size; /* تفعيل Container Queries */
+}
 
     /* ========================================
        الخلفية
@@ -177,46 +181,55 @@
        قائمة الصلوات
        ======================================== */
     .prayer-list {
-        display: flex; flex: 1; flex-direction: column;
-        justify-content: space-between; min-height: 0;
-        width: 100%; max-width: 850px;
-        margin: 0 auto; padding: 0 0 clamp(8px, 1.8vh, 22px);
-        gap: var(--prayer-gap);
-    }
+       display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 4px 0;
+    gap: clamp(4px, 1cqh, 12px);
+}
     .prayer-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: clamp(8px, 2vw, 20px);
-    flex-shrink: 0;
-    min-height: 35px !important;
-    padding: clamp(6px, 1.8vh, 16px) 8px !important;
-    margin-bottom: 2px !important;
-    border: 1px solid var(--border-prayer);
-    border-radius: 15px !important;
+    flex: 1 1 0;
+    min-height: 0;
+    padding: 0 clamp(12px, 3cqi, 28px);
+    border: 1.5px solid var(--border-prayer);
+    border-radius: clamp(12px, 2cqh, 22px);
     background: var(--bg-prayer);
     overflow: hidden;
     direction: ltr;
-    }
+}
     .prayer-row.next-prayer {
         border-color: var(--border-prayer-active);
         background: var(--bg-prayer-active);
         box-shadow: 0 4px 16px rgba(24,93,56,0.18);
     }
     .prayer-row strong {
-        color: var(--text-prayer-name); direction: rtl;
-        font-family: var(--font-arabic);
-        font-size: var(--prayer-name-size); font-weight: 700;
-        line-height: 1.25; white-space: nowrap;
-        min-width: 0; overflow: hidden; text-overflow: ellipsis;
-    }
+    color: var(--text-prayer-name);
+    direction: rtl;
+    font-family: var(--font-arabic);
+    font-size: clamp(26px, 4.8cqh, 85px);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
     .prayer-row.next-prayer strong { color: var(--text-prayer-active); }
     .prayer-row time {
-        color: var(--text-prayer-time); direction: ltr;
-        font-family: var(--font-numbers);
-        font-size: var(--prayer-time-size); font-weight: 800;
-        letter-spacing: .02em; line-height: 1; white-space: nowrap;
-    }
+    color: var(--text-prayer-time);
+    direction: ltr;
+    font-family: var(--font-numbers);
+    font-size: clamp(34px, 6.2cqh, 105px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: .02em;
+    white-space: nowrap;
+}
     .prayer-row.next-prayer time { color: var(--text-prayer-active); }
 
     /* ========================================
@@ -1244,17 +1257,8 @@
     // ============================================================
     const fitContentEl = document.getElementById('fit-content');
     function fitScreen() {
-        if (!fitContentEl) return;
-        fitContentEl.style.transform = 'scale(1)';
-        // إجبار المتصفح على إعادة الحساب قبل القياس
-        void fitContentEl.offsetHeight;
-        const available = fitContentEl.clientHeight;
-        const needed = fitContentEl.scrollHeight;
-        if (needed > available && available > 0) {
-            const scale = Math.max(available / needed, 0.5);
-            fitContentEl.style.transform = `scale(${scale})`;
         }
-    }
+    
     window.addEventListener('resize', fitScreen);
     window.addEventListener('orientationchange', () => setTimeout(fitScreen, 200));
 
