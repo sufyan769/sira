@@ -286,19 +286,30 @@
        الإعدادات
        ======================================== */
     .settings-layer {
-        position: absolute; inset: 0; z-index: 10;
-        display: grid; place-items: center;
-        padding: clamp(12px, 4vw, 36px);
-        background: rgba(4,35,20,.45); backdrop-filter: blur(4px);
-    }
+       position: absolute;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    padding: 16px;
+}
     .settings-panel {
-        display: flex; flex-direction: column;
-        width: min(94%, 720px); max-height: 94vh; overflow-y: auto;
-        padding: clamp(16px, 3.5vw, 30px);
-        border: 1px solid rgba(21,91,56,.34); border-radius: 16px;
-        color: #121715; background: #ffffff;
-        box-shadow: 0 20px 60px rgba(0,0,0,.35);
-    }
+       display: flex;
+    flex-direction: column;
+    width: 95%;
+    max-width: 850px;
+    height: 96%;
+    max-height: 96%;
+    padding: 20px 24px;
+    border-radius: 20px;
+    border: 2px solid rgba(21, 91, 56, 0.3);
+    background: #ffffff;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    overflow-y: auto;
+}
     .settings-header {
         display: flex; align-items: flex-start; justify-content: space-between;
         gap: 18px; padding-bottom: 12px;
