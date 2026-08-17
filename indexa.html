@@ -72,6 +72,15 @@
     @media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }
 
     /* ========================================
+       حاوية التصغير التلقائي (لمنع خروج المحتوى)
+       ======================================== */
+    .fit-content {
+        display: flex; flex-direction: column; flex: 1 1 auto;
+        min-height: 0; width: 100%;
+        transform-origin: top center;
+    }
+
+    /* ========================================
        الخلفية
        ======================================== */
     .soft-pattern {
@@ -165,7 +174,7 @@
        ======================================== */
     .prayer-list {
         display: flex; flex: 1; flex-direction: column;
-        justify-content: space-between;
+        justify-content: space-between; min-height: 0;
         width: 100%; max-width: 850px;
         margin: 0 auto; padding: 0 0 clamp(8px, 1.8vh, 22px);
         gap: var(--prayer-gap);
@@ -341,6 +350,7 @@
     </svg>
   </button>
 
+  <div class="fit-content" id="fit-content">
   <section class="clock-frame" aria-label="الساعة الحالية">
     <time id="live-clock">00:00:00</time>
   </section>
@@ -379,6 +389,7 @@
       <strong id="countdown-adhan">00:00:00</strong>
     </div>
   </footer>
+  </div>
 
   <div class="settings-layer" id="settings-modal" style="display: none;" role="presentation">
     <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
@@ -1221,11 +1232,32 @@
     }
 
     // ============================================================
+    // 8.5 التصغير التلقائي لمنع خروج المحتوى عن الشاشة
+    // ============================================================
+    const fitContentEl = document.getElementById('fit-content');
+    function fitScreen() {
+        if (!fitContentEl) return;
+        fitContentEl.style.transform = 'scale(1)';
+        // إجبار المتصفح على إعادة الحساب قبل القياس
+        void fitContentEl.offsetHeight;
+        const available = fitContentEl.clientHeight;
+        const needed = fitContentEl.scrollHeight;
+        if (needed > available && available > 0) {
+            const scale = Math.max(available / needed, 0.5);
+            fitContentEl.style.transform = `scale(${scale})`;
+        }
+    }
+    window.addEventListener('resize', fitScreen);
+    window.addEventListener('orientationchange', () => setTimeout(fitScreen, 200));
+
+    // ============================================================
     // 9. بدء التشغيل
     // ============================================================
     loadSettings();
     updateUI();
+    fitScreen();
     setInterval(updateUI, 1000);
+    setInterval(fitScreen, 3000);
     keepScreenOn();
 
     // إعادة تحميل الصفحة في حالة أي خطأ
