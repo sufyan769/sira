@@ -36,13 +36,13 @@
         --footer-bg: #155b38;
         --footer-text: #ffffff;
         
-        --clock-size: clamp(48px, 13vw, 135px);
-        --weekday-size: clamp(18px, 4vw, 42px);
-        --date-size: clamp(16px, 3.6vw, 38px);
-        --prayer-name-size: clamp(30px, 8vw, 90px);
-        --prayer-time-size: clamp(40px, 11vw, 120px);
-        --countdown-label-size: clamp(12px, 2.6vw, 28px);
-        --countdown-number-size: clamp(26px, 7.8vw, 82px);
+        --clock-size: clamp(40px, min(11vw, 12vh), 135px);
+        --weekday-size: clamp(16px, min(3.5vw, 4vh), 42px);
+        --date-size: clamp(14px, min(3.2vw, 3.4vh), 38px);
+        --prayer-name-size: clamp(20px, min(6.5vw, 6.5vh), 90px);
+        --prayer-time-size: clamp(24px, min(8.5vw, 8.5vh), 120px);
+        --countdown-label-size: clamp(10px, min(2.2vw, 2.4vh), 28px);
+        --countdown-number-size: clamp(18px, min(6.5vw, 7vh), 82px);
         
         --prayer-gap: 0px;
         --prayer-padding: 0px 10px;
@@ -183,6 +183,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: clamp(8px, 2vw, 20px);
     min-height: 35px !important;
     padding: 0px 8px !important;
     margin-bottom: 2px !important;
@@ -201,6 +202,7 @@
         font-family: var(--font-arabic);
         font-size: var(--prayer-name-size); font-weight: 700;
         line-height: 1; white-space: nowrap;
+        min-width: 0; overflow: hidden; text-overflow: ellipsis;
     }
     .prayer-row.next-prayer strong { color: var(--text-prayer-active); }
     .prayer-row time {
@@ -928,7 +930,7 @@
             timeZone: TIME_ZONE,
             year: "numeric", month: "2-digit", day: "2-digit",
             hour: "2-digit", minute: "2-digit", second: "2-digit",
-            hourCycle: "h12",
+            hourCycle: "h23",
         }).formatToParts(date);
 
         const get = (type) => Number(parts.find((p) => p.type === type)?.value ?? 0);
