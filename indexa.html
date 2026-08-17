@@ -182,15 +182,15 @@
        ======================================== */
     .prayer-list {
        display: flex;
-    flex: 1 1 0;
     flex-direction: column;
+    flex: 1 1 auto;
     justify-content: space-between;
     min-height: 0;
     width: 100%;
-    max-width: 850px;
+    max-width: 92%;
     margin: 0 auto;
-    padding: 4px 0;
-    gap: clamp(4px, 1cqh, 12px);
+    padding: 8px 0;
+    gap: 8px;
 }
     .prayer-row {
     display: flex;
@@ -198,9 +198,9 @@
     justify-content: space-between;
     flex: 1 1 0;
     min-height: 0;
-    padding: 0 clamp(12px, 3cqi, 28px);
-    border: 1.5px solid var(--border-prayer);
-    border-radius: clamp(12px, 2cqh, 22px);
+    padding: 0 32px;
+    border: 2px solid var(--border-prayer);
+    border-radius: 20px;
     background: var(--bg-prayer);
     overflow: hidden;
     direction: ltr;
@@ -214,7 +214,7 @@
     color: var(--text-prayer-name);
     direction: rtl;
     font-family: var(--font-arabic);
-    font-size: clamp(26px, 4.8cqh, 85px);
+    font-size: clamp(38px, 4.5vw, 68px) !important;
     font-weight: 700;
     line-height: 1;
     white-space: nowrap;
@@ -224,7 +224,7 @@
     color: var(--text-prayer-time);
     direction: ltr;
     font-family: var(--font-numbers);
-    font-size: clamp(34px, 6.2cqh, 105px);
+    font-size: clamp(48px, 6vw, 92px) !important;
     font-weight: 800;
     line-height: 1;
     letter-spacing: .02em;
