@@ -8,401 +8,23 @@
   <meta http-equiv="Expires" content="0" />
   <title>شاشة مواقيت الصلاة - كركوك</title>
   
-  <!-- Fonts -->
+    <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Alyamama:wght@300..900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&family=El+Messiri:wght@400..700&family=Chivo+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@400;500;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
 
-  <style>
-    /* ========================================
-       المتغيرات الرئيسية
-       ======================================== */
-    :root {
-        --font-arabic: "Readex Pro", "Noto Sans Arabic", "Cairo", sans-serif;
-        --font-numbers: "Fjalla One", Arial, sans-serif;
-        --font-clock: "Share Tech Mono", "Courier New", monospace;
-        
-        --bg-main: #f8fbf9;
-        --bg-prayer: rgba(255, 255, 255, 0.45);
-        --bg-prayer-active: rgba(24, 93, 56, 0.12);
-        --text-primary: #0b0d0d;
-        --text-prayer-name: #080b0b;
-        --text-prayer-time: #6a062b;
-        --text-prayer-active: #185d38;
-        --text-clock: #185d38;
-        --text-date: #155b38;
-        --text-gregorian: #3b4d43;
-        --border-prayer: rgba(97, 103, 100, 0.65);
-        --border-prayer-active: #185d38;
-        --footer-bg: #155b38;
-        --footer-text: #ffffff;
-        
-        --clock-size: clamp(48px, 13vw, 135px);
-        --weekday-size: clamp(18px, 4vw, 42px);
-        --date-size: clamp(16px, 3.6vw, 38px);
-        --prayer-name-size: clamp(30px, 8vw, 90px);
-        --prayer-time-size: clamp(40px, 11vw, 120px);
-        --countdown-label-size: clamp(12px, 2.6vw, 28px);
-        --countdown-number-size: clamp(26px, 7.8vw, 82px);
-        
-        --prayer-gap: 0px;
-        --prayer-padding: 0px 10px;
-        --prayer-margin: 0px;
-        --prayer-min-height: clamp(30px, 5vh, 55px);
-        --prayer-border-radius: 30px;
-        --container-padding: 8px 16px 0;
-
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: var(--bg-main); }
-
-    /* ========================================
-       الشاشة الرئيسية
-       ======================================== */
-    .mosque-screen {
-        position: absolute; top: 0; left: 0; isolation: isolate;
-        display: flex; flex-direction: column;
-        width: 100vh; height: 100vw;
-        margin: 0; padding: var(--container-padding);
-        overflow: hidden;
-        background: linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(248,251,249,.96) 78%, rgba(215,226,219,.88) 100%), var(--bg-main);
-        transform: rotate(90deg) translateY(-100%);
-        transform-origin: top left;
-    }
-    @media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }
-
-    /* ========================================
-       حاوية التصغير التلقائي (لمنع خروج المحتوى)
-       ======================================== */
-    .fit-content {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0;
-    min-height: 0;
-    width: 100%;
-    justify-content: space-between;
-    container-type: size; /* تفعيل Container Queries */
-}
-
-    /* ========================================
-       الخلفية
-       ======================================== */
-    .soft-pattern {
-        position: absolute; inset: 0; z-index: -1; opacity: .42; pointer-events: none;
-        background-image:
-            radial-gradient(circle at 10% 6%, transparent 0 26px, rgba(185,200,193,.45) 27px 28px, transparent 29px),
-            radial-gradient(circle at 88% 13%, transparent 0 22px, rgba(190,205,197,.38) 23px 24px, transparent 25px),
-            radial-gradient(circle at 22% 40%, transparent 0 30px, rgba(190,205,197,.32) 31px 32px, transparent 33px),
-            radial-gradient(circle at 80% 55%, transparent 0 27px, rgba(190,205,197,.3) 28px 29px, transparent 30px),
-            radial-gradient(circle at 15% 79%, transparent 0 24px, rgba(190,205,197,.34) 25px 26px, transparent 27px),
-            radial-gradient(circle at 65% 88%, transparent 0 32px, rgba(190,205,197,.3) 33px 34px, transparent 35px);
-        background-size: 100px 100px;
-    }
-
-    /* ========================================
-       زر الإعدادات
-       ======================================== */
-    .settings-button {
-        position: absolute; top: clamp(10px, 2.2vh, 26px); right: clamp(10px, 2.5vw, 28px);
-        z-index: 4; display: grid; place-items: center;
-        width: clamp(34px, 5.5vw, 54px); height: clamp(34px, 5.5vw, 54px);
-        padding: 0; border: 1px solid rgba(30,91,57,.3); border-radius: 50%;
-        color: #185d38; background: rgba(255,255,255,.85);
-        cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        transition: background .2s ease, transform .2s ease;
-    }
-    .settings-button:hover { background: #fff; transform: rotate(30deg); }
-    .settings-button svg { width: 60%; height: 60%; fill: currentColor; }
-
-    /* ========================================
-       الساعة
-       ======================================== */
-    .clock-frame {
-        display: grid;
-    place-items: center;
-    flex-shrink: 0;
-    width: min(96%, 950px);
-    min-height: clamp(90px, 12vh, 160px);
-    margin: 0 auto;
-    border: 3px solid rgba(24, 93, 56, 0.3);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.75);
-    box-shadow: 0 6px 24px rgba(24, 93, 56, 0.12), inset 0 0 0 6px rgba(255, 255, 255, 0.5);
-}
-    .clock-frame time {
-        direction: ltr;
-    color: var(--text-clock);
-    font-family: var(--font-clock);
-    font-size: clamp(65px, 8.5vw, 130px) !important;
-    font-weight: 800;
-    letter-spacing: 4px;
-    line-height: 1;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-}
-
-    /* ========================================
-       التاريخ
-       ======================================== */
-    .date-block {
-        display: flex; align-items: center; flex-direction: row;
-        justify-content: center; gap: clamp(10px, 2vw, 25px);
-        flex-shrink: 0;
-        width: 100%; max-width: 850px;
-        margin: clamp(8px, 1.5vh, 18px) auto clamp(8px, 1.8vh, 20px);
-        flex-wrap: wrap;
-    }
-    .weekday {
-        width: 100%; text-align: center;
-        color: var(--text-date); font-family: var(--font-arabic);
-        font-size: var(--weekday-size); font-weight: 800; line-height: 1.15;
-        margin-bottom: 4px;
-    }
-    .date-card {
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        padding: clamp(8px, 1.5vh, 16px) clamp(16px, 3vw, 35px);
-        border: 2px solid rgba(24,93,56,0.25); border-radius: 16px;
-        background: rgba(255,255,255,0.65);
-        box-shadow: 0 2px 10px rgba(24,93,56,0.08);
-        min-width: clamp(120px, 20vw, 200px); flex: 1;
-    }
-    .date-card .date-label {
-        color: #155b38; font-size: clamp(12px, 1.8vw, 18px);
-        font-weight: 700; font-family: var(--font-arabic);
-        margin-bottom: 2px; opacity: 0.8;
-    }
-    .date-card .date-value {
-        color: #0b0d0d; font-size: clamp(18px, 3.5vw, 38px);
-        font-weight: 800; font-family: var(--font-arabic);
-        line-height: 1.3; text-align: center;
-    }
-    .date-card .date-value .day-number {
-        font-family: var(--font-numbers); font-weight: 900;
-    }
-    .date-card.hijri-card { border-color: rgba(138,22,64,0.25); }
-    .date-card.hijri-card .date-label { color: #8a1640; }
-
-    /* ========================================
-       قائمة الصلوات
-       ======================================== */
-    .prayer-list {
-       display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    justify-content: space-between;
-    min-height: 0;
-    width: 100%;
-    max-width: 92%;
-    margin: 0 auto;
-    padding: 8px 0;
-    gap: 8px;
-}
-    .prayer-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex: 1 1 0;
-    min-height: 0;
-    padding: 0 32px;
-    border: 2px solid var(--border-prayer);
-    border-radius: 20px;
-    background: var(--bg-prayer);
-    overflow: hidden;
-    direction: ltr;
-}
-    .prayer-row.next-prayer {
-        border-color: var(--border-prayer-active);
-        background: var(--bg-prayer-active);
-        box-shadow: 0 4px 16px rgba(24,93,56,0.18);
-    }
-    .prayer-row strong {
-    color: var(--text-prayer-name);
-    direction: rtl;
-    font-family: var(--font-arabic);
-    font-size: clamp(38px, 4.5vw, 68px) !important;
-    font-weight: 700;
-    line-height: 1;
-    white-space: nowrap;
-}
-    .prayer-row.next-prayer strong { color: var(--text-prayer-active); }
-    .prayer-row time {
-    color: var(--text-prayer-time);
-    direction: ltr;
-    font-family: var(--font-numbers);
-    font-size: clamp(48px, 6vw, 92px) !important;
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: .02em;
-    white-space: nowrap;
-}
-    .prayer-row.next-prayer time { color: var(--text-prayer-active); }
-
-    /* ========================================
-       العد التنازلي
-       ======================================== */
-    .countdown-footer {
-        display: grid;
-    grid-template-columns: 1fr 1fr;
-    flex: 0 0 clamp(85px, 12vh, 145px);
-    width: calc(100% + clamp(32px, 7vw, 84px));
-    margin-right: calc(clamp(16px, 3.5vw, 42px) * -1);
-    margin-left: calc(clamp(16px, 3.5vw, 42px) * -1);
-    padding: clamp(10px, 1.5vh, 18px) clamp(16px, 3.5vw, 42px) 0;
-    color: var(--footer-text);
-    background: var(--footer-bg);
-    direction: ltr;
-    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.15);
-}
-    .countdown-column {
-        display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
-    direction: rtl;
-}
-    .countdown-column span {
-        font-family: var(--font-arabic);
-    font-size: clamp(18px, 2.2vw, 32px) !important;
-    font-weight: 700;
-    line-height: 1.2;
-    opacity: 0.95;
-    white-space: nowrap;
-}
-    .countdown-column strong {
-        margin-top: 4px;
-    direction: ltr;
-    font-family: var(--font-numbers);
-    font-size: clamp(42px, 5.5vw, 82px) !important;
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: .02em;
-    white-space: nowrap;
-}
-
-    /* ========================================
-       الإعدادات
-       ======================================== */
-    .settings-layer {
-       position: absolute;
-    inset: 0;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(6px);
-    padding: 16px;
-}
-    .settings-panel {
-       display: flex;
-    flex-direction: column;
-    width: 95%;
-    max-width: 850px;
-    height: 96%;
-    max-height: 96%;
-    padding: 20px 24px;
-    border-radius: 20px;
-    border: 2px solid rgba(21, 91, 56, 0.3);
-    background: #ffffff;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-    overflow-y: auto;
-}
-    .settings-header {
-        display: flex; align-items: flex-start; justify-content: space-between;
-        gap: 18px; padding-bottom: 12px;
-        border-bottom: 1px solid rgba(21,91,56,.18);
-    }
-    .settings-header span { display: block; color: #8a1640; font-size: clamp(11px, 2.2vw, 15px); font-weight: 700; font-family: var(--font-arabic); }
-    .settings-header h2 { margin: 1px 0 0; color: #155b38; font-size: clamp(20px, 4vw, 32px); font-weight: 800; line-height: 1.2; font-family: var(--font-arabic); }
-    .settings-close {
-        display: grid; place-items: center;
-        width: 36px; height: 36px; padding: 0 0 3px;
-        border: 1px solid rgba(21,91,56,.25); border-radius: 50%;
-        color: #155b38; background: #f1f6f2;
-        cursor: pointer; font-size: 26px; font-weight: bold; line-height: 1;
-    }
-    .settings-description { margin: 12px 0; color: #55635a; font-size: clamp(12px, 2.2vw, 15px); line-height: 1.5; font-family: var(--font-arabic); }
-    .settings-prayers, .settings-special { display: grid; gap: 8px; }
-    .settings-special { margin-top: 14px; padding-top: 14px; border-top: 1px dashed rgba(21,91,56,.26); }
-    .settings-row {
-        display: flex; align-items: center; justify-content: space-between;
-        gap: 12px; min-height: 52px; padding: 8px 12px;
-        border: 1px solid rgba(91,110,99,.25); border-radius: 10px;
-        background: #f8fbf8;
-    }
-    .settings-row > div:first-child { min-width: 0; }
-    .prayer-controls { display: flex; align-items: flex-end; flex: 0 0 auto; gap: 12px; }
-    .control-field { display: flex; align-items: center; flex-direction: column; gap: 3px; }
-    .control-field > span { color: #55635a; font-size: 11px; font-weight: 700; line-height: 1; font-family: var(--font-arabic); }
-    .settings-row strong { display: block; color: #101613; font-size: clamp(14px, 2.6vw, 18px); font-weight: 700; line-height: 1.2; font-family: var(--font-arabic); }
-    .settings-row small { display: block; margin-top: 2px; color: #647369; font-size: clamp(10px, 2vw, 13px); line-height: 1.2; font-family: var(--font-arabic); }
-    .minute-control { display: flex; align-items: center; flex: 0 0 auto; gap: 4px; direction: ltr; }
-    .minute-control button {
-        display: grid; place-items: center;
-        width: 30px; height: 30px; padding: 0 0 2px;
-        border: 0; border-radius: 6px;
-        color: #fff; background: #155b38;
-        cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1;
-    }
-    .minute-control button:hover { background: #0b4428; }
-    .minute-control input {
-        width: 50px; height: 30px; padding: 0 2px;
-        border: 1px solid rgba(21,91,56,.4); border-radius: 6px;
-        color: #155b38; background: #fff;
-        font-family: var(--font-numbers);
-        font-size: 15px; font-weight: 700; text-align: center;
-    }
-    .minute-control em { color: #55635a; font-size: 11px; font-style: normal; white-space: nowrap; font-family: var(--font-arabic); }
-    .settings-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; }
-    .settings-actions button {
-        min-height: 40px; padding: 6px 20px; border-radius: 8px;
-        cursor: pointer; font-size: clamp(12px, 2.4vw, 15px);
-        font-weight: 700; font-family: var(--font-arabic);
-    }
-    .reset-button { border: 1px solid rgba(138,22,64,.4); color: #8a1640; background: #fff; }
-    .save-button { border: 1px solid #155b38; color: #fff; background: #155b38; }
-
-    /* ========================================
-       إبقاء الشاشة مضاءة
-       ======================================== */
- /* إلغاء تأثير الثواني */
-.clock-frame time.pulse {
-    animation: none !important;
-    transform: none !important;
-}
-    .clock-frame time.pulse {
-        animation: pulse 0.5s ease-out;
-    }
-
-    /* للأجهزة المحمولة */
-    @media (max-width: 600px) {
-        :root {
-            --clock-size: clamp(32px, 10vw, 60px);
-            --prayer-name-size: clamp(18px, 6vw, 40px);
-            --prayer-time-size: clamp(20px, 7vw, 50px);
-            --countdown-number-size: clamp(16px, 5vw, 35px);
-            --prayer-min-height: clamp(20px, 4vh, 35px);
-            --prayer-border-radius: 15px;
-        }
-        .date-card { min-width: 80px; padding: 4px 8px; }
-        .date-card .date-value { font-size: clamp(12px, 2.5vw, 20px); }
-        .date-card .date-label { font-size: clamp(8px, 1.5vw, 12px); }
-        .weekday { font-size: clamp(12px, 3vw, 20px); }
-    }
-</style>
+  <style id="active-theme-style"></style>
 </head>
 <body>
 <main class="mosque-screen" dir="rtl">
   <div class="soft-pattern" aria-hidden="true"></div>
-
-  <button class="settings-button" type="button" id="open-settings" aria-label="فتح الإعدادات" title="الإعدادات">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Zm9 3.8-2-.7a7.3 7.3 0 0 0-.7-1.7l.9-1.9-1.8-1.8-1.9.9a7.3 7.3 0 0 0-1.7-.7l-.7-2h-2.5l-.7 2a7.3 7.3 0 0 0-1.7.7l-1.9-.9L4.5 7.7l.9 1.9a7.3 7.3 0 0 0-.7 1.7l-2 .7v2.5l2 .7c.2.6.4 1.2.7 1.7l-.9 1.9 1.8 1.8 1.9-.9c.5.3 1.1.5 1.7.7l.7 2h2.5l.7-2c.6-.2 1.2-.4 1.7-.7l1.9.9 1.8-1.8-.9-1.9c.3-.5.5-1.1.7-1.7l2-.7v-2.5Z" />
-    </svg>
-  </button>
 
   <div class="fit-content" id="fit-content">
   <section class="clock-frame" aria-label="الساعة الحالية">
@@ -413,7 +35,7 @@
     <strong class="weekday" id="live-weekday">--</strong>
     <div style="display: flex; gap: clamp(10px, 2vw, 25px); width: 100%; justify-content: center; flex-wrap: wrap;">
       <div class="date-card hijri-card">
-        <span class="date-label">التاريخ الهجري</span>
+        <span class="date-label"></span>
         <div class="date-value" id="live-hijri">
           <span class="day-number">--</span>
           <span>--</span>
@@ -421,7 +43,7 @@
         </div>
       </div>
       <div class="date-card">
-        <span class="date-label">التاريخ الميلادي</span>
+        <span class="date-label"></span>
         <div class="date-value" id="live-gregorian">
           <span class="day-number">--</span>
           <span>--</span>
@@ -865,11 +487,232 @@
 "12-31~~~~~05:40|07:08|12:10|14:45|17:05|18:26"
 ];
 
-    // ============================================================
+// ============================================================
     // 2. الإعدادات والمتغيرات
     // ============================================================
     const TIME_ZONE = "Asia/Baghdad";
     const SETTINGS_STORAGE_KEY = "mosque-display-settings";
+
+    // ============================================================
+    // إدارة الستايلات (الثيمات المدمجة)
+    // ============================================================
+    const THEMES = [
+    {
+        "id": 0,
+        "name": "index.html",
+        "style": "/* ========================================\n       المتغيرات الرئيسية\n       ======================================== */\n    :root {\n        --font-arabic: \"Readex Pro\", \"Noto Sans Arabic\", \"Cairo\", sans-serif;\n        --font-numbers: \"Fjalla One\", Arial, sans-serif;\n        --font-clock: \"Share Tech Mono\", \"Courier New\", monospace;\n        \n        --bg-main: #f8fbf9;\n        --bg-prayer: rgba(255, 255, 255, 0.45);\n        --bg-prayer-active: rgba(24, 93, 56, 0.12);\n        --text-primary: #0b0d0d;\n        --text-prayer-name: #080b0b;\n        --text-prayer-time: #6a062b;\n        --text-prayer-active: #185d38;\n        --text-clock: #185d38;\n        --text-date: #155b38;\n        --text-gregorian: #3b4d43;\n        --border-prayer: rgba(97, 103, 100, 0.65);\n        --border-prayer-active: #185d38;\n        --footer-bg: #155b38;\n        --footer-text: #ffffff;\n        \n        --clock-size: clamp(48px, 13vw, 135px);\n        --weekday-size: clamp(18px, 4vw, 42px);\n        --date-size: clamp(16px, 3.6vw, 38px);\n        --prayer-name-size: clamp(30px, 8vw, 90px);\n        --prayer-time-size: clamp(40px, 11vw, 120px);\n        --countdown-label-size: clamp(12px, 2.6vw, 28px);\n        --countdown-number-size: clamp(26px, 7.8vw, 82px);\n        \n        --prayer-gap: 0px;\n        --prayer-padding: 0px 10px;\n        --prayer-margin: 0px;\n        --prayer-min-height: clamp(30px, 5vh, 55px);\n        --prayer-border-radius: 30px;\n        --container-padding: 8px 16px 0;\n\n    }\n\n    * { box-sizing: border-box; margin: 0; padding: 0; }\n    html, body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: var(--bg-main); }\n\n    /* ========================================\n       الشاشة الرئيسية\n       ======================================== */\n    .mosque-screen {\n        position: absolute; top: 0; left: 0; isolation: isolate;\n    display: flex; flex-direction: column;\n    width: 100vh; height: 100vw;\n    margin: 0; padding: var(--container-padding);\n    overflow: hidden;\n    background-color: #f8fbf9;\n    background-image: url('bg.jpg') !important;\n    background-size: cover !important;\n    background-position: center !important;\n    background-repeat: no-repeat !important;\n    transform: rotate(90deg) translateY(-100%);\n    transform-origin: top left;\n}\n    @media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }\n\n    /* ========================================\n       حاوية التصغير التلقائي (لمنع خروج المحتوى)\n       ======================================== */\n    .fit-content {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0;\n    min-height: 0;\n    width: 100%;\n    justify-content: space-between;\n    container-type: size; /* تفعيل Container Queries */\n}\n.prayer-row, .clock-frame, .date-card {\n    background: rgba(255, 255, 255, 0.92) !important;\n    backdrop-filter: blur(4px);\n}\n    /* ========================================\n       الخلفية\n       ======================================== */\n    .soft-pattern {\n       display: none !important;\n}\n\n    /* ========================================\n       زر الإعدادات\n       ======================================== */\n    .settings-button {\n        position: absolute; top: clamp(10px, 2.2vh, 26px); right: clamp(10px, 2.5vw, 28px);\n        z-index: 4; display: grid; place-items: center;\n        width: clamp(34px, 5.5vw, 54px); height: clamp(34px, 5.5vw, 54px);\n        padding: 0; border: 1px solid rgba(30,91,57,.3); border-radius: 50%;\n        color: #185d38; background: rgba(255,255,255,.85);\n        cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n        transition: background .2s ease, transform .2s ease;\n    }\n    .settings-button:hover { background: #fff; transform: rotate(30deg); }\n    .settings-button svg { width: 60%; height: 60%; fill: currentColor; }\n\n    /* ========================================\n       الساعة\n       ======================================== */\n    .clock-frame {\n        display: grid;\n    place-items: center;\n    flex-shrink: 0;\n    width: min(96%, 950px);\n    min-height: clamp(90px, 12vh, 160px);\n    margin: 0 auto;\n    border: 3px solid rgba(24, 93, 56, 0.3);\n    border-radius: 999px;\n    background: rgba(255, 255, 255, 0.75);\n    box-shadow: 0 6px 24px rgba(24, 93, 56, 0.12), inset 0 0 0 6px rgba(255, 255, 255, 0.5);\n}\n    .clock-frame time {\n        direction: ltr;\n    color: var(--text-clock);\n    font-family: var(--font-clock);\n    font-size: clamp(65px, 8.5vw, 130px) !important;\n    font-weight: 800;\n    letter-spacing: 4px;\n    line-height: 1;\n    white-space: nowrap;\n    font-variant-numeric: tabular-nums;\n}\n\n    /* ========================================\n       التاريخ\n       ======================================== */\n    .date-block {\n        display: flex; align-items: center; flex-direction: row;\n        justify-content: center; gap: clamp(10px, 2vw, 25px);\n        flex-shrink: 0;\n        width: 100%; max-width: 850px;\n        margin: clamp(8px, 1.5vh, 18px) auto clamp(8px, 1.8vh, 20px);\n        flex-wrap: wrap;\n    }\n    .weekday {\n        width: 100%; text-align: center;\n        color: var(--text-date); font-family: var(--font-arabic);\n        font-size: var(--weekday-size); font-weight: 800; line-height: 1.15;\n        margin-bottom: 4px;\n    }\n    .date-card {\n        display: flex; flex-direction: column; align-items: center; justify-content: center;\n        padding: clamp(8px, 1.5vh, 16px) clamp(16px, 3vw, 35px);\n        border: 2px solid rgba(24,93,56,0.25); border-radius: 16px;\n        background: rgba(255,255,255,0.65);\n        box-shadow: 0 2px 10px rgba(24,93,56,0.08);\n        min-width: clamp(120px, 20vw, 200px); flex: 1;\n    }\n    .date-card .date-label {\n        color: #155b38; font-size: clamp(12px, 1.8vw, 18px);\n        font-weight: 700; font-family: var(--font-arabic);\n        margin-bottom: 2px; opacity: 0.8;\n    }\n    .date-card .date-value {\n        color: #0b0d0d; font-size: clamp(18px, 3.5vw, 38px);\n        font-weight: 800; font-family: var(--font-arabic);\n        line-height: 1.3; text-align: center;\n    }\n    .date-card .date-value .day-number {\n        font-family: var(--font-numbers); font-weight: 900;\n    }\n    .date-card.hijri-card { border-color: rgba(138,22,64,0.25); }\n    .date-card.hijri-card .date-label { color: #8a1640; }\n\n    /* ========================================\n       قائمة الصلوات\n       ======================================== */\n    .prayer-list {\n       display: flex;\n    flex-direction: column;\n    flex: 1 1 auto;\n    justify-content: space-between;\n    min-height: 0;\n    width: 100%;\n    max-width: 92%;\n    margin: 0 auto;\n    padding: 8px 0;\n    gap: 8px;\n}\n    .prayer-row {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    flex: 1 1 0;\n    min-height: 0;\n    padding: 0 32px;\n    border: 2px solid var(--border-prayer);\n    border-radius: 20px;\n    background: var(--bg-prayer);\n    overflow: hidden;\n    direction: ltr;\n}\n    .prayer-row.next-prayer {\n        border-color: var(--border-prayer-active);\n        background: var(--bg-prayer-active);\n        box-shadow: 0 4px 16px rgba(24,93,56,0.18);\n    }\n    .prayer-row strong {\n    color: var(--text-prayer-name);\n    direction: rtl;\n    font-family: var(--font-arabic);\n    font-size: clamp(38px, 4.5vw, 68px) !important;\n    font-weight: 700;\n    line-height: 1;\n    white-space: nowrap;\n}\n    .prayer-row.next-prayer strong { color: var(--text-prayer-active); }\n    .prayer-row time {\n    color: var(--text-prayer-time);\n    direction: ltr;\n    font-family: var(--font-numbers);\n    font-size: clamp(48px, 6vw, 92px) !important;\n    font-weight: 800;\n    line-height: 1;\n    letter-spacing: .02em;\n    white-space: nowrap;\n}\n    .prayer-row.next-prayer time { color: var(--text-prayer-active); }\n\n    /* ========================================\n       العد التنازلي\n       ======================================== */\n    .countdown-footer {\n        display: grid;\n    grid-template-columns: 1fr 1fr;\n    flex: 0 0 clamp(85px, 12vh, 145px);\n    width: calc(100% + clamp(32px, 7vw, 84px));\n    margin-right: calc(clamp(16px, 3.5vw, 42px) * -1);\n    margin-left: calc(clamp(16px, 3.5vw, 42px) * -1);\n    padding: clamp(10px, 1.5vh, 18px) clamp(16px, 3.5vw, 42px) 0;\n    color: var(--footer-text);\n    background: var(--footer-bg);\n    direction: ltr;\n    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.15);\n}\n    .countdown-column {\n        display: flex;\n    align-items: center;\n    flex-direction: column;\n    justify-content: center;\n    direction: rtl;\n}\n    .countdown-column span {\n        font-family: var(--font-arabic);\n    font-size: clamp(18px, 2.2vw, 32px) !important;\n    font-weight: 700;\n    line-height: 1.2;\n    opacity: 0.95;\n    white-space: nowrap;\n}\n    .countdown-column strong {\n        margin-top: 4px;\n    direction: ltr;\n    font-family: var(--font-numbers);\n    font-size: clamp(42px, 5.5vw, 82px) !important;\n    font-weight: 800;\n    line-height: 1;\n    letter-spacing: .02em;\n    white-space: nowrap;\n}\n\n    /* ========================================\n       الإعدادات\n       ======================================== */\n    .settings-layer {\n       position: absolute;\n    inset: 0;\n    z-index: 9999;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    background: rgba(0, 0, 0, 0.75);\n    backdrop-filter: blur(6px);\n    padding: 16px;\n}\n    .settings-panel {\n       display: flex;\n    flex-direction: column;\n    width: 95%;\n    max-width: 850px;\n    height: 96%;\n    max-height: 96%;\n    padding: 20px 24px;\n    border-radius: 20px;\n    border: 2px solid rgba(21, 91, 56, 0.3);\n    background: #ffffff;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);\n    overflow-y: auto;\n}\n    .settings-header {\n        display: flex; align-items: flex-start; justify-content: space-between;\n        gap: 18px; padding-bottom: 12px;\n        border-bottom: 1px solid rgba(21,91,56,.18);\n    }\n    .settings-header span { display: block; color: #8a1640; font-size: clamp(11px, 2.2vw, 15px); font-weight: 700; font-family: var(--font-arabic); }\n    .settings-header h2 { margin: 1px 0 0; color: #155b38; font-size: clamp(20px, 4vw, 32px); font-weight: 800; line-height: 1.2; font-family: var(--font-arabic); }\n    .settings-close {\n        display: grid; place-items: center;\n        width: 36px; height: 36px; padding: 0 0 3px;\n        border: 1px solid rgba(21,91,56,.25); border-radius: 50%;\n        color: #155b38; background: #f1f6f2;\n        cursor: pointer; font-size: 26px; font-weight: bold; line-height: 1;\n    }\n    .settings-description { margin: 12px 0; color: #55635a; font-size: clamp(12px, 2.2vw, 15px); line-height: 1.5; font-family: var(--font-arabic); }\n    .settings-prayers, .settings-special { display: grid; gap: 8px; }\n    .settings-special { margin-top: 14px; padding-top: 14px; border-top: 1px dashed rgba(21,91,56,.26); }\n    .settings-row {\n        display: flex; align-items: center; justify-content: space-between;\n        gap: 12px; min-height: 52px; padding: 8px 12px;\n        border: 1px solid rgba(91,110,99,.25); border-radius: 10px;\n        background: #f8fbf8;\n    }\n    .settings-row > div:first-child { min-width: 0; }\n    .prayer-controls { display: flex; align-items: flex-end; flex: 0 0 auto; gap: 12px; }\n    .control-field { display: flex; align-items: center; flex-direction: column; gap: 3px; }\n    .control-field > span { color: #55635a; font-size: 11px; font-weight: 700; line-height: 1; font-family: var(--font-arabic); }\n    .settings-row strong { display: block; color: #101613; font-size: clamp(14px, 2.6vw, 18px); font-weight: 700; line-height: 1.2; font-family: var(--font-arabic); }\n    .settings-row small { display: block; margin-top: 2px; color: #647369; font-size: clamp(10px, 2vw, 13px); line-height: 1.2; font-family: var(--font-arabic); }\n    .minute-control { display: flex; align-items: center; flex: 0 0 auto; gap: 4px; direction: ltr; }\n    .minute-control button {\n        display: grid; place-items: center;\n        width: 30px; height: 30px; padding: 0 0 2px;\n        border: 0; border-radius: 6px;\n        color: #fff; background: #155b38;\n        cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1;\n    }\n    .minute-control button:hover { background: #0b4428; }\n    .minute-control input {\n        width: 50px; height: 30px; padding: 0 2px;\n        border: 1px solid rgba(21,91,56,.4); border-radius: 6px;\n        color: #155b38; background: #fff;\n        font-family: var(--font-numbers);\n        font-size: 15px; font-weight: 700; text-align: center;\n    }\n    .minute-control em { color: #55635a; font-size: 11px; font-style: normal; white-space: nowrap; font-family: var(--font-arabic); }\n    .settings-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; }\n    .settings-actions button {\n        min-height: 40px; padding: 6px 20px; border-radius: 8px;\n        cursor: pointer; font-size: clamp(12px, 2.4vw, 15px);\n        font-weight: 700; font-family: var(--font-arabic);\n    }\n    .reset-button { border: 1px solid rgba(138,22,64,.4); color: #8a1640; background: #fff; }\n    .save-button { border: 1px solid #155b38; color: #fff; background: #155b38; }\n\n    /* ========================================\n       إبقاء الشاشة مضاءة\n       ======================================== */\n /* إلغاء تأثير الثواني */\n.clock-frame time.pulse {\n    animation: none !important;\n    transform: none !important;\n}\n    .clock-frame time.pulse {\n        animation: pulse 0.5s ease-out;\n    }\n\n    /* للأجهزة المحمولة */\n    @media (max-width: 600px) {\n        :root {\n            --clock-size: clamp(32px, 10vw, 60px);\n            --prayer-name-size: clamp(18px, 6vw, 40px);\n            --prayer-time-size: clamp(20px, 7vw, 50px);\n            --countdown-number-size: clamp(16px, 5vw, 35px);\n            --prayer-min-height: clamp(20px, 4vh, 35px);\n            --prayer-border-radius: 15px;\n        }\n        .date-card { min-width: 80px; padding: 4px 8px; }\n        .date-card .date-value { font-size: clamp(12px, 2.5vw, 20px); }\n        .date-card .date-label { font-size: clamp(8px, 1.5vw, 12px); }\n        .weekday { font-size: clamp(12px, 3vw, 20px); }\n\n        \n    }",
+        "prayerNames": [
+            "الفـجــر",
+            "الشروق",
+            "الظهـر",
+            "العصـر",
+            "المغرب",
+            "العشــاء"
+        ]
+    },
+    {
+        "id": 1,
+        "name": "index1.html",
+        "style": "/* =========================================================\n   التصميم الجديد بالكامل\n   ========================================================= */\n\n:root {\n\n    /* =========================\n       الخطوط\n       ========================= */\n\n    --font-arabic: \"Noto Kufi Arabic\", sans-serif;\n    --font-numbers: \"Fjalla One\", monospace;\n    --font-clock: \"Roboto Mono\", monospace;\n\n\n    /* =========================\n       الألوان\n       ========================= */\n\n    --bg-main: #00c4b0;\n\n    --text-primary: #f4f7f5;\n\n    --text-prayer-name: #f4f7f5;\n\n    --text-prayer-time: #f4f7f5;\n\n    --text-prayer-active: #d9b45a;\n\n    --text-clock: #ffffff;\n\n    --text-date: #d9b45a;\n\n    --text-gregorian: #c7d0cc;\n\n    --text-secondary: #aebbb5;\n\n    --accent: #d9b45a;\n\n    --accent-light: #efd58b;\n\n    --line: rgba(217,180,90,.45);\n\n    --line-soft: rgba(255,255,255,.13);\n\n    --footer-bg: #006c73;\n\n    --footer-text: #ffffff;\n\n\n    /* =========================\n       الأحجام\n       ========================= */\n\n    --clock-size: clamp(70px, 10vw, 150px);\n\n    --weekday-size: clamp(22px, 3vw, 42px);\n\n    --date-size: clamp(18px, 2.5vw, 34px);\n\n    --prayer-name-size: clamp(42px, 6vw, 82px);\n\n    --prayer-time-size: clamp(62px, 8vw, 130px);\n\n    --countdown-label-size: clamp(18px, 2vw, 30px);\n\n    --countdown-number-size: clamp(45px, 5vw, 80px);\n\n\n    --container-padding: 18px 32px 0;\n}\n\n\n/* =========================================================\n   RESET\n   ========================================================= */\n\n* {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n}\n\n\nhtml,\nbody {\n\n    width: 100vw;\n    height: 100vh;\n\n    margin: 0;\n    padding: 0;\n\n    overflow: hidden;\n\n    background: var(--bg-main);\n}\n\n\n/* =========================================================\n   الشاشة الرئيسية\n   ========================================================= */\n\n.mosque-screen {\n\n    position: absolute;\n\n    top: 0;\n    left: 0;\n\n    isolation: isolate;\n\n    display: flex;\n\n    flex-direction: column;\n\n    width: 100vh;\n    height: 100vw;\n\n    margin: 0;\n\n    padding: var(--container-padding);\n\n    overflow: hidden;\n\n    color: var(--text-primary);\n\n    background-color: var(--bg-main);\n\n    background-image:\n        linear-gradient(\n            rgba(4,14,12,.72),\n            rgba(4,14,12,.82)\n        ),\n        url('bg.jpg');\n\n    background-size: cover;\n    background-position: center;\n    background-repeat: no-repeat;\n\n    transform: rotate(90deg) translateY(-100%);\n\n    transform-origin: top left;\n}\n\n\n@media (orientation: portrait) {\n\n    .mosque-screen {\n\n        width: 100vw;\n        height: 100vh;\n\n        transform: none;\n    }\n}\n\n\n/* =========================================================\n   الحاوية\n   ========================================================= */\n\n.fit-content {\n\n    display: flex;\n\n    flex-direction: column;\n\n    flex: 1 1 0;\n\n    min-height: 0;\n\n    width: 100%;\n\n    justify-content: space-between;\n}\n\n\n/* =========================================================\n   إلغاء شكل البطاقات القديمة\n   ========================================================= */\n\n.prayer-row,\n.clock-frame,\n.date-card {\n\n    background: transparent !important;\n\n    backdrop-filter: none !important;\n\n    box-shadow: none !important;\n}\n\n\n/* =========================================================\n   الخلفية الإضافية القديمة\n   ========================================================= */\n\n.soft-pattern {\n\n    display: none !important;\n}\n\n\n/* =========================================================\n   زر الإعدادات\n   ========================================================= */\n\n.settings-button {\n\n    position: absolute;\n\n    top: 20px;\n    right: 25px;\n\n    z-index: 4;\n\n    display: grid;\n\n    place-items: center;\n\n    width: 48px;\n    height: 48px;\n\n    padding: 0;\n\n    border: 1px solid rgba(217,180,90,.45);\n\n    border-radius: 8px;\n\n    color: var(--accent);\n\n    background: rgba(7,19,17,.7);\n\n    cursor: pointer;\n\n    box-shadow: none;\n\n    transition:\n        background .2s ease,\n        border-color .2s ease;\n}\n\n\n.settings-button:hover {\n\n    background: rgba(217,180,90,.12);\n\n    border-color: var(--accent);\n}\n\n\n.settings-button svg {\n\n    width: 60%;\n    height: 60%;\n\n    fill: currentColor;\n}\n\n\n/* =========================================================\n   الساعة\n   ========================================================= */\n\n.clock-frame {\n\n    display: flex;\n\n    align-items: center;\n\n    justify-content: center;\n\n    flex-shrink: 0;\n\n    width: 100%;\n\n    min-height: clamp(100px, 14vh, 170px);\n\n    margin: 0 auto;\n\n    padding: 5px 0;\n\n    border: none;\n\n    border-radius: 0;\n\n    background: transparent !important;\n\n    box-shadow: none !important;\n}\n\n\n.clock-frame time {\n\n    direction: ltr;\n\n    color: var(--text-clock);\n\n    font-family: var(--font-clock);\n\n    font-size: var(--clock-size) !important;\n\n    font-weight: 600;\n\n    letter-spacing: 5px;\n\n    line-height: 1;\n\n    white-space: nowrap;\n\n    font-variant-numeric: tabular-nums;\n\n    /* مهم:\n       لا حركة ولا اهتزاز عند تغير الثانية\n    */\n\n    animation: none !important;\n\n    transform: none !important;\n\n    transition: none !important;\n}\n\n\n/* =========================================================\n   التاريخ\n   ========================================================= */\n\n.date-block {\n\n    display: flex;\n\n    align-items: center;\n\n    justify-content: center;\n\n    flex-direction: column;\n\n    gap: 5px;\n\n    flex-shrink: 0;\n\n    width: 100%;\n\n    max-width: none;\n\n    margin: 2px auto 12px;\n\n    flex-wrap: nowrap;\n}\n\n\n/* اليوم */\n\n.weekday {\n\n    width: 100%;\n\n    text-align: center;\n\n    color: var(--accent);\n\n    font-family: var(--font-arabic);\n\n    font-size: var(--weekday-size);\n\n    font-weight: 800;\n\n    line-height: 1.2;\n\n    margin: 0;\n}\n\n\n/* =========================================================\n   إلغاء البطاقات حول التاريخ\n   ========================================================= */\n\n.date-card {\n\n    display: inline-flex;\n\n    flex-direction: row;\n\n    align-items: center;\n\n    justify-content: center;\n\n    padding: 0;\n\n    border: none !important;\n\n    border-radius: 0;\n\n    background: transparent !important;\n\n    min-width: 0;\n\n    box-shadow: none !important;\n\n    gap: 12px;\n}\n\n\n.date-card .date-label {\n\n    color: var(--text-secondary);\n\n    font-size: clamp(15px, 1.8vw, 23px);\n\n    font-weight: 500;\n\n    font-family: var(--font-arabic);\n\n    margin: 0;\n\n    opacity: 1;\n}\n\n\n.date-card .date-value {\n\n    color: var(--text-primary);\n\n    font-size: var(--date-size);\n\n    font-weight: 700;\n\n    font-family: var(--font-arabic);\n\n    line-height: 1.3;\n\n    text-align: center;\n}\n\n\n.date-card .date-value .day-number {\n\n    font-family: var(--font-numbers);\n\n    font-weight: 700;\n}\n\n\n.date-card.hijri-card {\n\n    border: none !important;\n}\n\n\n.date-card.hijri-card .date-label {\n\n    color: var(--accent);\n}\n\n\n/* =========================================================\n   قائمة الصلوات\n   ========================================================= */\n\n.prayer-list {\n\n    display: flex;\n\n    flex-direction: column;\n\n    flex: 1 1 auto;\n\n    justify-content: space-evenly;\n\n    min-height: 0;\n\n    width: 100%;\n\n    max-width: 100%;\n\n    margin: 0 auto;\n\n    padding: 5px 0;\n\n    gap: 0;\n}\n\n\n/* =========================================================\n   سطر الصلاة\n   بدون بطاقة\n   بدون إطار\n   بدون خلفية\n   ========================================================= */\n\n.prayer-row {\n\n    position: relative;\n\n    display: grid;\n\n    grid-template-columns: 1fr 1fr;\n\n    align-items: center;\n\n    justify-content: center;\n\n    flex: 1 1 0;\n\n    min-height: 0;\n\n    padding: 0 45px;\n\n    column-gap: 200px;\n\n    border: none !important;\n\n    border-radius: 0;\n\n    background: transparent !important;\n\n    overflow: visible;\n\n    direction: ltr;\n\n    box-shadow: none !important;\n}\n\n\n/* خط فاصل خفيف بين الصلوات */\n\n.prayer-row:not(:last-child)::after {\n\n    content: \"\";\n\n    position: absolute;\n\n    bottom: 0;\n\n    left: 10%;\n\n    width: 80%;\n\n    height: 1px;\n\n    background: var(--line-soft);\n}\n\n\n/* =========================================================\n   الصلاة القادمة\n   ========================================================= */\n\n.prayer-row.next-prayer {\n\n    border: none !important;\n\n    background: transparent !important;\n\n    box-shadow: none !important;\n}\n\n\n/* خط ذهبي للصلاة القادمة */\n\n.prayer-row.next-prayer::before {\n\n    content: \"\";\n\n    position: absolute;\n\n    right: 0;\n\n    top: 12%;\n\n    width: 5px;\n\n    height: 76%;\n\n    background: var(--accent);\n\n    border-radius: 0;\n}\n\n\n/* =========================================================\n   اسم الصلاة\n   ========================================================= */\n\n.prayer-row strong {\n\n    color: var(--text-prayer-name);\n\n    direction: rtl;\n\n   font-family: \"Alyamama\", sans-serif !important;\n\n    font-size: var(--prayer-name-size) !important;\n\n    font-weight: 900;\n\n    line-height: 1;\n\n    white-space: nowrap;\n\n    text-align: center;\n}\n\n\n.prayer-row.next-prayer strong {\n\n    color: var(--accent-light);\n}\n\n\n/* =========================================================\n   وقت الصلاة\n   ========================================================= */\n\n.prayer-row time {\n\n    color: var(--text-prayer-time);\n\n    direction: ltr;\n\n    font-family: var(--font-numbers);\n\n    font-size: var(--prayer-time-size) !important;\n\n    font-weight: 700;\n\n    line-height: 1;\n\n    letter-spacing: .02em;\n\n    white-space: nowrap;\n\n    text-align: center;\n\n    font-variant-numeric: tabular-nums;\n}\n\n\n.prayer-row.next-prayer time {\n\n    color: var(--accent);\n}\n\n\n/* =========================================================\n   العد التنازلي\n   ========================================================= */\n\n.countdown-footer {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n\n    flex: 0 0 clamp(130px, 18vh, 210px);\n\n    width: calc(100% + 64px);\n    margin-right: -32px;\n    margin-left: -32px;\n\n    padding: 15px 20px;\n\n    color: var(--footer-text);\n    background: var(--footer-bg);\n\n    direction: ltr;\n\n    border-top: 1px solid rgba(217,180,90,.35);\n}\n\n\n.countdown-column {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n\n    flex-direction: column;\n\n    gap: 8px;\n\n    direction: rtl;\n\n    white-space: nowrap;\n}\n\n\n.countdown-column span {\n\n    color: var(--accent);\n\n    font-family: var(--font-arabic);\n\n    font-size: clamp(22px, 2.5vw, 34px) !important;\n\n    font-weight: 600;\n\n    line-height: 1.2;\n\n    white-space: nowrap;\n}\n\n\n.countdown-column strong {\n\n    margin-top: 0;\n\n    direction: ltr;\n\n    color: #ffffff;\n\n    font-family: var(--font-numbers);\n\n    font-size: clamp(50px, 5.5vw, 90px) !important;\n\n    font-weight: 700;\n\n    line-height: 1;\n\n    white-space: nowrap;\n}\n\n\n/* =========================================================\n   الإعدادات\n   ========================================================= */\n\n.settings-layer {\n\n    position: absolute;\n\n    inset: 0;\n\n    z-index: 9999;\n\n    display: flex;\n\n    align-items: center;\n\n    justify-content: center;\n\n    background: rgba(0,0,0,.82);\n\n    backdrop-filter: blur(3px);\n\n    padding: 16px;\n}\n\n\n.settings-panel {\n\n    display: flex;\n\n    flex-direction: column;\n\n    width: 95%;\n\n    max-width: 850px;\n\n    height: 96%;\n\n    max-height: 96%;\n\n    padding: 24px 28px;\n\n    border-radius: 6px;\n\n    border: 1px solid rgba(217,180,90,.45);\n\n    background: #0b1916;\n\n    box-shadow: none;\n\n    overflow-y: auto;\n}\n\n\n.settings-header {\n\n    display: flex;\n\n    align-items: flex-start;\n\n    justify-content: space-between;\n\n    gap: 18px;\n\n    padding-bottom: 14px;\n\n    border-bottom: 1px solid rgba(217,180,90,.25);\n}\n\n\n.settings-header span {\n\n    display: block;\n\n    color: var(--accent);\n\n    font-size: clamp(12px, 2.2vw, 16px);\n\n    font-weight: 600;\n\n    font-family: var(--font-arabic);\n}\n\n\n.settings-header h2 {\n\n    margin: 2px 0 0;\n\n    color: #ffffff;\n\n    font-size: clamp(22px, 4vw, 34px);\n\n    font-weight: 800;\n\n    line-height: 1.2;\n\n    font-family: var(--font-arabic);\n}\n\n\n.settings-close {\n\n    display: grid;\n\n    place-items: center;\n\n    width: 40px;\n\n    height: 40px;\n\n    padding: 0 0 3px;\n\n    border: 1px solid rgba(217,180,90,.4);\n\n    border-radius: 4px;\n\n    color: var(--accent);\n\n    background: transparent;\n\n    cursor: pointer;\n\n    font-size: 26px;\n\n    font-weight: bold;\n\n    line-height: 1;\n}\n\n\n.settings-description {\n\n    margin: 14px 0;\n\n    color: #aebbb5;\n\n    font-size: clamp(12px, 2.2vw, 15px);\n\n    line-height: 1.6;\n\n    font-family: var(--font-arabic);\n}\n\n\n.settings-prayers,\n.settings-special {\n\n    display: grid;\n\n    gap: 8px;\n}\n\n\n.settings-special {\n\n    margin-top: 14px;\n\n    padding-top: 14px;\n\n    border-top: 1px dashed rgba(217,180,90,.3);\n}\n\n\n.settings-row {\n\n    display: flex;\n\n    align-items: center;\n\n    justify-content: space-between;\n\n    gap: 12px;\n\n    min-height: 52px;\n\n    padding: 8px 12px;\n\n    border: 1px solid rgba(255,255,255,.12);\n\n    border-radius: 4px;\n\n    background: rgba(255,255,255,.035);\n}\n\n\n.settings-row > div:first-child {\n\n    min-width: 0;\n}\n\n\n.prayer-controls {\n\n    display: flex;\n\n    align-items: flex-end;\n\n    flex: 0 0 auto;\n\n    gap: 12px;\n}\n\n\n.control-field {\n\n    display: flex;\n\n    align-items: center;\n\n    flex-direction: column;\n\n    gap: 3px;\n}\n\n\n.control-field > span {\n\n    color: #aebbb5;\n\n    font-size: 11px;\n\n    font-weight: 700;\n\n    line-height: 1;\n\n    font-family: var(--font-arabic);\n}\n\n\n.settings-row strong {\n\n    display: block;\n\n    color: #ffffff;\n\n    font-size: clamp(14px, 2.6vw, 18px);\n\n    font-weight: 700;\n\n    line-height: 1.2;\n\n    font-family: var(--font-arabic);\n}\n\n\n.settings-row small {\n\n    display: block;\n\n    margin-top: 2px;\n\n    color: #82918b;\n\n    font-size: clamp(10px, 2vw, 13px);\n\n    line-height: 1.2;\n\n    font-family: var(--font-arabic);\n}\n\n\n/* =========================================================\n   التحكم بالدقائق\n   ========================================================= */\n\n.minute-control {\n\n    display: flex;\n\n    align-items: center;\n\n    flex: 0 0 auto;\n\n    gap: 4px;\n\n    direction: ltr;\n}\n\n\n.minute-control button {\n\n    display: grid;\n\n    place-items: center;\n\n    width: 32px;\n\n    height: 32px;\n\n    padding: 0 0 2px;\n\n    border: 0;\n\n    border-radius: 3px;\n\n    color: #071311;\n\n    background: var(--accent);\n\n    cursor: pointer;\n\n    font-size: 20px;\n\n    font-weight: bold;\n\n    line-height: 1;\n}\n\n\n.minute-control button:hover {\n\n    background: var(--accent-light);\n}\n\n\n.minute-control input {\n\n    width: 52px;\n\n    height: 32px;\n\n    padding: 0 2px;\n\n    border: 1px solid rgba(217,180,90,.5);\n\n    border-radius: 3px;\n\n    color: var(--accent);\n\n    background: #071311;\n\n    font-family: var(--font-numbers);\n\n    font-size: 15px;\n\n    font-weight: 700;\n\n    text-align: center;\n}\n\n\n.minute-control em {\n\n    color: #aebbb5;\n\n    font-size: 11px;\n\n    font-style: normal;\n\n    white-space: nowrap;\n\n    font-family: var(--font-arabic);\n}\n\n\n/* =========================================================\n   أزرار الإعدادات\n   ========================================================= */\n\n.settings-actions {\n\n    display: flex;\n\n    justify-content: space-between;\n\n    gap: 12px;\n\n    margin-top: 18px;\n}\n\n\n.settings-actions button {\n\n    min-height: 42px;\n\n    padding: 6px 22px;\n\n    border-radius: 3px;\n\n    cursor: pointer;\n\n    font-size: clamp(12px, 2.4vw, 15px);\n\n    font-weight: 700;\n\n    font-family: var(--font-arabic);\n}\n\n\n.reset-button {\n\n    border: 1px solid rgba(217,180,90,.5);\n\n    color: var(--accent);\n\n    background: transparent;\n}\n\n\n.save-button {\n\n    border: 1px solid var(--accent);\n\n    color: #071311;\n\n    background: var(--accent);\n}\n\n\n/* =========================================================\n   إلغاء حركة الساعة تمامًا\n   ========================================================= */\n\n.clock-frame time.pulse {\n\n    animation: none !important;\n\n    transform: none !important;\n\n    transition: none !important;\n}\n\n\n@keyframes pulse {\n\n    0%,\n    100% {\n\n        transform: none;\n    }\n}\n\n\n/* =========================================================\n   الشاشات الصغيرة\n   ========================================================= */\n\n@media (max-width: 600px) {\n\n    :root {\n\n        --clock-size: clamp(42px, 11vw, 70px);\n\n        --weekday-size: clamp(16px, 3vw, 24px);\n\n        --date-size: clamp(14px, 2.8vw, 22px);\n\n        --prayer-name-size: clamp(22px, 6vw, 42px);\n\n        --prayer-time-size: clamp(30px, 7vw, 55px);\n\n        --countdown-number-size: clamp(25px, 5vw, 40px);\n    }\n\n\n    .mosque-screen {\n\n        padding: 10px 16px 0;\n    }\n\n\n    .prayer-row {\n\n        padding: 0 20px;\n\n        grid-template-columns: 1fr 1fr;\n    }\n\n\n    .prayer-row.next-prayer::before {\n\n        width: 3px;\n    }\n\n\n    .countdown-footer {\n\n        width: calc(100% + 32px);\n\n        margin-right: -16px;\n\n        margin-left: -16px;\n\n        padding-left: 18px;\n\n        padding-right: 18px;\n    }\n\n\n    .settings-button {\n\n        width: 38px;\n\n        height: 38px;\n\n        top: 10px;\n\n        right: 12px;\n    }\n\n\n    .date-card {\n\n        gap: 7px;\n    }\n}",
+        "prayerNames": [
+            "الفـجــر",
+            "الشروق",
+            "الظهـر",
+            "العصـر",
+            "المغرب",
+            "العشــاء"
+        ]
+    },
+    {
+        "id": 2,
+        "name": "index2.html",
+        "style": "/* =========================================================\n   التصميم الجديد بالكامل\n   ========================================================= */\n\n:root {\n\n    /* =========================\n       الخطوط\n       ========================= */\n\n    --font-arabic: \"Noto Kufi Arabic\", sans-serif;\n    --font-numbers: \"Fjalla One\", monospace;\n    --font-clock: \"Roboto Mono\", monospace;\n\n\n    /* =========================\n       الألوان\n       ========================= */\n\n    --bg-main: #005352;\n\n    --text-primary: #f4f7f5;\n\n    --text-prayer-name: #f4f7f5;\n\n    --text-prayer-time: #f4f7f5;\n\n    --text-prayer-active: #d9b45a;\n\n    --text-clock: #ffffff;\n\n    --text-date: #d9b45a;\n\n    --text-gregorian: #c7d0cc;\n\n    --text-secondary: #aebbb5;\n\n    --accent: #d9b45a;\n\n    --accent-light: #efd58b;\n\n    --line: rgba(217,180,90,.45);\n\n    --line-soft: rgba(255,255,255,.13);\n\n    --footer-bg: #0f5458;\n\n    --footer-text: #ffffff;\n\n\n    /* =========================\n       الأحجام\n       ========================= */\n\n    --clock-size: clamp(70px, 10vw, 150px);\n\n    --weekday-size: clamp(22px, 3vw, 42px);\n\n    --date-size: clamp(18px, 2.5vw, 34px);\n\n    --prayer-name-size: clamp(42px, 6vw, 82px);\n\n    --prayer-time-size: clamp(62px, 8vw, 130px);\n\n    --countdown-label-size: clamp(18px, 2vw, 30px);\n\n    --countdown-number-size: clamp(45px, 5vw, 80px);\n\n\n    --container-padding: 18px 32px 0;\n}\n\n\n/* =========================================================\n   RESET\n   ========================================================= */\n\n* {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n}\n\n\nhtml,\nbody {\n\n    width: 100vw;\n    height: 100vh;\n\n    margin: 0;\n    padding: 0;\n\n    overflow: hidden;\n\n    background: var(--bg-main);\n}\n\n\n/* =========================================================\n   الشاشة الرئيسية\n   ========================================================= */\n\n.mosque-screen {\n\n    position: absolute;\n\n    top: 0;\n    left: 0;\n\n    isolation: isolate;\n\n    display: flex;\n\n    flex-direction: column;\n\n    width: 100vh;\n    height: 100vw;\n\n    margin: 0;\n\n    padding: var(--container-padding);\n\n    overflow: hidden;\n\n    color: var(--text-primary);\n\n    background-color: var(--bg-main);\n\n    background-image:\n        linear-gradient(\n            rgba(1, 99, 78, 0.831),\n            rgb(0, 10, 30)\n        ),\n        url('bg.jpg');\n\n    background-size: cover;\n    background-position: center;\n    background-repeat: no-repeat;\n\n    transform: rotate(90deg) translateY(-100%);\n\n    transform-origin: top left;\n}\n\n\n@media (orientation: portrait) {\n\n    .mosque-screen {\n\n        width: 100vw;\n        height: 100vh;\n\n        transform: none;\n    }\n}\n\n\n/* =========================================================\n   الحاوية\n   ========================================================= */\n\n.fit-content {\n\n    display: flex;\n\n    flex-direction: column;\n\n    flex: 1 1 0;\n\n    min-height: 0;\n\n    width: 100%;\n\n    justify-content: space-between;\n}\n\n\n/* =========================================================\n   إلغاء شكل البطاقات القديمة\n   ========================================================= */\n\n.prayer-row,\n.clock-frame,\n.date-card {\n\n    background: transparent !important;\n\n    backdrop-filter: none !important;\n\n    box-shadow: none !important;\n}\n\n\n/* =========================================================\n   الخلفية الإضافية القديمة\n   ========================================================= */\n\n.soft-pattern {\n\n    display: none !important;\n}\n\n\n/* =========================================================\n   زر الإعدادات\n   ========================================================= */\n\n.settings-button {\n\n    position: absolute;\n\n    top: 20px;\n    right: 25px;\n\n    z-index: 4;\n\n    display: grid;\n\n    place-items: center;\n\n    width: 48px;\n    height: 48px;\n\n    padding: 0;\n\n    border: 1px solid rgba(217,180,90,.45);\n\n    border-radius: 8px;\n\n    color: var(--accent);\n\n    background: rgba(7,19,17,.7);\n\n    cursor: pointer;\n\n    box-shadow: none;\n\n    transition:\n        background .2s ease,\n        border-color .2s ease;\n}\n\n\n.settings-button:hover {\n\n    background: rgba(217,180,90,.12);\n\n    border-color: var(--accent);\n}\n\n\n.settings-button svg {\n\n    width: 60%;\n    height: 60%;\n\n    fill: currentColor;\n}\n\n\n/* =========================================================\n   الساعة\n   ========================================================= */\n\n.clock-frame {\n\n    display: flex;\n\n    align-items: center;\n\n    justify-content: center;\n\n    flex-shrink: 0;\n\n    width: 100%;\n\n    min-height: clamp(100px, 14vh, 170px);\n\n    margin: 0 auto;\n\n    padding: 5px 0;\n\n    border: none;\n\n    border-radius: 0;\n\n    background: transparent !important;\n\n    box-shadow: none !important;\n}\n\n\n.clock-frame time {\n\n    direction: ltr;\n\n    color: var(--text-clock);\n\n    font-family: var(--font-clock);\n\n    font-size: var(--clock-size) !important;\n\n    font-weight: 600;\n\n    letter-spacing: 5px;\n\n    line-height: 1;\n\n    white-space: nowrap;\n\n    font-variant-numeric: tabular-nums;\n\n    /* مهم:\n       لا حركة ولا اهتزاز عند تغير الثانية\n    */\n\n    animation: none !important;\n\n    transform: none !important;\n\n    transition: none !important;\n}\n\n\n/* =========================================================\n   التاريخ\n   ========================================================= */\n\n.date-block {\n\n    display: flex;\n\n    align-items: center;\n\n    justify-content: center;\n\n    flex-direction: column;\n\n    gap: 5px;\n\n    flex-shrink: 0;\n\n    width: 100%;\n\n    max-width: none;\n\n    margin: 2px auto 12px;\n\n    flex-wrap: nowrap;\n}\n\n\n/* اليوم */\n\n.weekday {\n\n    width: 100%;\n\n    text-align: center;\n\n    color: var(--accent);\n\n    font-family: var(--font-arabic);\n\n    font-size: var(--weekday-size);\n\n    font-weight: 800;\n\n    line-height: 1.2;\n\n    margin: 0;\n}\n\n\n/* =========================================================\n   إلغاء البطاقات حول التاريخ\n   ========================================================= */\n\n.date-card {\n\n    display: inline-flex;\n\n    flex-direction: row;\n\n    align-items: center;\n\n    justify-content: center;\n\n    padding: 0;\n\n    border: none !important;\n\n    border-radius: 0;\n\n    background: transparent !important;\n\n    min-width: 0;\n\n    box-shadow: none !important;\n\n    gap: 12px;\n}\n\n\n.date-card .date-label {\n\n    color: var(--text-secondary);\n\n    font-size: clamp(15px, 1.8vw, 23px);\n\n    font-weight: 500;\n\n    font-family: var(--font-arabic);\n\n    margin: 0;\n\n    opacity: 1;\n}\n\n\n.date-card .date-value {\n\n    color: var(--text-primary);\n\n    font-size: var(--date-size);\n\n    font-weight: 700;\n\n    font-family: var(--font-arabic);\n\n    line-height: 1.3;\n\n    text-align: center;\n}\n\n\n.date-card .date-value .day-number {\n\n    font-family: var(--font-numbers);\n\n    font-weight: 700;\n}\n\n\n.date-card.hijri-card {\n\n    border: none !important;\n}\n\n\n.date-card.hijri-card .date-label {\n\n    color: var(--accent);\n}\n\n\n/* =========================================================\n   قائمة الصلوات\n   ========================================================= */\n\n.prayer-list {\n\n    display: flex;\n\n    flex-direction: column;\n\n    flex: 1 1 auto;\n\n    justify-content: space-evenly;\n\n    min-height: 0;\n\n    width: 100%;\n\n    max-width: 100%;\n\n    margin: 0 auto;\n\n    padding: 5px 0;\n\n    gap: 0;\n}\n\n\n/* =========================================================\n   سطر الصلاة\n   بدون بطاقة\n   بدون إطار\n   بدون خلفية\n   ========================================================= */\n\n.prayer-row {\n\n    position: relative;\n\n    display: grid;\n\n    grid-template-columns: 1fr 1fr;\n\n    align-items: center;\n\n    justify-content: center;\n\n    flex: 1 1 0;\n\n    min-height: 0;\n\n    padding: 0 45px;\n\n    column-gap: 200px;\n\n    border: none !important;\n\n    border-radius: 0;\n\n    background: transparent !important;\n\n    overflow: visible;\n\n    direction: ltr;\n\n    box-shadow: none !important;\n}\n\n\n/* خط فاصل خفيف بين الصلوات */\n\n.prayer-row:not(:last-child)::after {\n\n    content: \"\";\n\n    position: absolute;\n\n    bottom: 0;\n\n    left: 10%;\n\n    width: 80%;\n\n    height: 1px;\n\n    background: var(--line-soft);\n}\n\n\n/* =========================================================\n   الصلاة القادمة\n   ========================================================= */\n\n.prayer-row.next-prayer {\n\n    border: none !important;\n\n    background: transparent !important;\n\n    box-shadow: none !important;\n}\n\n\n/* خط ذهبي للصلاة القادمة */\n\n.prayer-row.next-prayer::before {\n\n    content: \"\";\n\n    position: absolute;\n\n    right: 0;\n\n    top: 12%;\n\n    width: 5px;\n\n    height: 76%;\n\n    background: var(--accent);\n\n    border-radius: 0;\n}\n\n\n/* =========================================================\n   اسم الصلاة\n   ========================================================= */\n\n.prayer-row strong {\n\n    color: var(--text-prayer-name);\n\n    direction: rtl;\n\n   font-family: \"Alyamama\", sans-serif !important;\n\n    font-size: var(--prayer-name-size) !important;\n\n    font-weight: 900;\n\n    line-height: 1;\n\n    white-space: nowrap;\n\n    text-align: center;\n}\n\n\n.prayer-row.next-prayer strong {\n\n    color: var(--accent-light);\n}\n\n\n/* =========================================================\n   وقت الصلاة\n   ========================================================= */\n\n.prayer-row time {\n\n    color: var(--text-prayer-time);\n\n    direction: ltr;\n\n    font-family: var(--font-numbers);\n\n    font-size: var(--prayer-time-size) !important;\n\n    font-weight: 700;\n\n    line-height: 1;\n\n    letter-spacing: .02em;\n\n    white-space: nowrap;\n\n    text-align: center;\n\n    font-variant-numeric: tabular-nums;\n}\n\n\n.prayer-row.next-prayer time {\n\n    color: var(--accent);\n}\n\n\n/* =========================================================\n   العد التنازلي\n   ========================================================= */\n\n.countdown-footer {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n\n    flex: 0 0 clamp(130px, 18vh, 210px);\n\n    width: calc(100% + 64px);\n    margin-right: -32px;\n    margin-left: -32px;\n\n    padding: 15px 20px;\n\n    color: var(--footer-text);\n    background: var(--footer-bg);\n\n    direction: ltr;\n\n    border-top: 1px solid rgba(217,180,90,.35);\n}\n\n\n.countdown-column {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n\n    flex-direction: column;\n\n    gap: 8px;\n\n    direction: rtl;\n\n    white-space: nowrap;\n}\n\n\n.countdown-column span {\n\n    color: var(--accent);\n\n    font-family: var(--font-arabic);\n\n    font-size: clamp(22px, 2.5vw, 34px) !important;\n\n    font-weight: 600;\n\n    line-height: 1.2;\n\n    white-space: nowrap;\n}\n\n\n.countdown-column strong {\n\n    margin-top: 0;\n\n    direction: ltr;\n\n    color: #ffffff;\n\n    font-family: var(--font-numbers);\n\n    font-size: clamp(50px, 5.5vw, 90px) !important;\n\n    font-weight: 700;\n\n    line-height: 1;\n\n    white-space: nowrap;\n}\n\n\n/* =========================================================\n   الإعدادات\n   ========================================================= */\n\n.settings-layer {\n\n    position: absolute;\n\n    inset: 0;\n\n    z-index: 9999;\n\n    display: flex;\n\n    align-items: center;\n\n    justify-content: center;\n\n    background: rgba(0,0,0,.82);\n\n    backdrop-filter: blur(3px);\n\n    padding: 16px;\n}\n\n\n.settings-panel {\n\n    display: flex;\n\n    flex-direction: column;\n\n    width: 95%;\n\n    max-width: 850px;\n\n    height: 96%;\n\n    max-height: 96%;\n\n    padding: 24px 28px;\n\n    border-radius: 6px;\n\n    border: 1px solid rgba(217,180,90,.45);\n\n    background: #0b1916;\n\n    box-shadow: none;\n\n    overflow-y: auto;\n}\n\n\n.settings-header {\n\n    display: flex;\n\n    align-items: flex-start;\n\n    justify-content: space-between;\n\n    gap: 18px;\n\n    padding-bottom: 14px;\n\n    border-bottom: 1px solid rgba(217,180,90,.25);\n}\n\n\n.settings-header span {\n\n    display: block;\n\n    color: var(--accent);\n\n    font-size: clamp(12px, 2.2vw, 16px);\n\n    font-weight: 600;\n\n    font-family: var(--font-arabic);\n}\n\n\n.settings-header h2 {\n\n    margin: 2px 0 0;\n\n    color: #ffffff;\n\n    font-size: clamp(22px, 4vw, 34px);\n\n    font-weight: 800;\n\n    line-height: 1.2;\n\n    font-family: var(--font-arabic);\n}\n\n\n.settings-close {\n\n    display: grid;\n\n    place-items: center;\n\n    width: 40px;\n\n    height: 40px;\n\n    padding: 0 0 3px;\n\n    border: 1px solid rgba(217,180,90,.4);\n\n    border-radius: 4px;\n\n    color: var(--accent);\n\n    background: transparent;\n\n    cursor: pointer;\n\n    font-size: 26px;\n\n    font-weight: bold;\n\n    line-height: 1;\n}\n\n\n.settings-description {\n\n    margin: 14px 0;\n\n    color: #aebbb5;\n\n    font-size: clamp(12px, 2.2vw, 15px);\n\n    line-height: 1.6;\n\n    font-family: var(--font-arabic);\n}\n\n\n.settings-prayers,\n.settings-special {\n\n    display: grid;\n\n    gap: 8px;\n}\n\n\n.settings-special {\n\n    margin-top: 14px;\n\n    padding-top: 14px;\n\n    border-top: 1px dashed rgba(217,180,90,.3);\n}\n\n\n.settings-row {\n\n    display: flex;\n\n    align-items: center;\n\n    justify-content: space-between;\n\n    gap: 12px;\n\n    min-height: 52px;\n\n    padding: 8px 12px;\n\n    border: 1px solid rgba(255,255,255,.12);\n\n    border-radius: 4px;\n\n    background: rgba(255,255,255,.035);\n}\n\n\n.settings-row > div:first-child {\n\n    min-width: 0;\n}\n\n\n.prayer-controls {\n\n    display: flex;\n\n    align-items: flex-end;\n\n    flex: 0 0 auto;\n\n    gap: 12px;\n}\n\n\n.control-field {\n\n    display: flex;\n\n    align-items: center;\n\n    flex-direction: column;\n\n    gap: 3px;\n}\n\n\n.control-field > span {\n\n    color: #aebbb5;\n\n    font-size: 11px;\n\n    font-weight: 700;\n\n    line-height: 1;\n\n    font-family: var(--font-arabic);\n}\n\n\n.settings-row strong {\n\n    display: block;\n\n    color: #ffffff;\n\n    font-size: clamp(14px, 2.6vw, 18px);\n\n    font-weight: 700;\n\n    line-height: 1.2;\n\n    font-family: var(--font-arabic);\n}\n\n\n.settings-row small {\n\n    display: block;\n\n    margin-top: 2px;\n\n    color: #82918b;\n\n    font-size: clamp(10px, 2vw, 13px);\n\n    line-height: 1.2;\n\n    font-family: var(--font-arabic);\n}\n\n\n/* =========================================================\n   التحكم بالدقائق\n   ========================================================= */\n\n.minute-control {\n\n    display: flex;\n\n    align-items: center;\n\n    flex: 0 0 auto;\n\n    gap: 4px;\n\n    direction: ltr;\n}\n\n\n.minute-control button {\n\n    display: grid;\n\n    place-items: center;\n\n    width: 32px;\n\n    height: 32px;\n\n    padding: 0 0 2px;\n\n    border: 0;\n\n    border-radius: 3px;\n\n    color: #071311;\n\n    background: var(--accent);\n\n    cursor: pointer;\n\n    font-size: 20px;\n\n    font-weight: bold;\n\n    line-height: 1;\n}\n\n\n.minute-control button:hover {\n\n    background: var(--accent-light);\n}\n\n\n.minute-control input {\n\n    width: 52px;\n\n    height: 32px;\n\n    padding: 0 2px;\n\n    border: 1px solid rgba(217,180,90,.5);\n\n    border-radius: 3px;\n\n    color: var(--accent);\n\n    background: #071311;\n\n    font-family: var(--font-numbers);\n\n    font-size: 15px;\n\n    font-weight: 700;\n\n    text-align: center;\n}\n\n\n.minute-control em {\n\n    color: #aebbb5;\n\n    font-size: 11px;\n\n    font-style: normal;\n\n    white-space: nowrap;\n\n    font-family: var(--font-arabic);\n}\n\n\n/* =========================================================\n   أزرار الإعدادات\n   ========================================================= */\n\n.settings-actions {\n\n    display: flex;\n\n    justify-content: space-between;\n\n    gap: 12px;\n\n    margin-top: 18px;\n}\n\n\n.settings-actions button {\n\n    min-height: 42px;\n\n    padding: 6px 22px;\n\n    border-radius: 3px;\n\n    cursor: pointer;\n\n    font-size: clamp(12px, 2.4vw, 15px);\n\n    font-weight: 700;\n\n    font-family: var(--font-arabic);\n}\n\n\n.reset-button {\n\n    border: 1px solid rgba(217,180,90,.5);\n\n    color: var(--accent);\n\n    background: transparent;\n}\n\n\n.save-button {\n\n    border: 1px solid var(--accent);\n\n    color: #071311;\n\n    background: var(--accent);\n}\n\n\n/* =========================================================\n   إلغاء حركة الساعة تمامًا\n   ========================================================= */\n\n.clock-frame time.pulse {\n\n    animation: none !important;\n\n    transform: none !important;\n\n    transition: none !important;\n}\n\n\n@keyframes pulse {\n\n    0%,\n    100% {\n\n        transform: none;\n    }\n}\n\n\n/* =========================================================\n   الشاشات الصغيرة\n   ========================================================= */\n\n@media (max-width: 600px) {\n\n    :root {\n\n        --clock-size: clamp(42px, 11vw, 70px);\n\n        --weekday-size: clamp(16px, 3vw, 24px);\n\n        --date-size: clamp(14px, 2.8vw, 22px);\n\n        --prayer-name-size: clamp(22px, 6vw, 42px);\n\n        --prayer-time-size: clamp(30px, 7vw, 55px);\n\n        --countdown-number-size: clamp(25px, 5vw, 40px);\n    }\n\n\n    .mosque-screen {\n\n        padding: 10px 16px 0;\n    }\n\n\n    .prayer-row {\n\n        padding: 0 20px;\n\n        grid-template-columns: 1fr 1fr;\n    }\n\n\n    .prayer-row.next-prayer::before {\n\n        width: 3px;\n    }\n\n\n    .countdown-footer {\n\n        width: calc(100% + 32px);\n\n        margin-right: -16px;\n\n        margin-left: -16px;\n\n        padding-left: 18px;\n\n        padding-right: 18px;\n    }\n\n\n    .settings-button {\n\n        width: 38px;\n\n        height: 38px;\n\n        top: 10px;\n\n        right: 12px;\n    }\n\n\n    .date-card {\n\n        gap: 7px;\n    }\n}",
+        "prayerNames": [
+            "الفـجــر",
+            "الشروق",
+            "الظهـر",
+            "العصـر",
+            "المغرب",
+            "العشــاء"
+        ]
+    },
+    {
+        "id": 3,
+        "name": "index3.html",
+        "style": ":root {\n        --font-arabic: \"Readex Pro\", \"Noto Sans Arabic\", \"Cairo\", sans-serif;\n        --font-numbers: \"Fjalla One\", Arial, sans-serif;\n        --font-clock: \"Share Tech Mono\", \"Courier New\", monospace;\n        \n        --bg-deep: #0a020a;\n        --accent-emerald: #00ffaa;\n        --accent-gold: #f6ff00;\n        \n        --text-primary: #ffffff;\n        --text-prayer-name: #f0fdf4;\n        --text-prayer-time: #f5ff62;\n        --text-prayer-active: #00ffaa;\n        --text-clock: #ffffff;\n        --text-date: #00ffea;\n        --footer-bg: #ed0cde00;\n        --footer-text: #ffffff;\n        \n        --container-padding: 4px 16px 0;\n    }\n\n    * { box-sizing: border-box; margin: 0; padding: 0; }\n    html, body { \n        width: 100vw; height: 100vh; \n        margin: 0; padding: 0; \n        overflow: hidden; \n        background: var(--bg-deep); \n    }\n\n    .mosque-screen {\n        position: absolute; top: 0; left: 0; isolation: isolate;\n        display: flex; flex-direction: column;\n        width: 100vh; height: 100vw;\n        margin: 0; padding: var(--container-padding);\n        overflow: hidden;\n        background: radial-gradient(circle at center, #056434 0%, #020a05 100%) !important;\n        transform: rotate(90deg) translateY(-100%);\n        transform-origin: top left;\n    }\n    @media (orientation: portrait) { \n        .mosque-screen { width: 100vw; height: 100vh; transform: none; } \n    }\n\n    .fit-content {\n        display: flex;\n        flex-direction: column;\n        flex: 1 1 0;\n        min-height: 0;\n        width: 100%;\n        justify-content: space-between;\n    }\n\n    .soft-pattern { display: none !important; }\n\n    /* ========================================\n       الساعة بدون إطار وبحجم ضخم\n       ======================================== */\n    .clock-frame {\n        display: grid;\n        place-items: center;\n        flex-shrink: 0;\n        width: 100%;\n        min-height: clamp(90px, 13vh, 170px);\n        margin: 0 auto;\n        border: none !important;\n        background: transparent !important;\n        box-shadow: none !important;\n    }\n    .clock-frame time {\n        direction: ltr;\n        color: var(--text-clock);\n        font-family: var(--font-numbers);\n        font-size: clamp(80px, 11vw, 160px) !important;\n        font-weight: 800;\n        letter-spacing: 4px;\n        line-height: 1;\n        white-space: nowrap;\n        font-variant-numeric: tabular-nums;\n        text-shadow: 0 0 25px rgba(0, 255, 170, 0.45);\n    }\n\n    /* ========================================\n       التاريخ بدون بطاقات\n       ======================================== */\n    .date-block {\n        display: flex; align-items: center; flex-direction: row;\n        justify-content: space-around;\n        flex-shrink: 0;\n        width: 100%; max-width: 95%;\n        margin: 2px auto 8px;\n        flex-wrap: wrap;\n    }\n    .weekday {\n        width: 100%; text-align: center;\n        color: var(--text-date); font-family: var(--font-arabic);\n        font-size: clamp(24px, 4vw, 48px); font-weight: 800; line-height: 1.1;\n        margin-bottom: 4px;\n        text-shadow: 0 0 15px rgba(0, 255, 170, 0.3);\n    }\n    .date-card {\n        display: flex; flex-direction: row; align-items: center; justify-content: center;\n        gap: 8px;\n        padding: 4px 8px;\n        border: none !important;\n        background: transparent !important;\n        box-shadow: none !important;\n        flex: 1;\n    }\n    .date-card .date-label { display: none; }\n    .date-card .date-value {\n        color: #ffffff; font-size: clamp(22px, 3.8vw, 44px);\n        font-weight: 800; font-family: var(--font-arabic);\n        line-height: 1.2; text-align: center;\n    }\n    .date-card .date-value .day-number {\n        font-family: var(--font-numbers); font-weight: 900;\n        color: var(--accent-gold);\n    }\n\n    /* ========================================\n       قائمة الصلوات بحجم كبير وبدون أي إطارات\n       ======================================== */\n    .prayer-list {\n        display: flex;\n        flex-direction: column;\n        flex: 1 1 auto;\n        justify-content: space-around;\n        min-height: 0;\n        width: 100%;\n        max-width: 96%;\n        margin: 0 auto;\n        padding: 0;\n        gap: 0;\n        border: none !important;\n        background: transparent !important;\n        box-shadow: none !important;\n    }\n    .prayer-row {\n        display: flex;\n        align-items: center;\n        justify-content: space-between;\n        flex: 1 1 0;\n        min-height: 0;\n        padding: 0 20px;\n        border: none !important;\n        background: transparent !important;\n        box-shadow: none !important;\n        direction: ltr;\n        border-radius: 16px;\n    }\n    .prayer-row.next-prayer {\n        background: rgba(0, 255, 170, 0.14) !important;\n    }\n    .prayer-row strong {\n        color: var(--text-prayer-name);\n        direction: rtl;\nfont-family: \"Alyamama\", sans-serif !important;        font-size: clamp(48px, 6.5vw, 96px) !important;\n        font-weight: 700;\n        line-height: 1;\n        white-space: nowrap;\n    }\n    .prayer-row.next-prayer strong { \n        color: var(--text-prayer-active); \n        text-shadow: 0 0 15px rgba(0, 255, 170, 0.6);\n    }\n    .prayer-row time {\n        color: var(--text-prayer-time);\n        direction: ltr;\n        font-family: var(--font-numbers);\n        font-size: clamp(62px, 8.5vw, 125px) !important;\n        font-weight: 800;\n        line-height: 1;\n        letter-spacing: .02em;\n        white-space: nowrap;\n    }\n    .prayer-row.next-prayer time { \n        color: #ffffff; \n        text-shadow: 0 0 20px rgba(255, 255, 255, 0.7);\n    }\n\n    /* ========================================\n       العد التنازلي السفلي\n       ======================================== */\n    .countdown-footer {\n        display: grid;\n        grid-template-columns: 1fr 1fr;\n        flex: 0 0 clamp(85px, 12vh, 145px);\n        width: calc(100% + clamp(32px, 7vw, 84px));\n        margin-right: calc(clamp(16px, 3.5vw, 42px) * -1);\n        margin-left: calc(clamp(16px, 3.5vw, 42px) * -1);\n        padding: clamp(10px, 1.5vh, 18px) clamp(16px, 3.5vw, 42px) 0;\n        color: var(--footer-text);\n        background: var(--footer-bg);\n        border-top: 1px solid rgba(0, 255, 170, 0.2);\n        direction: ltr;\n        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8);\n    }\n    .countdown-column {\n        display: flex;\n        align-items: center;\n        flex-direction: column;\n        justify-content: center;\n        direction: rtl;\n    }\n    .countdown-column span {\n        color: #a2c7b5;\n        font-family: var(--font-arabic);\n        font-size: clamp(18px, 2.4vw, 34px) !important;\n        font-weight: 700;\n        line-height: 1.2;\n        white-space: nowrap;\n    }\n    .countdown-column strong {\n        margin-top: 4px;\n        color: var(--accent-emerald);\n        direction: ltr;\n        font-family: var(--font-numbers);\n        font-size: clamp(48px, 6.2vw, 92px) !important;\n        font-weight: 800;\n        line-height: 1;\n        letter-spacing: .02em;\n        white-space: nowrap;\n        text-shadow: 0 0 15px rgba(0, 255, 170, 0.4);\n    }\n\n    /* زر الإعدادات */\n    .settings-button {\n        position: absolute; top: 16px; right: 20px;\n        z-index: 4; display: grid; place-items: center;\n        width: 44px; height: 44px;\n        padding: 0; border: none; border-radius: 50%;\n        color: var(--accent-emerald); background: rgba(3, 20, 11, 0.6);\n        cursor: pointer; transition: transform .2s ease;\n    }\n    .settings-button:hover { transform: rotate(30deg) scale(1.1); }\n    .settings-button svg { width: 65%; height: 65%; fill: currentColor; }",
+        "prayerNames": [
+            "الفَـجـر",
+            "الشُروق",
+            "الظهـــر",
+            "العَصــر",
+            "المغرب",
+            "العِشـاء"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "index4.html",
+        "style": ":root {\n      /* الخطوط */\n      --font-arabic: \"El Messiri\", \"Readex Pro\", sans-serif;\n      --font-kufi:   \"Reem Kufi\", \"El Messiri\", sans-serif;\n      --font-numbers:\"Chivo Mono\", Arial, sans-serif;\n      --font-clock:  \"Chivo Mono\", \"Courier New\", monospace;\n\n      /* الألوان — نفس ثيم التصميم الجديد */\n      --bg-0: #03110c;\n      --bg-1: #072a1e;\n      --bg-2: #0b4230;\n      --ink: #f4efe1;\n      --ink-soft: #a7c9ba;\n      --gold: #eac16b;\n      --gold-deep: #c99a3f;\n      --mint: #4ee0a3;\n      --mint-soft: #7cf0c4;\n      --line: rgba(234, 193, 107, 0.16);\n\n      --text-primary: var(--ink);\n      --text-prayer-name: var(--ink);\n      --text-prayer-time: var(--gold);\n      --text-prayer-active: var(--mint-soft);\n      --text-clock: #ffffff;\n      --text-date: var(--mint-soft);\n      --footer-text: var(--ink);\n\n      --container-padding: 4px 16px 0;\n  }\n\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  html, body {\n      width: 100vw; height: 100vh;\n      margin: 0; padding: 0;\n      overflow: hidden;\n      background: var(--bg-0);\n  }\n\n  .mosque-screen {\n      position: absolute; top: 0; left: 0; isolation: isolate;\n      display: flex; flex-direction: column;\n      width: 100vh; height: 100vw;\n      margin: 0; padding: var(--container-padding);\n      overflow: hidden;\n      color: var(--ink);\n      direction: rtl;\n      font-family: var(--font-arabic);\n      background:\n        radial-gradient(120% 80% at 50% -10%, var(--bg-2) 0%, var(--bg-1) 42%, var(--bg-0) 100%) !important;\n      transform: rotate(90deg) translateY(-100%);\n      transform-origin: top left;\n  }\n  /* زخرفة نجمية + توهّج علوي */\n  .mosque-screen::before {\n      content: \"\"; position: absolute; inset: 0; z-index: -1; pointer-events: none;\n      opacity: .10;\n      background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23eac16b' stroke-width='1.2'%3E%3Cpath d='M60 8l14 26 29 4-21 21 5 29-27-14-27 14 5-29-21-21 29-4z'/%3E%3Ccircle cx='60' cy='60' r='40'/%3E%3C/g%3E%3C/svg%3E\");\n      background-size: 240px 240px;\n      -webkit-mask-image: radial-gradient(circle at 50% 40%, #000 0%, transparent 78%);\n      mask-image: radial-gradient(circle at 50% 40%, #000 0%, transparent 78%);\n  }\n  .mosque-screen::after {\n      content: \"\"; position: absolute; top: -22%; left: 50%; transform: translateX(-50%);\n      width: 70%; height: 45%; z-index: -1; pointer-events: none;\n      background: radial-gradient(circle, rgba(78,224,163,.22) 0%, transparent 70%);\n      filter: blur(20px);\n  }\n  @media (orientation: portrait) {\n      .mosque-screen { width: 100vw; height: 100vh; transform: none; }\n  }\n\n  .fit-content {\n      display: flex; flex-direction: column;\n      flex: 1 1 0; min-height: 0; width: 100%;\n      justify-content: space-between;\n  }\n  .soft-pattern { display: none !important; }\n\n  /* ========================================\n     الساعة — ضخمة ومتوهّجة\n     ======================================== */\n  .clock-frame {\n      display: grid; place-items: center;\n      flex-shrink: 0; width: 100%;\n      min-height: clamp(90px, 13vh, 170px);\n      margin: 0 auto;\n      border: none !important; background: transparent !important; box-shadow: none !important;\n  }\n  .clock-frame time {\n      direction: ltr;\n      color: var(--text-clock);\n      font-family: var(--font-numbers);\n      font-size: clamp(80px, 11vw, 170px) !important;\n      font-weight: 700;\n      letter-spacing: 2px;\n      line-height: 1;\n      white-space: nowrap;\n      font-variant-numeric: tabular-nums;\n      text-shadow: 0 0 38px rgba(78, 224, 163, 0.5), 0 0 4px rgba(255,255,255,0.4);\n  }\n\n  /* ========================================\n     التاريخ\n     ======================================== */\n  .date-block {\n      display: flex; align-items: center; flex-direction: row;\n      justify-content: space-around;\n      flex-shrink: 0; width: 100%; max-width: 95%;\n      margin: 2px auto 8px; flex-wrap: wrap;\n  }\n  .weekday {\n      width: 100%; text-align: center;\n      color: var(--text-date); font-family: var(--font-kufi);\n      font-size: clamp(24px, 4vw, 52px); font-weight: 700; line-height: 1.1;\n      margin-bottom: 4px;\n      text-shadow: 0 0 18px rgba(78, 224, 163, 0.3);\n  }\n  .date-card {\n      display: flex; flex-direction: row; align-items: center; justify-content: center;\n      gap: 8px; padding: 4px 8px; flex: 1;\n      border: none !important; background: transparent !important; box-shadow: none !important;\n  }\n  .date-card .date-label { display: none; }\n  .date-card .date-value {\n      color: var(--ink); font-size: clamp(20px, 3.4vw, 40px);\n      font-weight: 600; font-family: var(--font-arabic);\n      line-height: 1.2; text-align: center;\n  }\n  .date-card .date-value .day-number {\n      font-family: var(--font-numbers); font-weight: 700;\n      color: var(--gold);\n  }\n\n  /* ========================================\n     قائمة الصلوات — كبيرة وبدون إطارات\n     ======================================== */\n  .prayer-list {\n      display: flex; flex-direction: column;\n      flex: 1 1 auto; justify-content: space-around;\n      min-height: 0; width: 100%; max-width: 96%;\n      margin: 0 auto; padding: 0; gap: 0;\n      border: none !important; background: transparent !important; box-shadow: none !important;\n  }\n  .prayer-row {\n      position: relative;\n      display: flex; align-items: center; justify-content: space-between;\n      flex: 1 1 0; min-height: 0; padding: 0 20px;\n      direction: ltr; border-radius: 20px;\n      border-bottom: 1px solid var(--line);\n      background: transparent !important; box-shadow: none !important;\n  }\n  .prayer-list .prayer-row:last-child { border-bottom: none; }\n\n  .prayer-row strong {\n      color: var(--text-prayer-name);\n      direction: rtl;\n      font-family: var(--font-kufi) !important;\n      font-size: clamp(48px, 6.5vw, 100px) !important;\n      font-weight: 700; line-height: 1; white-space: nowrap;\n  }\n  .prayer-row time {\n      color: var(--text-prayer-time);\n      direction: ltr;\n      font-family: var(--font-numbers);\n      font-size: clamp(62px, 8.5vw, 128px) !important;\n      font-weight: 700; line-height: 1; letter-spacing: .02em;\n      white-space: nowrap; font-variant-numeric: tabular-nums;\n  }\n\n  /* الصلاة القادمة */\n  .prayer-row.next-prayer {\n      background: linear-gradient(90deg, rgba(78,224,163,.16), rgba(234,193,107,.08)) !important;\n      box-shadow: inset 0 0 0 1px rgba(78,224,163,.35), 0 0 34px rgba(78,224,163,.18) !important;\n      animation: nextPulse 3.2s ease-in-out infinite;\n  }\n  .prayer-row.next-prayer::after {\n      content: \"\"; position: absolute; right: 0; top: 14%; bottom: 14%;\n      width: 8px; border-radius: 8px;\n      background: linear-gradient(var(--mint), var(--gold));\n      box-shadow: 0 0 20px var(--mint);\n  }\n  .prayer-row.next-prayer strong {\n      color: var(--text-prayer-active);\n      text-shadow: 0 0 20px rgba(78, 224, 163, 0.55);\n  }\n  .prayer-row.next-prayer time {\n      color: #ffffff;\n      text-shadow: 0 0 22px rgba(255, 255, 255, 0.55);\n  }\n  @keyframes nextPulse {\n      0%, 100% { box-shadow: inset 0 0 0 1px rgba(78,224,163,.35), 0 0 24px rgba(78,224,163,.14); }\n      50%      { box-shadow: inset 0 0 0 1px rgba(78,224,163,.55), 0 0 44px rgba(78,224,163,.28); }\n  }\n\n  /* ========================================\n     العدّاد التنازلي السفلي\n     ======================================== */\n  .countdown-footer {\n      display: grid; grid-template-columns: 1fr 1fr;\n      flex: 0 0 clamp(85px, 12vh, 150px);\n      width: calc(100% + clamp(32px, 7vw, 84px));\n      margin-right: calc(clamp(16px, 3.5vw, 42px) * -1);\n      margin-left: calc(clamp(16px, 3.5vw, 42px) * -1);\n      padding: clamp(10px, 1.5vh, 18px) clamp(16px, 3.5vw, 42px) 0;\n      color: var(--footer-text);\n      direction: ltr;\n      background: linear-gradient(0deg, rgba(3,17,12,.9), rgba(11,66,48,.35));\n      border-top: 1px solid rgba(234, 193, 107, 0.28);\n      box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.6);\n  }\n  .countdown-column {\n      display: flex; align-items: center; flex-direction: column;\n      justify-content: center; direction: rtl;\n  }\n  .countdown-column span {\n      color: var(--ink-soft);\n      font-family: var(--font-arabic);\n      font-size: clamp(18px, 2.4vw, 34px) !important;\n      font-weight: 600; line-height: 1.2; white-space: nowrap;\n      letter-spacing: .06em;\n  }\n  .countdown-column strong {\n      margin-top: 4px;\n      color: var(--mint);\n      direction: ltr;\n      font-family: var(--font-numbers);\n      font-size: clamp(48px, 6.2vw, 96px) !important;\n      font-weight: 700; line-height: 1; letter-spacing: .02em;\n      white-space: nowrap;\n      text-shadow: 0 0 22px rgba(78, 224, 163, 0.4);\n  }\n\n  /* زر الإعدادات */\n  .settings-button {\n      position: absolute; top: 16px; right: 20px;\n      z-index: 4; display: grid; place-items: center;\n      width: 48px; height: 48px; padding: 0;\n      border: 1px solid rgba(234, 193, 107, 0.3); border-radius: 50%;\n      color: var(--gold); background: rgba(3, 17, 12, 0.55);\n      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);\n      cursor: pointer; transition: transform .25s ease, background .25s ease;\n  }\n  .settings-button:hover { transform: rotate(45deg) scale(1.08); background: rgba(11, 66, 48, 0.7); }\n  .settings-button svg { width: 62%; height: 62%; fill: currentColor; }",
+        "prayerNames": [
+            "الفَجــر",
+            "الشُروق",
+            "الظهر",
+            "العَصر",
+            "المغرب",
+            "العِشاء"
+        ]
+    },
+    {
+        "id": 5,
+        "name": "index5.html",
+        "style": ":root {\n      --font-arabic: \"Tajawal\", sans-serif;\n      --font-name:   \"Aref Ruqaa\", \"Tajawal\", serif;\n      --font-numbers:\"Sora\", Arial, sans-serif;\n      --font-clock:  \"Sora\", Arial, sans-serif;\n\n      --paper: #f6f1e3;\n      --paper-2: #ece4cf;\n      --olive: #34401c;\n      --olive-2: #556128;\n      --brass: #977a2c;\n      --brass-2: #b8923a;\n      --cream: #f8f4e8;\n      --line: rgba(52, 64, 28, 0.14);\n\n      --text-clock: #2c3617;\n      --text-date: #6c7a34;\n      --footer-text: #34401c;\n      --container-padding: 4px 16px 0;\n  }\n\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  html, body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: var(--paper); }\n\n  .mosque-screen {\n      position: absolute; top: 0; left: 0; isolation: isolate;\n      display: flex; flex-direction: column;\n      width: 100vh; height: 100vw;\n      margin: 0; padding: var(--container-padding);\n      overflow: hidden; color: var(--olive); direction: rtl;\n      font-family: var(--font-arabic);\n      background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%) !important;\n      transform: rotate(90deg) translateY(-100%);\n      transform-origin: top left;\n  }\n  .mosque-screen::before {\n      content: \"\"; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .10;\n      background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%2334401c' stroke-width='1.3'%3E%3Cpath d='M60 8l14 26 29 4-21 21 5 29-27-14-27 14 5-29-21-21 29-4z'/%3E%3Ccircle cx='60' cy='60' r='40'/%3E%3C/g%3E%3C/svg%3E\");\n      background-size: 240px 240px;\n      -webkit-mask-image: radial-gradient(circle at 50% 42%, #000 0%, transparent 80%);\n      mask-image: radial-gradient(circle at 50% 42%, #000 0%, transparent 80%);\n  }\n  @media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }\n\n  .fit-content { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; width: 100%; justify-content: space-between; }\n  .soft-pattern { display: none !important; }\n\n  /* الساعة */\n  .clock-frame { display: grid; place-items: center; flex-shrink: 0; width: 100%; min-height: clamp(90px, 13vh, 170px); margin: 0 auto; border: none !important; background: transparent !important; box-shadow: none !important; }\n  .clock-frame time {\n      direction: ltr; color: var(--text-clock); font-family: var(--font-clock);\n      font-size: clamp(80px, 11vw, 170px) !important; font-weight: 800; letter-spacing: 1px; line-height: 1;\n      white-space: nowrap; font-variant-numeric: tabular-nums;\n  }\n\n  /* التاريخ */\n  .date-block { display: flex; align-items: center; flex-direction: row; justify-content: space-around; flex-shrink: 0; width: 100%; max-width: 95%; margin: 6px auto 8px; flex-wrap: wrap; }\n  .weekday { width: 100%; text-align: center; color: var(--text-date); font-family: var(--font-name); font-size: clamp(26px, 4.2vw, 54px); font-weight: 700; line-height: 1.15; margin-bottom: 8px; }\n  .date-card { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: 4px 14px; flex: 1; border: none !important; background: transparent !important; box-shadow: none !important; }\n  .date-card + .date-card { border-right: 2px solid var(--line) !important; }\n  .date-card .date-label { display: none; }\n  .date-card .date-value { color: var(--olive-2); font-size: clamp(20px, 3.4vw, 40px); font-weight: 700; font-family: var(--font-arabic); line-height: 1.2; text-align: center; }\n  .date-card .date-value .day-number { font-family: var(--font-numbers); font-weight: 800; color: var(--brass); }\n\n  /* قائمة الصلوات */\n  .prayer-list { display: flex; flex-direction: column; flex: 1 1 auto; justify-content: space-around; min-height: 0; width: 100%; max-width: 96%; margin: 0 auto; padding: 0; gap: 8px; border: none !important; background: transparent !important; box-shadow: none !important; }\n  .prayer-row {\n      position: relative; display: flex; align-items: center; justify-content: space-between;\n      flex: 1 1 0; min-height: 0; padding: 0 clamp(16px, 3vw, 34px);\n      direction: ltr; border-radius: 18px; border-bottom: 2px solid var(--line);\n      background: transparent !important; box-shadow: none !important;\n  }\n  .prayer-list .prayer-row:last-child { border-bottom: none; }\n  .prayer-row strong {\n      color: var(--olive); direction: rtl; \nfont-family: \"Alyamama\", sans-serif !important;      font-size: clamp(46px, 6.2vw, 96px) !important; font-weight: 900; line-height: 1.1; white-space: nowrap;\n  }\n  .prayer-row time {\n      color: var(--brass); direction: ltr; font-family: var(--font-numbers);\n      font-size: clamp(60px, 8.2vw, 122px) !important; font-weight: 800; line-height: 1; letter-spacing: .01em;\n      white-space: nowrap; font-variant-numeric: tabular-nums;\n  }\n  .prayer-row.next-prayer {\n      background: var(--olive) !important; border-bottom: none !important;\n      box-shadow: 0 10px 30px rgba(52, 64, 28, 0.28) !important;\n  }\n  .prayer-row.next-prayer::after {\n      content: \"\"; position: absolute; right: 0; top: 16%; bottom: 16%; width: 8px; border-radius: 8px;\n      background: var(--brass-2); box-shadow: 0 0 0 1px rgba(248,244,232,.25);\n  }\n  .prayer-row.next-prayer strong { color: var(--cream); }\n  .prayer-row.next-prayer time { color: #ffffff; }\n\n  /* العدّاد التنازلي */\n  .countdown-footer {\n      display: grid; grid-template-columns: 1fr 1fr; flex: 0 0 clamp(85px, 12vh, 150px);\n      width: calc(100% + clamp(32px, 7vw, 84px));\n      margin-right: calc(clamp(16px, 3.5vw, 42px) * -1); margin-left: calc(clamp(16px, 3.5vw, 42px) * -1);\n      padding: clamp(10px, 1.5vh, 18px) clamp(16px, 3.5vw, 42px) 0;\n      color: var(--footer-text); direction: ltr;\n      background: rgba(52, 64, 28, 0.06); border-top: 2px solid rgba(52, 64, 28, 0.2);\n  }\n  .countdown-column { display: flex; align-items: center; flex-direction: column; justify-content: center; direction: rtl; }\n  .countdown-column + .countdown-column { border-right: 2px solid var(--line); }\n  .countdown-column span { color: var(--olive-2); font-family: var(--font-arabic); font-size: clamp(18px, 2.4vw, 34px) !important; font-weight: 700; line-height: 1.2; white-space: nowrap; }\n  .countdown-column strong { margin-top: 4px; color: var(--brass); direction: ltr; font-family: var(--font-numbers); font-size: clamp(44px, 5.8vw, 88px) !important; font-weight: 800; line-height: 1; white-space: nowrap; letter-spacing: .01em; font-variant-numeric: tabular-nums; }\n\n  /* زر الإعدادات */\n  .settings-button { position: absolute; top: 16px; right: 20px; z-index: 4; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 2px solid rgba(52,64,28,.2); border-radius: 50%; color: var(--olive); background: rgba(248,244,232,.7); cursor: pointer; transition: transform .25s ease; }\n  .settings-button:hover { transform: rotate(45deg) scale(1.08); }\n  .settings-button svg { width: 60%; height: 60%; fill: currentColor; }",
+        "prayerNames": [
+            "الفَجــر",
+            "الشُروق",
+            "الظهر",
+            "العَصر",
+            "المغرب",
+            "العِشاء"
+        ]
+    },
+    {
+        "id": 6,
+        "name": "index6.html",
+        "style": ":root {\n      --font-arabic: \"Tajawal\", sans-serif;\n      --font-name:   \"Aref Ruqaa\", \"Tajawal\", serif;\n      --font-numbers:\"Sora\", Arial, sans-serif;\n      --font-clock:  \"Sora\", Arial, sans-serif;\n\n      --paper: #f6f1e3;\n      --paper-2: #ece4cf;\n      --olive: #34401c;\n      --olive-2: #556128;\n      --brass: #977a2c;\n      --brass-2: #b8923a;\n      --cream: #f8f4e8;\n      --line: rgba(52, 64, 28, 0.14);\n\n      --text-clock: #2c3617;\n      --text-date: #6c7a34;\n      --footer-text: #34401c;\n      --container-padding: 4px 16px 0;\n  }\n\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  html, body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: var(--paper); }\n\n  .mosque-screen {\n      position: absolute; top: 0; left: 0; isolation: isolate;\n      display: flex; flex-direction: column;\n      width: 100vh; height: 100vw;\n      margin: 0; padding: var(--container-padding);\n      overflow: hidden; color: var(--olive); direction: rtl;\n      font-family: var(--font-arabic);\n      background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%) !important;\n      transform: rotate(90deg) translateY(-100%);\n      transform-origin: top left;\n  }\n  .mosque-screen::before {\n      content: \"\"; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .10;\n      background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%2334401c' stroke-width='1.3'%3E%3Cpath d='M60 8l14 26 29 4-21 21 5 29-27-14-27 14 5-29-21-21 29-4z'/%3E%3Ccircle cx='60' cy='60' r='40'/%3E%3C/g%3E%3C/svg%3E\");\n      background-size: 240px 240px;\n      -webkit-mask-image: radial-gradient(circle at 50% 42%, #000 0%, transparent 80%);\n      mask-image: radial-gradient(circle at 50% 42%, #000 0%, transparent 80%);\n  }\n  @media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }\n\n  .fit-content { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; width: 100%; justify-content: space-between; }\n  .soft-pattern { display: none !important; }\n\n  /* الساعة */\n  .clock-frame { display: grid; place-items: center; flex-shrink: 0; width: 100%; min-height: clamp(90px, 13vh, 170px); margin: 0 auto; border: none !important; background: transparent !important; box-shadow: none !important; }\n  .clock-frame time {\n      direction: ltr; color: var(--text-clock); font-family: var(--font-clock);\n      font-size: clamp(80px, 11vw, 170px) !important; font-weight: 800; letter-spacing: 1px; line-height: 1;\n      white-space: nowrap; font-variant-numeric: tabular-nums;\n  }\n\n  /* التاريخ */\n  .date-block { display: flex; align-items: center; flex-direction: row; justify-content: space-around; flex-shrink: 0; width: 100%; max-width: 95%; margin: 6px auto 8px; flex-wrap: wrap; }\n  .weekday { width: 100%; text-align: center; color: var(--text-date); font-family: var(--font-name); font-size: clamp(26px, 4.2vw, 54px); font-weight: 700; line-height: 1.15; margin-bottom: 8px; }\n  .date-card { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding: 4px 14px; flex: 1; border: none !important; background: transparent !important; box-shadow: none !important; }\n  .date-card + .date-card { border-right: 2px solid var(--line) !important; }\n  .date-card .date-label { display: none; }\n  .date-card .date-value { color: var(--olive-2); font-size: clamp(20px, 3.4vw, 40px); font-weight: 700; font-family: var(--font-arabic); line-height: 1.2; text-align: center; }\n  .date-card .date-value .day-number { font-family: var(--font-numbers); font-weight: 800; color: var(--brass); }\n\n  /* قائمة الصلوات */\n  .prayer-list { display: flex; flex-direction: column; flex: 1 1 auto; justify-content: space-around; min-height: 0; width: 100%; max-width: 96%; margin: 0 auto; padding: 0; gap: 8px; border: none !important; background: transparent !important; box-shadow: none !important; }\n  .prayer-row {\n      position: relative; display: flex; align-items: center; justify-content: space-between;\n      flex: 1 1 0; min-height: 0; padding: 0 clamp(16px, 3vw, 34px);\n      direction: ltr; border-radius: 18px; border-bottom: 2px solid var(--line);\n      background: transparent !important; box-shadow: none !important;\n  }\n  .prayer-list .prayer-row:last-child { border-bottom: none; }\n  .prayer-row strong {\n      color: var(--olive); direction: rtl; font-family: var(--font-name) !important;\n      font-size: clamp(46px, 6.2vw, 96px) !important; font-weight: 700; line-height: 1.1; white-space: nowrap;\n  }\n  .prayer-row time {\n      color: var(--brass); direction: ltr; font-family: var(--font-numbers);\n      font-size: clamp(60px, 8.2vw, 122px) !important; font-weight: 800; line-height: 1; letter-spacing: .01em;\n      white-space: nowrap; font-variant-numeric: tabular-nums;\n  }\n  .prayer-row.next-prayer {\n      background: var(--olive) !important; border-bottom: none !important;\n      box-shadow: 0 10px 30px rgba(52, 64, 28, 0.28) !important;\n  }\n  .prayer-row.next-prayer::after {\n      content: \"\"; position: absolute; right: 0; top: 16%; bottom: 16%; width: 8px; border-radius: 8px;\n      background: var(--brass-2); box-shadow: 0 0 0 1px rgba(248,244,232,.25);\n  }\n  .prayer-row.next-prayer strong { color: var(--cream); }\n  .prayer-row.next-prayer time { color: #ffffff; }\n\n  /* العدّاد التنازلي */\n  .countdown-footer {\n      display: grid; grid-template-columns: 1fr 1fr; flex: 0 0 clamp(85px, 12vh, 150px);\n      width: calc(100% + clamp(32px, 7vw, 84px));\n      margin-right: calc(clamp(16px, 3.5vw, 42px) * -1); margin-left: calc(clamp(16px, 3.5vw, 42px) * -1);\n      padding: clamp(10px, 1.5vh, 18px) clamp(16px, 3.5vw, 42px) 0;\n      color: var(--footer-text); direction: ltr;\n      background: rgba(52, 64, 28, 0.06); border-top: 2px solid rgba(52, 64, 28, 0.2);\n  }\n  .countdown-column { display: flex; align-items: center; flex-direction: column; justify-content: center; direction: rtl; }\n  .countdown-column + .countdown-column { border-right: 2px solid var(--line); }\n  .countdown-column span { color: var(--olive-2); font-family: var(--font-arabic); font-size: clamp(18px, 2.4vw, 34px) !important; font-weight: 700; line-height: 1.2; white-space: nowrap; }\n  .countdown-column strong { margin-top: 4px; color: var(--brass); direction: ltr; font-family: var(--font-numbers); font-size: clamp(44px, 5.8vw, 88px) !important; font-weight: 800; line-height: 1; white-space: nowrap; letter-spacing: .01em; font-variant-numeric: tabular-nums; }\n\n  /* زر الإعدادات */\n  .settings-button { position: absolute; top: 16px; right: 20px; z-index: 4; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 2px solid rgba(52,64,28,.2); border-radius: 50%; color: var(--olive); background: rgba(248,244,232,.7); cursor: pointer; transition: transform .25s ease; }\n  .settings-button:hover { transform: rotate(45deg) scale(1.08); }\n  .settings-button svg { width: 60%; height: 60%; fill: currentColor; }",
+        "prayerNames": [
+            "الفَـجـر",
+            "الشُروق",
+            "الظهـــر",
+            "العَصــر",
+            "المغرب",
+            "العِشـاء"
+        ]
+    },
+    {
+        "id": 7,
+        "name": "الستايل الملكي الكحلي والذهبي",
+        "style": ":root {\n    --font-arabic: \"Readex Pro\", sans-serif;\n    --font-numbers: \"Fjalla One\", monospace;\n    --font-clock: \"Share Tech Mono\", monospace;\n    --bg-main: #060b19;\n    --text-primary: #f8fafc;\n    --text-prayer-name: #e2e8f0;\n    --text-prayer-time: #f59e0b;\n    --text-prayer-active: #fbbf24;\n    --text-clock: #fbf8f0;\n    --text-date: #fbbf24;\n    --text-secondary: #94a3b8;\n    --accent: #d4af37;\n    --accent-light: #fef08a;\n    --footer-bg: #09152e;\n    --footer-text: #ffffff;\n    --container-padding: 16px 28px 0;\n}\n* { box-sizing: border-box; margin: 0; padding: 0; }\nhtml, body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: var(--bg-main); }\n.mosque-screen {\n    position: absolute; top: 0; left: 0; isolation: isolate;\n    display: flex; flex-direction: column; width: 100vh; height: 100vw;\n    margin: 0; padding: var(--container-padding); overflow: hidden; color: var(--text-primary);\n    background: radial-gradient(circle at center, #0f172a 0%, #060b19 100%);\n    transform: rotate(90deg) translateY(-100%); transform-origin: top left;\n}\n@media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }\n.fit-content { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; width: 100%; justify-content: space-between; }\n.soft-pattern { display: none !important; }\n.clock-frame {\n    display: flex; align-items: center; justify-content: center; flex-shrink: 0;\n    width: 100%; min-height: clamp(90px, 13vh, 150px); margin: 0 auto;\n    border: 2px solid rgba(212, 175, 55, 0.4); border-radius: 20px;\n    background: rgba(15, 23, 42, 0.7) !important; backdrop-filter: blur(10px);\n    box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 0 15px rgba(212, 175, 55, 0.15) !important;\n}\n.clock-frame time {\n    direction: ltr; color: var(--text-clock); font-family: var(--font-clock);\n    font-size: clamp(60px, 9vw, 135px) !important; font-weight: 700; letter-spacing: 4px; line-height: 1;\n}\n.date-block { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; margin: 10px auto 14px; }\n.weekday { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(22px, 3.2vw, 42px); font-weight: 800; }\n.date-card {\n    display: inline-flex; gap: 12px; border: 1px solid rgba(212, 175, 55, 0.3) !important;\n    border-radius: 12px; padding: 6px 20px; background: rgba(15, 23, 42, 0.5) !important;\n}\n.date-card .date-label { color: var(--text-secondary); font-size: clamp(14px, 1.8vw, 22px); }\n.date-card .date-value { color: var(--text-primary); font-size: clamp(16px, 2.5vw, 32px); font-weight: 700; }\n.date-card .date-value .day-number { font-family: var(--font-numbers); }\n.prayer-list { display: flex; flex-direction: column; flex: 1 1 auto; justify-content: space-around; gap: 8px; margin: 0 auto; width: 100%; }\n.prayer-row {\n    position: relative; display: flex; align-items: center; justify-content: space-between;\n    flex: 1 1 0; padding: 0 35px; border: 1px solid rgba(212, 175, 55, 0.25) !important;\n    border-radius: 16px; background: rgba(15, 23, 42, 0.45) !important; direction: ltr;\n}\n.prayer-row.next-prayer {\n    border-color: var(--accent) !important; background: rgba(212, 175, 55, 0.15) !important;\n    box-shadow: 0 0 20px rgba(212, 175, 55, 0.25) !important;\n}\n.prayer-row strong { color: var(--text-prayer-name); font-family: var(--font-arabic); font-size: clamp(34px, 5.2vw, 76px) !important; font-weight: 800; }\n.prayer-row.next-prayer strong { color: var(--accent-light); }\n.prayer-row time { color: var(--text-prayer-time); font-family: var(--font-numbers); font-size: clamp(44px, 6.8vw, 105px) !important; font-weight: 800; }\n.prayer-row.next-prayer time { color: var(--text-prayer-active); }\n.countdown-footer {\n    display: flex; align-items: center; justify-content: space-between; flex: 0 0 clamp(110px, 15vh, 180px);\n    width: calc(100% + 56px); margin-right: -28px; margin-left: -28px; padding: 12px 28px;\n    background: var(--footer-bg); border-top: 2px solid var(--accent); direction: ltr;\n}\n.countdown-column { display: flex; flex-direction: column; align-items: center; direction: rtl; }\n.countdown-column span { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(20px, 2.4vw, 32px) !important; font-weight: 700; }\n.countdown-column strong { color: #ffffff; font-family: var(--font-numbers); font-size: clamp(44px, 5.2vw, 84px) !important; font-weight: 800; }\n.settings-layer { position: absolute; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.85); backdrop-filter: blur(5px); padding: 16px; }\n.settings-panel { display: flex; flex-direction: column; width: 95%; max-width: 850px; height: 96%; padding: 24px; border-radius: 12px; border: 1px solid var(--accent); background: #0b132b; color: #fff; overflow-y: auto; }\n.settings-header { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid rgba(212,175,55,.3); padding-bottom: 12px; }\n.settings-header h2 { color: var(--accent); font-size: clamp(20px, 3.5vw, 30px); }\n.settings-close { width: 36px; height: 36px; border: 1px solid var(--accent); color: var(--accent); background: transparent; cursor: pointer; border-radius: 6px; font-size: 24px; }\n.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border: 1px solid rgba(212,175,55,.2); border-radius: 8px; background: rgba(255,255,255,.05); margin-bottom: 6px; }\n.minute-control button { width: 30px; height: 30px; border: 0; background: var(--accent); color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; }\n.minute-control input { width: 48px; height: 30px; text-align: center; background: #000; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; }\n.settings-actions button { padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }\n.reset-button { border: 1px solid var(--accent); color: var(--accent); background: transparent; }\n.save-button { border: 1px solid var(--accent); color: #000; background: var(--accent); }",
+        "prayerNames": [
+            "الفـجــر",
+            "الشروق",
+            "الظهـر",
+            "العصـر",
+            "المغرب",
+            "العشــاء"
+        ]
+    },
+    {
+        "id": 8,
+        "name": "ستايل الشفق الأرجواني والذهبي",
+        "style": ":root {\n    --font-arabic: \"Readex Pro\", sans-serif;\n    --font-numbers: \"Fjalla One\", monospace;\n    --font-clock: \"Share Tech Mono\", monospace;\n    --bg-main: #180828;\n    --text-primary: #ffffff;\n    --text-prayer-name: #f3e8ff;\n    --text-prayer-time: #facc15;\n    --text-prayer-active: #fde047;\n    --text-clock: #ffffff;\n    --text-date: #facc15;\n    --text-secondary: #c084fc;\n    --accent: #e879f9;\n    --accent-light: #fef08a;\n    --footer-bg: #2e1052;\n    --footer-text: #ffffff;\n    --container-padding: 16px 28px 0;\n}\n* { box-sizing: border-box; margin: 0; padding: 0; }\nhtml, body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: var(--bg-main); }\n.mosque-screen {\n    position: absolute; top: 0; left: 0; isolation: isolate;\n    display: flex; flex-direction: column; width: 100vh; height: 100vw;\n    margin: 0; padding: var(--container-padding); overflow: hidden; color: var(--text-primary);\n    background: linear-gradient(135deg, #2a0845 0%, #120024 100%);\n    transform: rotate(90deg) translateY(-100%); transform-origin: top left;\n}\n@media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }\n.fit-content { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; width: 100%; justify-content: space-between; }\n.soft-pattern { display: none !important; }\n.clock-frame {\n    display: flex; align-items: center; justify-content: center; flex-shrink: 0;\n    width: 100%; min-height: clamp(90px, 13vh, 150px); margin: 0 auto;\n    border: 2px solid rgba(232, 121, 249, 0.4); border-radius: 999px;\n    background: rgba(42, 8, 69, 0.6) !important; backdrop-filter: blur(8px);\n    box-shadow: 0 0 25px rgba(232, 121, 249, 0.25) !important;\n}\n.clock-frame time {\n    direction: ltr; color: var(--text-clock); font-family: var(--font-clock);\n    font-size: clamp(60px, 9vw, 135px) !important; font-weight: 700; letter-spacing: 4px; line-height: 1;\n}\n.date-block { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; margin: 10px auto 14px; }\n.weekday { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(22px, 3.2vw, 42px); font-weight: 800; }\n.date-card {\n    display: inline-flex; gap: 12px; border: 1px solid rgba(232, 121, 249, 0.3) !important;\n    border-radius: 20px; padding: 6px 20px; background: rgba(42, 8, 69, 0.4) !important;\n}\n.date-card .date-label { color: var(--text-secondary); font-size: clamp(14px, 1.8vw, 22px); }\n.date-card .date-value { color: var(--text-primary); font-size: clamp(16px, 2.5vw, 32px); font-weight: 700; }\n.date-card .date-value .day-number { font-family: var(--font-numbers); }\n.prayer-list { display: flex; flex-direction: column; flex: 1 1 auto; justify-content: space-around; gap: 8px; margin: 0 auto; width: 100%; }\n.prayer-row {\n    position: relative; display: flex; align-items: center; justify-content: space-between;\n    flex: 1 1 0; padding: 0 35px; border: 1px solid rgba(232, 121, 249, 0.2) !important;\n    border-radius: 16px; background: rgba(255, 255, 255, 0.05) !important; direction: ltr;\n}\n.prayer-row.next-prayer {\n    border-color: #facc15 !important; background: rgba(250, 204, 21, 0.15) !important;\n    box-shadow: 0 0 20px rgba(250, 204, 21, 0.3) !important;\n}\n.prayer-row strong { color: var(--text-prayer-name); font-family: var(--font-arabic); font-size: clamp(34px, 5.2vw, 76px) !important; font-weight: 800; }\n.prayer-row.next-prayer strong { color: var(--accent-light); }\n.prayer-row time { color: var(--text-prayer-time); font-family: var(--font-numbers); font-size: clamp(44px, 6.8vw, 105px) !important; font-weight: 800; }\n.prayer-row.next-prayer time { color: var(--text-prayer-active); }\n.countdown-footer {\n    display: flex; align-items: center; justify-content: space-between; flex: 0 0 clamp(110px, 15vh, 180px);\n    width: calc(100% + 56px); margin-right: -28px; margin-left: -28px; padding: 12px 28px;\n    background: var(--footer-bg); border-top: 2px solid var(--accent); direction: ltr;\n}\n.countdown-column { display: flex; flex-direction: column; align-items: center; direction: rtl; }\n.countdown-column span { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(20px, 2.4vw, 32px) !important; font-weight: 700; }\n.countdown-column strong { color: #ffffff; font-family: var(--font-numbers); font-size: clamp(44px, 5.2vw, 84px) !important; font-weight: 800; }\n.settings-layer { position: absolute; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.85); backdrop-filter: blur(5px); padding: 16px; }\n.settings-panel { display: flex; flex-direction: column; width: 95%; max-width: 850px; height: 96%; padding: 24px; border-radius: 12px; border: 1px solid var(--accent); background: #1a082c; color: #fff; overflow-y: auto; }\n.settings-header { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid rgba(232,121,249,.3); padding-bottom: 12px; }\n.settings-header h2 { color: var(--accent); font-size: clamp(20px, 3.5vw, 30px); }\n.settings-close { width: 36px; height: 36px; border: 1px solid var(--accent); color: var(--accent); background: transparent; cursor: pointer; border-radius: 6px; font-size: 24px; }\n.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border: 1px solid rgba(232,121,249,.2); border-radius: 8px; background: rgba(255,255,255,.05); margin-bottom: 6px; }\n.minute-control button { width: 30px; height: 30px; border: 0; background: var(--accent); color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; }\n.minute-control input { width: 48px; height: 30px; text-align: center; background: #000; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; }\n.settings-actions button { padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }\n.reset-button { border: 1px solid var(--accent); color: var(--accent); background: transparent; }\n.save-button { border: 1px solid var(--accent); color: #000; background: var(--accent); }",
+        "prayerNames": [
+            "الفـجــر",
+            "الشروق",
+            "الظهـر",
+            "العصـر",
+            "المغرب",
+            "العشــاء"
+        ]
+    },
+    {
+        "id": 9,
+        "name": "ستايل النيون السيبراني الفلورسنت",
+        "style": ":root {\n    --font-arabic: \"Noto Kufi Arabic\", sans-serif;\n    --font-numbers: \"Chivo Mono\", monospace;\n    --font-clock: \"Chivo Mono\", monospace;\n    --bg-main: #04090b;\n    --text-primary: #00ffcc;\n    --text-prayer-name: #ffffff;\n    --text-prayer-time: #00ffcc;\n    --text-prayer-active: #ff0077;\n    --text-clock: #00ffcc;\n    --text-date: #ff0077;\n    --text-secondary: #00b386;\n    --accent: #ff0077;\n    --accent-light: #ff66b2;\n    --footer-bg: #061318;\n    --footer-text: #ffffff;\n    --container-padding: 16px 28px 0;\n}\n* { box-sizing: border-box; margin: 0; padding: 0; }\nhtml, body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: var(--bg-main); }\n.mosque-screen {\n    position: absolute; top: 0; left: 0; isolation: isolate;\n    display: flex; flex-direction: column; width: 100vh; height: 100vw;\n    margin: 0; padding: var(--container-padding); overflow: hidden; color: var(--text-primary);\n    background: #04090b;\n    transform: rotate(90deg) translateY(-100%); transform-origin: top left;\n}\n@media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }\n.fit-content { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; width: 100%; justify-content: space-between; }\n.soft-pattern { display: none !important; }\n.clock-frame {\n    display: flex; align-items: center; justify-content: center; flex-shrink: 0;\n    width: 100%; min-height: clamp(90px, 13vh, 150px); margin: 0 auto;\n    border: 2px solid #00ffcc; border-radius: 12px;\n    background: rgba(0, 255, 204, 0.05) !important;\n    box-shadow: 0 0 15px rgba(0, 255, 204, 0.4), inset 0 0 15px rgba(0, 255, 204, 0.2) !important;\n}\n.clock-frame time {\n    direction: ltr; color: var(--text-clock); font-family: var(--font-clock);\n    font-size: clamp(60px, 9vw, 135px) !important; font-weight: 800; letter-spacing: 4px; line-height: 1;\n    text-shadow: 0 0 10px rgba(0, 255, 204, 0.8);\n}\n.date-block { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; margin: 10px auto 14px; }\n.weekday { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(22px, 3.2vw, 42px); font-weight: 800; text-shadow: 0 0 8px rgba(255,0,119,0.7); }\n.date-card {\n    display: inline-flex; gap: 12px; border: 1px solid #00ffcc !important;\n    border-radius: 8px; padding: 6px 20px; background: rgba(0,0,0,0.6) !important;\n}\n.date-card .date-label { color: var(--text-secondary); font-size: clamp(14px, 1.8vw, 22px); }\n.date-card .date-value { color: var(--text-primary); font-size: clamp(16px, 2.5vw, 32px); font-weight: 700; }\n.date-card .date-value .day-number { font-family: var(--font-numbers); }\n.prayer-list { display: flex; flex-direction: column; flex: 1 1 auto; justify-content: space-around; gap: 8px; margin: 0 auto; width: 100%; }\n.prayer-row {\n    position: relative; display: flex; align-items: center; justify-content: space-between;\n    flex: 1 1 0; padding: 0 35px; border: 1px solid rgba(0, 255, 204, 0.3) !important;\n    border-radius: 8px; background: rgba(4, 15, 20, 0.8) !important; direction: ltr;\n}\n.prayer-row.next-prayer {\n    border-color: #ff0077 !important; background: rgba(255, 0, 119, 0.15) !important;\n    box-shadow: 0 0 20px rgba(255, 0, 119, 0.5) !important;\n}\n.prayer-row strong { color: var(--text-prayer-name); font-family: var(--font-arabic); font-size: clamp(34px, 5.2vw, 76px) !important; font-weight: 800; }\n.prayer-row.next-prayer strong { color: #ff66b2; text-shadow: 0 0 8px #ff0077; }\n.prayer-row time { color: var(--text-prayer-time); font-family: var(--font-numbers); font-size: clamp(44px, 6.8vw, 105px) !important; font-weight: 800; text-shadow: 0 0 8px #00ffcc; }\n.prayer-row.next-prayer time { color: #ff0077; text-shadow: 0 0 10px #ff0077; }\n.countdown-footer {\n    display: flex; align-items: center; justify-content: space-between; flex: 0 0 clamp(110px, 15vh, 180px);\n    width: calc(100% + 56px); margin-right: -28px; margin-left: -28px; padding: 12px 28px;\n    background: var(--footer-bg); border-top: 2px solid #00ffcc; direction: ltr;\n}\n.countdown-column { display: flex; flex-direction: column; align-items: center; direction: rtl; }\n.countdown-column span { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(20px, 2.4vw, 32px) !important; font-weight: 700; }\n.countdown-column strong { color: #00ffcc; font-family: var(--font-numbers); font-size: clamp(44px, 5.2vw, 84px) !important; font-weight: 800; text-shadow: 0 0 8px #00ffcc; }\n.settings-layer { position: absolute; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.9); backdrop-filter: blur(5px); padding: 16px; }\n.settings-panel { display: flex; flex-direction: column; width: 95%; max-width: 850px; height: 96%; padding: 24px; border-radius: 12px; border: 2px solid #00ffcc; background: #04090b; color: #00ffcc; overflow-y: auto; }\n.settings-header { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid #00ffcc; padding-bottom: 12px; }\n.settings-header h2 { color: #00ffcc; font-size: clamp(20px, 3.5vw, 30px); }\n.settings-close { width: 36px; height: 36px; border: 1px solid #00ffcc; color: #00ffcc; background: transparent; cursor: pointer; border-radius: 6px; font-size: 24px; }\n.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border: 1px solid rgba(0,255,204,.3); border-radius: 8px; background: rgba(0,255,204,.05); margin-bottom: 6px; }\n.minute-control button { width: 30px; height: 30px; border: 0; background: #00ffcc; color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; }\n.minute-control input { width: 48px; height: 30px; text-align: center; background: #000; color: #00ffcc; border: 1px solid #00ffcc; border-radius: 4px; }\n.settings-actions button { padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }\n.reset-button { border: 1px solid #ff0077; color: #ff0077; background: transparent; }\n.save-button { border: 1px solid #00ffcc; color: #000; background: #00ffcc; }",
+        "prayerNames": [
+            "الفـجــر",
+            "الشروق",
+            "الظهـر",
+            "العصـر",
+            "المغرب",
+            "العشــاء"
+        ]
+    },
+    {
+        "id": 10,
+        "name": "ستايل الكعبة والشعر الذهبي",
+        "style": ":root {\n    --font-arabic: \"Alyamama\", sans-serif;\n    --font-numbers: \"Fjalla One\", monospace;\n    --font-clock: \"Roboto Mono\", monospace;\n    --bg-main: #0c0c0e;\n    --text-primary: #ffffff;\n    --text-prayer-name: #fef08a;\n    --text-prayer-time: #ffffff;\n    --text-prayer-active: #f59e0b;\n    --text-clock: #fef08a;\n    --text-date: #eab308;\n    --text-secondary: #a1a1aa;\n    --accent: #eab308;\n    --accent-light: #fef08a;\n    --footer-bg: #141417;\n    --footer-text: #ffffff;\n    --container-padding: 16px 28px 0;\n}\n* { box-sizing: border-box; margin: 0; padding: 0; }\nhtml, body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: var(--bg-main); }\n.mosque-screen {\n    position: absolute; top: 0; left: 0; isolation: isolate;\n    display: flex; flex-direction: column; width: 100vh; height: 100vw;\n    margin: 0; padding: var(--container-padding); overflow: hidden; color: var(--text-primary);\n    background: #09090b;\n    border: 4px solid var(--accent);\n    transform: rotate(90deg) translateY(-100%); transform-origin: top left;\n}\n@media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }\n.fit-content { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; width: 100%; justify-content: space-between; }\n.soft-pattern { display: none !important; }\n.clock-frame {\n    display: flex; align-items: center; justify-content: center; flex-shrink: 0;\n    width: 100%; min-height: clamp(90px, 13vh, 150px); margin: 0 auto;\n    border: 2px solid var(--accent); border-radius: 4px;\n    background: #141417 !important;\n    box-shadow: 0 4px 20px rgba(234, 179, 8, 0.2) !important;\n}\n.clock-frame time {\n    direction: ltr; color: var(--text-clock); font-family: var(--font-clock);\n    font-size: clamp(60px, 9vw, 135px) !important; font-weight: 800; letter-spacing: 4px; line-height: 1;\n}\n.date-block { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; margin: 10px auto 14px; }\n.weekday { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(22px, 3.2vw, 42px); font-weight: 800; }\n.date-card {\n    display: inline-flex; gap: 12px; border: 1px solid var(--accent) !important;\n    border-radius: 4px; padding: 6px 20px; background: #141417 !important;\n}\n.date-card .date-label { color: var(--text-secondary); font-size: clamp(14px, 1.8vw, 22px); }\n.date-card .date-value { color: var(--text-primary); font-size: clamp(16px, 2.5vw, 32px); font-weight: 700; }\n.date-card .date-value .day-number { font-family: var(--font-numbers); }\n.prayer-list { display: flex; flex-direction: column; flex: 1 1 auto; justify-content: space-around; gap: 8px; margin: 0 auto; width: 100%; }\n.prayer-row {\n    position: relative; display: flex; align-items: center; justify-content: space-between;\n    flex: 1 1 0; padding: 0 35px; border: 1px solid rgba(234, 179, 8, 0.3) !important;\n    border-radius: 4px; background: #141417 !important; direction: ltr;\n}\n.prayer-row.next-prayer {\n    border-color: var(--accent) !important; background: rgba(234, 179, 8, 0.2) !important;\n    box-shadow: 0 0 15px rgba(234, 179, 8, 0.3) !important;\n}\n.prayer-row strong { color: var(--text-prayer-name); font-family: var(--font-arabic); font-size: clamp(34px, 5.2vw, 76px) !important; font-weight: 900; }\n.prayer-row.next-prayer strong { color: var(--accent-light); }\n.prayer-row time { color: var(--text-prayer-time); font-family: var(--font-numbers); font-size: clamp(44px, 6.8vw, 105px) !important; font-weight: 800; }\n.prayer-row.next-prayer time { color: var(--text-prayer-active); }\n.countdown-footer {\n    display: flex; align-items: center; justify-content: space-between; flex: 0 0 clamp(110px, 15vh, 180px);\n    width: calc(100% + 56px); margin-right: -28px; margin-left: -28px; padding: 12px 28px;\n    background: var(--footer-bg); border-top: 3px solid var(--accent); direction: ltr;\n}\n.countdown-column { display: flex; flex-direction: column; align-items: center; direction: rtl; }\n.countdown-column span { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(20px, 2.4vw, 32px) !important; font-weight: 700; }\n.countdown-column strong { color: #ffffff; font-family: var(--font-numbers); font-size: clamp(44px, 5.2vw, 84px) !important; font-weight: 800; }\n.settings-layer { position: absolute; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.9); backdrop-filter: blur(5px); padding: 16px; }\n.settings-panel { display: flex; flex-direction: column; width: 95%; max-width: 850px; height: 96%; padding: 24px; border-radius: 8px; border: 2px solid var(--accent); background: #141417; color: #fff; overflow-y: auto; }\n.settings-header { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--accent); padding-bottom: 12px; }\n.settings-header h2 { color: var(--accent); font-size: clamp(20px, 3.5vw, 30px); }\n.settings-close { width: 36px; height: 36px; border: 1px solid var(--accent); color: var(--accent); background: transparent; cursor: pointer; border-radius: 4px; font-size: 24px; }\n.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border: 1px solid rgba(234,179,8,.3); border-radius: 4px; background: rgba(255,255,255,.05); margin-bottom: 6px; }\n.minute-control button { width: 30px; height: 30px; border: 0; background: var(--accent); color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; }\n.minute-control input { width: 48px; height: 30px; text-align: center; background: #000; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; }\n.settings-actions button { padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }\n.reset-button { border: 1px solid var(--accent); color: var(--accent); background: transparent; }\n.save-button { border: 1px solid var(--accent); color: #000; background: var(--accent); }",
+        "prayerNames": [
+            "الفـجــر",
+            "الشروق",
+            "الظهـر",
+            "العصـر",
+            "المغرب",
+            "العشــاء"
+        ]
+    },
+    {
+        "id": 11,
+        "name": "الستايل الرخامي الأبيض الفاخر",
+        "style": ":root {\n    --font-arabic: \"Readex Pro\", sans-serif;\n    --font-numbers: \"Fjalla One\", monospace;\n    --font-clock: \"Share Tech Mono\", monospace;\n    --bg-main: #f1f5f9;\n    --text-primary: #0f172a;\n    --text-prayer-name: #1e293b;\n    --text-prayer-time: #0284c7;\n    --text-prayer-active: #0369a1;\n    --text-clock: #0f172a;\n    --text-date: #0284c7;\n    --text-secondary: #64748b;\n    --accent: #0284c7;\n    --accent-light: #38bdf8;\n    --footer-bg: #0f172a;\n    --footer-text: #ffffff;\n    --container-padding: 16px 28px 0;\n}\n* { box-sizing: border-box; margin: 0; padding: 0; }\nhtml, body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: var(--bg-main); }\n.mosque-screen {\n    position: absolute; top: 0; left: 0; isolation: isolate;\n    display: flex; flex-direction: column; width: 100vh; height: 100vw;\n    margin: 0; padding: var(--container-padding); overflow: hidden; color: var(--text-primary);\n    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n    transform: rotate(90deg) translateY(-100%); transform-origin: top left;\n}\n@media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }\n.fit-content { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; width: 100%; justify-content: space-between; }\n.soft-pattern { display: none !important; }\n.clock-frame {\n    display: flex; align-items: center; justify-content: center; flex-shrink: 0;\n    width: 100%; min-height: clamp(90px, 13vh, 150px); margin: 0 auto;\n    border: 2px solid #cbd5e1; border-radius: 20px;\n    background: #ffffff !important;\n    box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;\n}\n.clock-frame time {\n    direction: ltr; color: var(--text-clock); font-family: var(--font-clock);\n    font-size: clamp(60px, 9vw, 135px) !important; font-weight: 800; letter-spacing: 4px; line-height: 1;\n}\n.date-block { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; margin: 10px auto 14px; }\n.weekday { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(22px, 3.2vw, 42px); font-weight: 800; }\n.date-card {\n    display: inline-flex; gap: 12px; border: 1px solid #cbd5e1 !important;\n    border-radius: 12px; padding: 6px 20px; background: #ffffff !important;\n    box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important;\n}\n.date-card .date-label { color: var(--text-secondary); font-size: clamp(14px, 1.8vw, 22px); }\n.date-card .date-value { color: var(--text-primary); font-size: clamp(16px, 2.5vw, 32px); font-weight: 700; }\n.date-card .date-value .day-number { font-family: var(--font-numbers); }\n.prayer-list { display: flex; flex-direction: column; flex: 1 1 auto; justify-content: space-around; gap: 8px; margin: 0 auto; width: 100%; }\n.prayer-row {\n    position: relative; display: flex; align-items: center; justify-content: space-between;\n    flex: 1 1 0; padding: 0 35px; border: 1px solid #cbd5e1 !important;\n    border-radius: 16px; background: #ffffff !important; direction: ltr;\n    box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;\n}\n.prayer-row.next-prayer {\n    border-color: #0284c7 !important; background: #e0f2fe !important;\n    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.2) !important;\n}\n.prayer-row strong { color: var(--text-prayer-name); font-family: var(--font-arabic); font-size: clamp(34px, 5.2vw, 76px) !important; font-weight: 800; }\n.prayer-row.next-prayer strong { color: #0369a1; }\n.prayer-row time { color: var(--text-prayer-time); font-family: var(--font-numbers); font-size: clamp(44px, 6.8vw, 105px) !important; font-weight: 800; }\n.prayer-row.next-prayer time { color: #0284c7; }\n.countdown-footer {\n    display: flex; align-items: center; justify-content: space-between; flex: 0 0 clamp(110px, 15vh, 180px);\n    width: calc(100% + 56px); margin-right: -28px; margin-left: -28px; padding: 12px 28px;\n    background: var(--footer-bg); border-top: 3px solid var(--accent); direction: ltr;\n}\n.countdown-column { display: flex; flex-direction: column; align-items: center; direction: rtl; }\n.countdown-column span { color: #38bdf8; font-family: var(--font-arabic); font-size: clamp(20px, 2.4vw, 32px) !important; font-weight: 700; }\n.countdown-column strong { color: #ffffff; font-family: var(--font-numbers); font-size: clamp(44px, 5.2vw, 84px) !important; font-weight: 800; }\n.settings-layer { position: absolute; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.6); backdrop-filter: blur(5px); padding: 16px; }\n.settings-panel { display: flex; flex-direction: column; width: 95%; max-width: 850px; height: 96%; padding: 24px; border-radius: 12px; border: 1px solid #0284c7; background: #ffffff; color: #0f172a; overflow-y: auto; }\n.settings-header { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; }\n.settings-header h2 { color: #0284c7; font-size: clamp(20px, 3.5vw, 30px); }\n.settings-close { width: 36px; height: 36px; border: 1px solid #cbd5e1; color: #0f172a; background: #f8fafc; cursor: pointer; border-radius: 6px; font-size: 24px; }\n.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; margin-bottom: 6px; }\n.minute-control button { width: 30px; height: 30px; border: 0; background: #0284c7; color: #fff; font-weight: bold; border-radius: 4px; cursor: pointer; }\n.minute-control input { width: 48px; height: 30px; text-align: center; background: #fff; color: #0284c7; border: 1px solid #0284c7; border-radius: 4px; }\n.settings-actions button { padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }\n.reset-button { border: 1px solid #ef4444; color: #ef4444; background: transparent; }\n.save-button { border: 1px solid #0284c7; color: #fff; background: #0284c7; }",
+        "prayerNames": [
+            "الفـجــر",
+            "الشروق",
+            "الظهـر",
+            "العصـر",
+            "المغرب",
+            "العشــاء"
+        ]
+    },
+    {
+        "id": 12,
+        "name": "ستايل الغروب النحاسي الدافئ",
+        "style": ":root {\n    --font-arabic: \"El Messiri\", sans-serif;\n    --font-numbers: \"Fjalla One\", monospace;\n    --font-clock: \"Roboto Mono\", monospace;\n    --bg-main: #240c06;\n    --text-primary: #fff7ed;\n    --text-prayer-name: #ffedd5;\n    --text-prayer-time: #f97316;\n    --text-prayer-active: #fdba74;\n    --text-clock: #fff7ed;\n    --text-date: #fb923c;\n    --text-secondary: #fdba74;\n    --accent: #f97316;\n    --accent-light: #ffedd5;\n    --footer-bg: #3d140a;\n    --footer-text: #ffffff;\n    --container-padding: 16px 28px 0;\n}\n* { box-sizing: border-box; margin: 0; padding: 0; }\nhtml, body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; background: var(--bg-main); }\n.mosque-screen {\n    position: absolute; top: 0; left: 0; isolation: isolate;\n    display: flex; flex-direction: column; width: 100vh; height: 100vw;\n    margin: 0; padding: var(--container-padding); overflow: hidden; color: var(--text-primary);\n    background: linear-gradient(180deg, #451a03 0%, #1c0702 100%);\n    transform: rotate(90deg) translateY(-100%); transform-origin: top left;\n}\n@media (orientation: portrait) { .mosque-screen { width: 100vw; height: 100vh; transform: none; } }\n.fit-content { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; width: 100%; justify-content: space-between; }\n.soft-pattern { display: none !important; }\n.clock-frame {\n    display: flex; align-items: center; justify-content: center; flex-shrink: 0;\n    width: 100%; min-height: clamp(90px, 13vh, 150px); margin: 0 auto;\n    border: 2px solid rgba(249, 115, 22, 0.4); border-radius: 16px;\n    background: rgba(69, 26, 3, 0.6) !important; backdrop-filter: blur(8px);\n    box-shadow: 0 4px 20px rgba(249, 115, 22, 0.2) !important;\n}\n.clock-frame time {\n    direction: ltr; color: var(--text-clock); font-family: var(--font-clock);\n    font-size: clamp(60px, 9vw, 135px) !important; font-weight: 800; letter-spacing: 4px; line-height: 1;\n}\n.date-block { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; margin: 10px auto 14px; }\n.weekday { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(22px, 3.2vw, 42px); font-weight: 800; }\n.date-card {\n    display: inline-flex; gap: 12px; border: 1px solid rgba(249, 115, 22, 0.3) !important;\n    border-radius: 12px; padding: 6px 20px; background: rgba(69, 26, 3, 0.4) !important;\n}\n.date-card .date-label { color: var(--text-secondary); font-size: clamp(14px, 1.8vw, 22px); }\n.date-card .date-value { color: var(--text-primary); font-size: clamp(16px, 2.5vw, 32px); font-weight: 700; }\n.date-card .date-value .day-number { font-family: var(--font-numbers); }\n.prayer-list { display: flex; flex-direction: column; flex: 1 1 auto; justify-content: space-around; gap: 8px; margin: 0 auto; width: 100%; }\n.prayer-row {\n    position: relative; display: flex; align-items: center; justify-content: space-between;\n    flex: 1 1 0; padding: 0 35px; border: 1px solid rgba(249, 115, 22, 0.25) !important;\n    border-radius: 12px; background: rgba(255, 255, 255, 0.04) !important; direction: ltr;\n}\n.prayer-row.next-prayer {\n    border-color: #f97316 !important; background: rgba(249, 115, 22, 0.18) !important;\n    box-shadow: 0 0 18px rgba(249, 115, 22, 0.3) !important;\n}\n.prayer-row strong { color: var(--text-prayer-name); font-family: var(--font-arabic); font-size: clamp(34px, 5.2vw, 76px) !important; font-weight: 800; }\n.prayer-row.next-prayer strong { color: var(--accent-light); }\n.prayer-row time { color: var(--text-prayer-time); font-family: var(--font-numbers); font-size: clamp(44px, 6.8vw, 105px) !important; font-weight: 800; }\n.prayer-row.next-prayer time { color: var(--text-prayer-active); }\n.countdown-footer {\n    display: flex; align-items: center; justify-content: space-between; flex: 0 0 clamp(110px, 15vh, 180px);\n    width: calc(100% + 56px); margin-right: -28px; margin-left: -28px; padding: 12px 28px;\n    background: var(--footer-bg); border-top: 3px solid var(--accent); direction: ltr;\n}\n.countdown-column { display: flex; flex-direction: column; align-items: center; direction: rtl; }\n.countdown-column span { color: var(--accent); font-family: var(--font-arabic); font-size: clamp(20px, 2.4vw, 32px) !important; font-weight: 700; }\n.countdown-column strong { color: #ffffff; font-family: var(--font-numbers); font-size: clamp(44px, 5.2vw, 84px) !important; font-weight: 800; }\n.settings-layer { position: absolute; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.85); backdrop-filter: blur(5px); padding: 16px; }\n.settings-panel { display: flex; flex-direction: column; width: 95%; max-width: 850px; height: 96%; padding: 24px; border-radius: 12px; border: 1px solid var(--accent); background: #240c06; color: #fff; overflow-y: auto; }\n.settings-header { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid rgba(249,115,22,.3); padding-bottom: 12px; }\n.settings-header h2 { color: var(--accent); font-size: clamp(20px, 3.5vw, 30px); }\n.settings-close { width: 36px; height: 36px; border: 1px solid var(--accent); color: var(--accent); background: transparent; cursor: pointer; border-radius: 6px; font-size: 24px; }\n.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border: 1px solid rgba(249,115,22,.2); border-radius: 8px; background: rgba(255,255,255,.05); margin-bottom: 6px; }\n.minute-control button { width: 30px; height: 30px; border: 0; background: var(--accent); color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; }\n.minute-control input { width: 48px; height: 30px; text-align: center; background: #000; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; }\n.settings-actions button { padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }\n.reset-button { border: 1px solid var(--accent); color: var(--accent); background: transparent; }\n.save-button { border: 1px solid var(--accent); color: #000; background: var(--accent); }",
+        "prayerNames": [
+            "الفـجــر",
+            "الشروق",
+            "الظهـر",
+            "العصـر",
+            "المغرب",
+            "العشــاء"
+        ]
+    }
+];
+    const THEME_STORAGE_KEY = "mosque-display-theme";
+    let currentThemeIndex = 0;
+
+    function applyTheme(index) {
+        currentThemeIndex = ((index % THEMES.length) + THEMES.length) % THEMES.length;
+        try {
+            localStorage.setItem(THEME_STORAGE_KEY, currentThemeIndex);
+        } catch (e) {
+            console.warn("Could not save theme:", e);
+        }
+
+        const theme = THEMES[currentThemeIndex];
+        const styleEl = document.getElementById("active-theme-style");
+        if (styleEl) {
+            styleEl.textContent = theme.style;
+        }
+
+        if (theme.prayerNames && Array.isArray(prayerDefinitions)) {
+            prayerDefinitions.forEach((def, i) => {
+                if (theme.prayerNames[i]) {
+                    def.name = theme.prayerNames[i];
+                }
+            });
+        }
+    }
+
+    function loadTheme() {
+        try {
+            const stored = localStorage.getItem(THEME_STORAGE_KEY);
+            if (stored !== null) {
+                const parsed = parseInt(stored, 10);
+                if (!isNaN(parsed) && parsed >= 0 && parsed < THEMES.length) {
+                    currentThemeIndex = parsed;
+                }
+            }
+        } catch (e) {
+            console.warn("Could not load theme:", e);
+        }
+        applyTheme(currentThemeIndex);
+    }
+
+    function cycleTheme() {
+        applyTheme(currentThemeIndex + 1);
+        updateUI();
+    }
+
 
     const prayerDefinitions = [
         { key: "fajr", name: "الفـجــر" },
@@ -961,10 +804,16 @@
         if (!time || time === "--:--") return "--:--";
         const [hours, minutes] = time.split(":").map(Number);
         const totalMinutes = (hours * 60 + minutes + offset + 1440) % 1440;
-        let newHours = Math.floor(totalMinutes / 60);
+        const newHours = Math.floor(totalMinutes / 60);
         const newMinutes = totalMinutes % 60;
-        newHours = newHours % 12 || 12;
-        return `${newHours}:${String(newMinutes).padStart(2, "0")}`;
+        return `${String(newHours).padStart(2, "0")}:${String(newMinutes).padStart(2, "0")}`;
+    }
+
+    function formatDisplayTime(time24) {
+        if (!time24 || time24 === "--:--") return "--:--";
+        const [hours, minutes] = time24.split(":").map(Number);
+        const displayHours = hours % 12 || 12;
+        return `${displayHours}:${String(minutes).padStart(2, "0")}`;
     }
 
     function toLatinDigits(val) {
@@ -1043,7 +892,13 @@
 
     function getNextPrayer(prayers, now) {
         const currentMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
-        const upcoming = prayers.find((p) => p.time !== "--:--" && toMinutes(p.time) > currentMinutes);
+        
+        const upcoming = prayers.find((p) => {
+            if (p.time === "--:--") return false;
+            const adhanMinutes = toMinutes(p.time);
+            const iqamaDelay = settings.iqamaDelays[p.key] || 0;
+            return (adhanMinutes + iqamaDelay) > currentMinutes;
+        });
 
         if (upcoming) {
             const target = new Date(now);
@@ -1088,10 +943,9 @@
         const now = new Date();
         const baghdadDate = getBaghdadDate();
 
-        // الساعة مع تأثير نبض
-       // الساعة بدون تأثير نبض
-         clockEl.textContent = formatClock(now);
-         clockEl.setAttribute("dateTime", now.toISOString());
+        // الساعة
+        clockEl.textContent = formatClock(baghdadDate);
+        clockEl.setAttribute("dateTime", baghdadDate.toISOString());
 
         // اليوم
         weekdayEl.textContent = new Intl.DateTimeFormat("ar-IQ", {
@@ -1124,23 +978,50 @@
         prayerListContainer.innerHTML = "";
         prayers.forEach((p) => {
             const row = document.createElement("div");
-            row.className = "prayer-row" + (p.key === nextPrayerInfo.prayer?.key ? " next-prayer" : "");
-            row.innerHTML = `<time>${p.time}</time><strong>${p.name}</strong>`;
+            const isNext = p.key === nextPrayerInfo.prayer?.key;
+            const isFajr = p.key === "fajr";
+            const isSunrise = p.key === "sunrise";
+            
+            row.className = "prayer-row" + (isNext ? " next-prayer" : "");
+            
+            let cursorAttr = '';
+            let titleAttr = '';
+            if (isFajr) {
+                cursorAttr = ' style="cursor: pointer;"';
+                titleAttr = ' title="انقر هنا لتغيير الستايل (التصميم)"';
+            } else if (isSunrise) {
+                cursorAttr = ' style="cursor: pointer;"';
+                titleAttr = ' title="انقر هنا لفتح الإعدادات"';
+            }
+            
+            row.innerHTML = `<time>${formatDisplayTime(p.time)}</time><strong${cursorAttr}${titleAttr}>${p.name}</strong>`;
+            
+            if (isFajr) {
+                row.style.cursor = "pointer";
+                row.title = "انقر هنا لتغيير الستايل (التصميم)";
+                row.addEventListener("click", cycleTheme);
+            } else if (isSunrise) {
+                row.style.cursor = "pointer";
+                row.title = "انقر هنا لفتح الإعدادات";
+                row.addEventListener("click", openSettingsModal);
+            }
+            
             prayerListContainer.appendChild(row);
         });
 
-        // العد التنازلي
-        const secondsToNext = Math.floor(
+        // العد التنازلي للأذان والإقامة
+        const secondsToNext = Math.round(
             (nextPrayerInfo.target.getTime() - baghdadDate.getTime()) / 1000
         );
         const nextIqamaDelay = nextPrayerInfo.prayer
-            ? settings.iqamaDelays[nextPrayerInfo.prayer.key] || 0
+            ? (settings.iqamaDelays[nextPrayerInfo.prayer.key] || 0) * 60
             : 0;
 
-        countdownAdhanEl.textContent = formatCountdown(secondsToNext);
-        countdownIqamaEl.textContent = formatCountdown(secondsToNext + nextIqamaDelay * 60);
-    }
+        const secondsToIqama = secondsToNext + nextIqamaDelay;
 
+        countdownAdhanEl.textContent = formatCountdown(secondsToNext);
+        countdownIqamaEl.textContent = formatCountdown(secondsToIqama);
+    }
     // ============================================================
     // 6. الإعدادات
     // ============================================================
@@ -1187,10 +1068,14 @@
     // ============================================================
     // 7. الأحداث
     // ============================================================
-    openSettingsBtn.addEventListener("click", () => {
+    function openSettingsModal() {
         renderSettingsModal();
         settingsModal.style.display = "grid";
-    });
+    }
+
+    if (openSettingsBtn) {
+        openSettingsBtn.addEventListener("click", openSettingsModal);
+    }
 
     closeSettingsBtn.addEventListener("click", () => {
         settingsModal.style.display = "none";
@@ -1299,6 +1184,7 @@
     // 9. بدء التشغيل
     // ============================================================
     loadSettings();
+    loadTheme();
     updateUI();
     fitScreen();
     setInterval(updateUI, 1000);
