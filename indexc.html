@@ -15,7 +15,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Changa:wght@600;700&family=El+Messiri:wght@400..700&family=Orbitron:wght@700;900&family=VT323&display=swap"
     rel="stylesheet">
-  
+  <link href="https://fonts.cdnfonts.com/css/druk-wide-bold" rel="stylesheet">
+                
   <link href="https://fonts.cdnfonts.com/css/antonio" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/seven-segment" rel="stylesheet">
 
@@ -40,7 +41,7 @@
       --text-accent: #ffffff; /* ذهبي */
       --text-dim: rgba(255, 255, 255, 0.6);
 
-      --font-primary: 'Antonio', sans-serif;
+      --font-primary: 'Druk Wide Bold', sans-serif;
       --font-secondary: 'Almarai', sans-serif;
       --font-display: 'El Messiri', sans-serif;
     }
@@ -305,7 +306,7 @@
       color: #dcc302;
       line-height: 1.2;
 
-      top: 30%;
+      top:  20%;
       white-space: nowrap;
       text-align: center;
       text-shadow: 0 2px 8px rgba(0,0,0,0.6);
@@ -335,14 +336,19 @@
     }
 
     .digital-countdown-large .curr-time {
-      font-size: clamp(15rem, 24vw, 24rem);
+      font-size: clamp(19rem, 28vw, 28rem);
       font-weight: 500;
       color: #ffffff;
-      font-family: 'Seven Segment', sans-serif;
+      font-family: 'Antonio', sans-serif;
       line-height: 0.85;
       letter-spacing: -2px;
       position: relative;
       display: inline-block;
+    }
+
+    .digital-countdown-large .curr-time.minutes-only {
+      font-size: clamp(22rem, 36vw, 38rem);
+      line-height: 0.8;
     }
 
     .prayer-card.next-prayer .prayer-card-name {
@@ -3695,26 +3701,38 @@ const PRAYER_DATABASE = {
 
         let color = 'var(--text-accent)';
         let displayTime = '';
+        let isMinutesOnly = false;
+
+        const h = parseInt(hours, 10);
+        const m = parseInt(minutes, 10);
 
         if (mode === 'imminent') {
             color = '#ff4444'; // Bright Red
-            const m = parseInt(minutes, 10);
-            displayTime = `${m}:${seconds}`;
+            displayTime = `${m}`;
+            isMinutesOnly = true;
         } else if (mode === 'elapsed') {
             color = '#22c55e'; // Green
-            const m = parseInt(minutes, 10);
-            displayTime = `${m}:${seconds}`;
+            displayTime = `${m}`;
+            isMinutesOnly = true;
         } else {
             // Normal
-            const h = parseInt(hours, 10);
-            // Show H:MM
-            displayTime = `${h}:${minutes}`;
+            if (h === 0) {
+                // أظهر الدقائق فقط بدون الساعة عندما يكون الوقت المتبقي أقل من ساعة
+                displayTime = `${m}`;
+                isMinutesOnly = true;
+            } else {
+                // ساعة أو أكثر -> أظهر H:MM
+                displayTime = `${h}:${minutes}`;
+                isMinutesOnly = false;
+            }
         }
 
         if (large) {
             return (
                 <div className="digital-countdown-large">
-                    <span className="curr-time" style={{ color }}>{displayTime}</span>
+                    <span className={`curr-time ${isMinutesOnly ? 'minutes-only' : ''}`} style={{ color }}>
+                        {displayTime}
+                    </span>
                 </div>
             );
         }
@@ -3723,13 +3741,13 @@ const PRAYER_DATABASE = {
             <div className="countdown-container">
                 <div className="digital-countdown" style={{ color }}>
                     <div className="time-part hours">
-                        <span className="value">{mode === 'normal' ? hours : minutes}</span>
-                        <span className="label">{mode === 'normal' ? 'ساعة' : 'دقيقة'}</span>
+                        <span className="value">{isMinutesOnly ? m : h}</span>
+                        <span className="label">{isMinutesOnly ? 'دقيقة' : 'ساعة'}</span>
                     </div>
-                    {(mode === 'normal' || mode === 'elapsed' || mode === 'imminent') && (
+                    {!isMinutesOnly && (
                         <div className="time-part minutes">
-                            <span className="value">{mode === 'normal' ? minutes : seconds}</span>
-                            <span className="label">{mode === 'normal' ? 'دقيقة' : 'ثانية'}</span>
+                            <span className="value">{minutes}</span>
+                            <span className="label">دقيقة</span>
                         </div>
                     )}
                 </div>
