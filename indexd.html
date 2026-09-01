@@ -236,14 +236,16 @@
       border-radius: 1.2rem;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-evenly;
       align-items: center;
-      padding: 0.1rem;
+      padding: 0.3rem;
       margin: 0;
       width: 100%;
       flex: 1;
       transition: transform 0.2s, background 0.2s, border-color 0.2s;
       backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
     }
 
     .prayer-card.next-prayer {
@@ -259,27 +261,24 @@
     }
 
     .prayer-card-name {
-        position: absolute;
-        top: 20%;
-      font-size: clamp(3.5rem, 4.2vw, 4.8rem);
+      font-size: clamp(2rem, 3.2vw, 3.8rem);
       font-weight: 800;
       font-family: var(--font-display);
       color: #ffca28;
-      margin-bottom: 0rem;
-      line-height: 0;
+      margin: 0;
+      line-height: 1.1;
       white-space: nowrap;
       text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
     .prayer-card-time {
-         position: absolute;
-        top: 60%;
-      font-size: clamp(4.5rem, 6.8vw, 6.8rem);
+      font-size: clamp(3rem, 5vw, 5.8rem);
       font-weight: 900;
       font-family: var(--font-primary);
       color: #ffffff;
       direction: ltr;
-      line-height: 0.5;
+      line-height: 1;
+      margin: 0;
       white-space: nowrap;
       text-shadow: 0 3px 6px rgba(0,0,0,0.6);
     }
@@ -305,14 +304,10 @@
     }
              
     .next-prayer-label {
-              position: absolute;
-
       font-size: clamp(2rem, 3.2vw, 3.8rem);
       font-weight: 900;
       color: #dcc302;
       line-height: 1.2;
-
-      top:  20%;
       white-space: nowrap;
       text-align: center;
       text-shadow: 0 2px 8px rgba(0,0,0,0.6);
@@ -342,9 +337,7 @@
     }
 
     .digital-countdown-large .curr-time {
-         position: absolute;
-      top: -3rem;
-      font-size: clamp(19rem, 28vw, 28rem);
+      font-size: clamp(15rem, 24vw, 24rem);
       font-weight: 500;
       color: #ffffff;
       font-family: 'Antonio', sans-serif;
@@ -355,8 +348,7 @@
     }
 
     .digital-countdown-large .curr-time.minutes-only {
-        
-      font-size: clamp(20rem, 34vw, 36rem);
+      font-size: clamp(18rem, 30vw, 32rem);
       line-height: 0.8;
     }
 
