@@ -16,7 +16,8 @@
     href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Changa:wght@600;700&family=El+Messiri:wght@400..700&family=Orbitron:wght@700;900&family=VT323&display=swap"
     rel="stylesheet">
   <link href="https://fonts.cdnfonts.com/css/druk-wide-bold" rel="stylesheet">
-                
+               
+  
   <link href="https://fonts.cdnfonts.com/css/antonio" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/seven-segment" rel="stylesheet">
 
@@ -37,11 +38,11 @@
       --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 
       --text-primary: #FFFFFF;
-      --text-secondary: #E0E0E0;
+      --text-secondary: #ffffff;
       --text-accent: #ffffff; /* ذهبي */
       --text-dim: rgba(255, 255, 255, 0.6);
 
-      --font-primary: 'Amiri Quran', sans-serif;
+      --font-primary: '', sans-serif;
       --font-secondary: 'Druk Wide Bold', sans-serif;
       --font-display: 'El Messiri', sans-serif;
     }
@@ -56,7 +57,7 @@
 
     body {
       font-family: var(--font-secondary);
-      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end));
+      background: black;
       color: var(--text-primary);
       height: 100vh;
       width: 100vw;
@@ -258,6 +259,8 @@
     }
 
     .prayer-card-name {
+        position: absolute;
+        top: 20%;
       font-size: clamp(3.5rem, 4.2vw, 4.8rem);
       font-weight: 800;
       font-family: var(--font-display);
@@ -269,7 +272,9 @@
     }
 
     .prayer-card-time {
-      font-size: clamp(5.8rem, 8.6vw, 9.5rem);
+         position: absolute;
+        top: 60%;
+      font-size: clamp(4.5rem, 6.8vw, 6.8rem);
       font-weight: 900;
       font-family: var(--font-primary);
       color: #ffffff;
