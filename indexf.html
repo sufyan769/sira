@@ -1,0 +1,4219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>أوقات الصلاة</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+ <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/dseg" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Changa:wght@600;700&family=El+Messiri:wght@400..700&family=Orbitron:wght@700;900&family=VT323&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/druk-wide-bold" rel="stylesheet">
+               
+  
+  <link href="https://fonts.cdnfonts.com/css/antonio" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/seven-segment" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
+  <link rel="shortcut icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>">
+  <style>
+    /* ==========================================================================
+       1. المتغيرات والنمط الأساسي (CSS Variables & Base Reset)
+       ========================================================================== */
+    :root {
+      --bg-gradient-start: #0f2027;
+      --bg-gradient-mid: #203a43;
+      --bg-gradient-end: #2c5364;
+
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+      --text-primary: #FFFFFF;
+      --text-secondary: #ffffff;
+      --text-accent: #ffffff; /* ذهبي */
+      --text-dim: rgba(255, 255, 255, 0.6);
+
+      --font-primary: 'Changa', 'Antonio', sans-serif;
+      --font-secondary: 'Almarai', sans-serif;
+      --font-display: 'El Messiri', sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-secondary);
+      background: black;
+      color: var(--text-primary);
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    #root {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .app-container {
+      width: 100vw;
+      height: 100vh;
+      padding: 1rem;
+      display: flex;
+      transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+    }
+    
+    .app-container.rotated-90 {
+      transform: rotate(90deg);
+      width: 100vh;
+      height: 100vw;
+    }
+
+    .main-panel {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.5rem;
+      position: relative;
+      direction: rtl;
+    }
+
+    .top-banner-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      direction: rtl;
+    }
+
+    .top-info-card {
+      background: rgba(10, 20, 32, 0.88);
+      border: 2.5px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      border-radius: 1.4rem;
+      backdrop-filter: blur(14px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0.6rem 1.2rem;
+      height: 6.8rem;
+    }
+
+    .gregorian-date-card {
+      gap: 1rem;
+    }
+
+    .date-weekday-text {
+      font-family: 'Lemonada', cursive;
+      font-size: clamp(5.8rem, 6.8vw, 7.6rem);
+      font-weight: 800;
+      color: #00e5ff;
+      line-height: 1;
+      white-space: nowrap;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.6);
+    }
+
+    .date-gregorian-text {
+      font-size: clamp(3.2rem, 4.6vw, 5.5rem);
+      font-weight: 900;
+      color: #1fff06;
+      direction: ltr;
+      unicode-bidi: plaintext;
+      line-height: 1;
+      white-space: nowrap;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+    }
+
+    .hijri-date-card .hijri-date-box {
+      font-size: clamp(4.2rem, 5.6vw, 6.5rem);
+      font-family: var(--font-display);
+      font-weight: 900;
+      text-align: center;
+      line-height: 1;
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+    }
+
+    .hijri-day-text {
+      color: #09ff00;
+    }
+
+    .hijri-month-text {
+      color: #00f2ff;
+    }
+
+    .weather-badge-inside {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      border-radius: 1.2rem;
+      padding: 0.5rem 1.6rem;
+      margin-top: 0.2rem;
+      margin-bottom: auto;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+    }
+
+    .weather-badge-inside .weather-area {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 4rem;
+    }
+
+    .weather-badge-inside .weather-icon {
+      font-size: clamp(5.4rem, 6.8vw, 6.5rem);
+      color: #ffd700;
+      line-height: 1;
+      filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.5));
+    }
+
+    .weather-badge-inside .weather-temp {
+      font-size: clamp(4rem, 5.2vw, 6rem);
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+    }
+
+    .bottom-dashboard-grid {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: stretch;
+      gap: 0.6rem;
+      direction: rtl;
+    }
+
+    .side-prayers-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.5rem;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .center-countdown-panel {
+      flex: 1.5;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .prayer-card {
+      background: rgba(10, 20, 32, 0.85);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      border-radius: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 0.2rem;
+      padding: 0.2rem;
+      margin: 0;
+      width: 100%;
+      flex: 1 1 0;
+      min-height: 0;
+      max-height: 32%;
+      transition: transform 0.2s, background 0.2s, border-color 0.2s;
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .prayer-card.next-prayer {
+      background: rgba(247, 180, 44, 0.25);
+      border: 2.5px solid #ffd700;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.35);
+      transform: scale(1.02);
+    }
+
+    .prayer-card:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .prayer-card-name {
+      font-size: clamp(1.4rem, 2.2vw, 2.5rem);
+      font-weight: 800;
+      font-family: var(--font-display);
+      color: #ffca28;
+      margin: 0;
+      line-height: 1.1;
+      white-space: nowrap;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .prayer-card-time {
+      font-size: clamp(6.4rem, 7.8vw, 8.2rem);
+      font-weight: 200;
+      font-family: var(--font-primary);
+      color: #ffffff;
+      direction: ltr;
+      line-height: 1;
+      margin: 0;
+      white-space: nowrap;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+    }
+
+    .next-prayer-countdown-card {
+      background: rgba(10, 20, 32, 0.9);
+      border: 2px solid rgba(255, 215, 0, 0.4);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      border-radius: 1.5rem;
+      backdrop-filter: blur(14px);
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 1rem 0.6rem 0.6rem 0.6rem;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      direction: rtl;
+      flex: 1;
+      overflow: hidden;
+    }
+             
+    .next-prayer-label {
+      font-size: clamp(2rem, 3.2vw, 3.8rem);
+      font-weight: 900;
+      color: #dcc302;
+      line-height: 1.2;
+      white-space: nowrap;
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      margin-top: 0.4rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .countdown-wrapper {
+      direction: ltr;
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .digital-countdown-large {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      direction: ltr;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .digital-countdown-large .curr-time {
+      font-size: clamp(20rem, 34vw, 34rem);
+      font-weight: 500;
+      color: #ffffff;
+      font-family: 'Antonio', sans-serif;
+      line-height: 0.85;
+      letter-spacing: -2px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .digital-countdown-large .curr-time.minutes-only {
+      font-size: clamp(18rem, 30vw, 32rem);
+      line-height: 0.8;
+    }
+
+    .prayer-card.next-prayer .prayer-card-name {
+      color: var(--text-accent);
+    }
+
+    .prayer-card.next-prayer .prayer-card-time {
+      color: var(--text-accent);
+      text-shadow: 0 0 15px rgba(247, 180, 44, 0.4);
+    }
+
+
+    /* ==========================================================================
+       8. العناصر الإضافية والإعدادات (Additional Controls & Settings)
+       ========================================================================== */
+    .bid-counter-circle {
+      position: absolute;
+      top: 0.8rem;
+      right: 78rem;
+      width: 5.2rem;
+      height: 5.2rem;
+      background:white;
+      border: 4px solid #868181;
+      border-radius: 20%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #1a1a1a;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+      z-index: 200;
+    }
+
+    .bid-counter-value {
+      font-weight: 800;
+      font-size: 3.2rem;
+      line-height: 1;
+      font-family: var(--font-primary);
+    }
+
+    .bid-counter-label {
+      font-size: 1.1rem;
+      color: #000000;
+      font-weight: 700;
+      margin-top: -1px;
+    }
+
+    .settings-button {
+      position: absolute;
+      top: 1rem;
+      left: 40rem;
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-dim);
+      border: 1px solid var(--glass-border);
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .settings-button:hover {
+      background: var(--text-accent);
+      color: #000;
+      border-color: var(--text-accent);
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js" crossorigin></script>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root">
+    <div id="offline-loader" style="color: white; font-family: sans-serif; text-align: center; padding-top: 20vh;">
+      <h2 id="loading-text">جاري التحميل...</h2>
+      <p id="connectivity-status" style="opacity: 0.6; margin-top: 1rem;"></p>
+      <script>
+        const loadingText = document.getElementById('loading-text');
+        const statusText = document.getElementById('connectivity-status');
+
+        // Only show error if React fails to load after 8 seconds
+        setTimeout(() => {
+          if (!window.React) {
+            loadingText.innerText = "تعذر تحميل ملفات التشغيل";
+            statusText.innerText = "يرجى التحقق من الاتصال بالإنترنت.";
+          }
+        }, 8000);
+
+        // Don't reload the whole page when online, React components handle their own data retry
+        if (!navigator.onLine) {
+          statusText.innerText = "أنت غير متصل بالإنترنت. سيتم عرض البيانات المخزنة مسبقاً.";
+        }
+      </script>
+    </div>
+  </div>
+  <script>
+    // --- SERVICE WORKER REGISTRATION ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const swCode = `
+          const CACHE_NAME = 'prayer-times-v1';
+          const ASSETS = [
+            '${window.location.href}',
+            'https://cdn.tailwindcss.com',
+            'https://unpkg.com/react@18/umd/react.development.js',
+            'https://unpkg.com/react-dom@18/umd/react-dom.development.js',
+            'https://unpkg.com/babel-standalone@6/babel.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css'
+          ];
+
+          self.addEventListener('install', (event) => {
+            event.waitUntil(
+              caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+            );
+          });
+
+          self.addEventListener('fetch', (event) => {
+            event.respondWith(
+              caches.match(event.request).then((response) => {
+                return response || fetch(event.request);
+              })
+            );
+          });
+        `;
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(url).catch(err => console.log('SW failed', err));
+      });
+    }
+  </script>
+  <script type="text/babel">
+    // --- START OF COMBINED CODE ---
+const PRAYER_DATABASE = {
+    "01-01": {
+        "Fajr": "05:41",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:11",
+        "Asr": "14:46",
+        "Maghrib": "17:06",
+        "Isha": "18:26"
+    },
+    "01-02": {
+        "Fajr": "05:41",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:12",
+        "Asr": "14:47",
+        "Maghrib": "17:07",
+        "Isha": "18:27"
+    },
+    "01-03": {
+        "Fajr": "05:41",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:12",
+        "Asr": "14:47",
+        "Maghrib": "17:08",
+        "Isha": "18:28"
+    },
+    "01-04": {
+        "Fajr": "05:41",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:12",
+        "Asr": "14:48",
+        "Maghrib": "17:09",
+        "Isha": "18:29"
+    },
+    "01-05": {
+        "Fajr": "05:41",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:13",
+        "Asr": "14:49",
+        "Maghrib": "17:10",
+        "Isha": "18:29"
+    },
+    "01-06": {
+        "Fajr": "05:42",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:13",
+        "Asr": "14:50",
+        "Maghrib": "17:10",
+        "Isha": "18:30"
+    },
+    "01-07": {
+        "Fajr": "05:42",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:14",
+        "Asr": "14:50",
+        "Maghrib": "17:11",
+        "Isha": "18:31"
+    },
+    "01-08": {
+        "Fajr": "05:42",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:14",
+        "Asr": "14:51",
+        "Maghrib": "17:12",
+        "Isha": "18:32"
+    },
+    "01-09": {
+        "Fajr": "05:42",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:15",
+        "Asr": "14:52",
+        "Maghrib": "17:13",
+        "Isha": "18:33"
+    },
+    "01-10": {
+        "Fajr": "05:42",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:15",
+        "Asr": "14:53",
+        "Maghrib": "17:14",
+        "Isha": "18:33"
+    },
+    "01-11": {
+        "Fajr": "05:42",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:15",
+        "Asr": "14:54",
+        "Maghrib": "17:15",
+        "Isha": "18:34"
+    },
+    "01-12": {
+        "Fajr": "05:42",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:16",
+        "Asr": "14:55",
+        "Maghrib": "17:16",
+        "Isha": "18:35"
+    },
+    "01-13": {
+        "Fajr": "05:42",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:16",
+        "Asr": "14:55",
+        "Maghrib": "17:17",
+        "Isha": "18:36"
+    },
+    "01-14": {
+        "Fajr": "05:42",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:17",
+        "Asr": "14:56",
+        "Maghrib": "17:18",
+        "Isha": "18:37"
+    },
+    "01-15": {
+        "Fajr": "05:42",
+        "Sunrise": "07:07",
+        "Dhuhr": "12:17",
+        "Asr": "14:57",
+        "Maghrib": "17:19",
+        "Isha": "18:37"
+    },
+    "01-16": {
+        "Fajr": "05:41",
+        "Sunrise": "07:07",
+        "Dhuhr": "12:17",
+        "Asr": "14:58",
+        "Maghrib": "17:20",
+        "Isha": "18:38"
+    },
+    "01-17": {
+        "Fajr": "05:41",
+        "Sunrise": "07:07",
+        "Dhuhr": "12:18",
+        "Asr": "14:59",
+        "Maghrib": "17:21",
+        "Isha": "18:39"
+    },
+    "01-18": {
+        "Fajr": "05:41",
+        "Sunrise": "07:06",
+        "Dhuhr": "12:18",
+        "Asr": "15:00",
+        "Maghrib": "17:22",
+        "Isha": "18:40"
+    },
+    "01-19": {
+        "Fajr": "05:41",
+        "Sunrise": "07:06",
+        "Dhuhr": "12:18",
+        "Asr": "15:01",
+        "Maghrib": "17:23",
+        "Isha": "18:41"
+    },
+    "01-20": {
+        "Fajr": "05:40",
+        "Sunrise": "07:06",
+        "Dhuhr": "12:18",
+        "Asr": "15:02",
+        "Maghrib": "17:24",
+        "Isha": "18:42"
+    },
+    "01-21": {
+        "Fajr": "05:40",
+        "Sunrise": "07:05",
+        "Dhuhr": "12:19",
+        "Asr": "15:02",
+        "Maghrib": "17:25",
+        "Isha": "18:43"
+    },
+    "01-22": {
+        "Fajr": "05:40",
+        "Sunrise": "07:05",
+        "Dhuhr": "12:19",
+        "Asr": "15:03",
+        "Maghrib": "17:26",
+        "Isha": "18:44"
+    },
+    "01-23": {
+        "Fajr": "05:39",
+        "Sunrise": "07:04",
+        "Dhuhr": "12:19",
+        "Asr": "15:04",
+        "Maghrib": "17:27",
+        "Isha": "18:44"
+    },
+    "01-24": {
+        "Fajr": "05:39",
+        "Sunrise": "07:04",
+        "Dhuhr": "12:20",
+        "Asr": "15:05",
+        "Maghrib": "17:28",
+        "Isha": "18:45"
+    },
+    "01-25": {
+        "Fajr": "05:39",
+        "Sunrise": "07:03",
+        "Dhuhr": "12:20",
+        "Asr": "15:06",
+        "Maghrib": "17:29",
+        "Isha": "18:46"
+    },
+    "01-26": {
+        "Fajr": "05:38",
+        "Sunrise": "07:03",
+        "Dhuhr": "12:20",
+        "Asr": "15:07",
+        "Maghrib": "17:30",
+        "Isha": "18:47"
+    },
+    "01-27": {
+        "Fajr": "05:38",
+        "Sunrise": "07:02",
+        "Dhuhr": "12:20",
+        "Asr": "15:08",
+        "Maghrib": "17:31",
+        "Isha": "18:48"
+    },
+    "01-28": {
+        "Fajr": "05:37",
+        "Sunrise": "07:01",
+        "Dhuhr": "12:20",
+        "Asr": "15:09",
+        "Maghrib": "17:32",
+        "Isha": "18:49"
+    },
+    "01-29": {
+        "Fajr": "05:37",
+        "Sunrise": "07:01",
+        "Dhuhr": "12:21",
+        "Asr": "15:10",
+        "Maghrib": "17:33",
+        "Isha": "18:50"
+    },
+    "01-30": {
+        "Fajr": "05:36",
+        "Sunrise": "07:00",
+        "Dhuhr": "12:21",
+        "Asr": "15:10",
+        "Maghrib": "17:34",
+        "Isha": "18:51"
+    },
+    "01-31": {
+        "Fajr": "05:36",
+        "Sunrise": "06:59",
+        "Dhuhr": "12:21",
+        "Asr": "15:11",
+        "Maghrib": "17:35",
+        "Isha": "18:52"
+    },
+    "02-01": {
+        "Fajr": "05:35",
+        "Sunrise": "06:59",
+        "Dhuhr": "12:21",
+        "Asr": "15:12",
+        "Maghrib": "17:36",
+        "Isha": "18:53"
+    },
+    "02-02": {
+        "Fajr": "05:34",
+        "Sunrise": "06:58",
+        "Dhuhr": "12:21",
+        "Asr": "15:13",
+        "Maghrib": "17:37",
+        "Isha": "18:53"
+    },
+    "02-03": {
+        "Fajr": "05:34",
+        "Sunrise": "06:57",
+        "Dhuhr": "12:21",
+        "Asr": "15:14",
+        "Maghrib": "17:38",
+        "Isha": "18:54"
+    },
+    "02-04": {
+        "Fajr": "05:33",
+        "Sunrise": "06:56",
+        "Dhuhr": "12:21",
+        "Asr": "15:15",
+        "Maghrib": "17:39",
+        "Isha": "18:55"
+    },
+    "02-05": {
+        "Fajr": "05:32",
+        "Sunrise": "06:55",
+        "Dhuhr": "12:21",
+        "Asr": "15:15",
+        "Maghrib": "17:40",
+        "Isha": "18:56"
+    },
+    "02-06": {
+        "Fajr": "05:31",
+        "Sunrise": "06:54",
+        "Dhuhr": "12:21",
+        "Asr": "15:16",
+        "Maghrib": "17:41",
+        "Isha": "18:57"
+    },
+    "02-07": {
+        "Fajr": "05:31",
+        "Sunrise": "06:54",
+        "Dhuhr": "12:22",
+        "Asr": "15:17",
+        "Maghrib": "17:42",
+        "Isha": "18:58"
+    },
+    "02-08": {
+        "Fajr": "05:30",
+        "Sunrise": "06:53",
+        "Dhuhr": "12:22",
+        "Asr": "15:18",
+        "Maghrib": "17:43",
+        "Isha": "18:59"
+    },
+    "02-09": {
+        "Fajr": "05:29",
+        "Sunrise": "06:52",
+        "Dhuhr": "12:22",
+        "Asr": "15:19",
+        "Maghrib": "17:44",
+        "Isha": "19:00"
+    },
+    "02-10": {
+        "Fajr": "05:28",
+        "Sunrise": "06:51",
+        "Dhuhr": "12:22",
+        "Asr": "15:19",
+        "Maghrib": "17:45",
+        "Isha": "19:01"
+    },
+    "02-11": {
+        "Fajr": "05:27",
+        "Sunrise": "06:50",
+        "Dhuhr": "12:22",
+        "Asr": "15:20",
+        "Maghrib": "17:46",
+        "Isha": "19:02"
+    },
+    "02-12": {
+        "Fajr": "05:26",
+        "Sunrise": "06:49",
+        "Dhuhr": "12:22",
+        "Asr": "15:21",
+        "Maghrib": "17:47",
+        "Isha": "19:02"
+    },
+    "02-13": {
+        "Fajr": "05:26",
+        "Sunrise": "06:48",
+        "Dhuhr": "12:22",
+        "Asr": "15:22",
+        "Maghrib": "17:48",
+        "Isha": "19:03"
+    },
+    "02-14": {
+        "Fajr": "05:25",
+        "Sunrise": "06:47",
+        "Dhuhr": "12:22",
+        "Asr": "15:22",
+        "Maghrib": "17:49",
+        "Isha": "19:04"
+    },
+    "02-15": {
+        "Fajr": "05:24",
+        "Sunrise": "06:46",
+        "Dhuhr": "12:22",
+        "Asr": "15:23",
+        "Maghrib": "17:50",
+        "Isha": "19:05"
+    },
+    "02-16": {
+        "Fajr": "05:23",
+        "Sunrise": "06:44",
+        "Dhuhr": "12:21",
+        "Asr": "15:24",
+        "Maghrib": "17:51",
+        "Isha": "19:06"
+    },
+    "02-17": {
+        "Fajr": "05:22",
+        "Sunrise": "06:43",
+        "Dhuhr": "12:21",
+        "Asr": "15:25",
+        "Maghrib": "17:52",
+        "Isha": "19:07"
+    },
+    "02-18": {
+        "Fajr": "05:21",
+        "Sunrise": "06:42",
+        "Dhuhr": "12:21",
+        "Asr": "15:25",
+        "Maghrib": "17:53",
+        "Isha": "19:08"
+    },
+    "02-19": {
+        "Fajr": "05:19",
+        "Sunrise": "06:41",
+        "Dhuhr": "12:21",
+        "Asr": "15:26",
+        "Maghrib": "17:54",
+        "Isha": "19:09"
+    },
+    "02-20": {
+        "Fajr": "05:18",
+        "Sunrise": "06:40",
+        "Dhuhr": "12:21",
+        "Asr": "15:27",
+        "Maghrib": "17:55",
+        "Isha": "19:10"
+    },
+    "02-21": {
+        "Fajr": "05:17",
+        "Sunrise": "06:39",
+        "Dhuhr": "12:21",
+        "Asr": "15:27",
+        "Maghrib": "17:56",
+        "Isha": "19:10"
+    },
+    "02-22": {
+        "Fajr": "05:16",
+        "Sunrise": "06:38",
+        "Dhuhr": "12:21",
+        "Asr": "15:28",
+        "Maghrib": "17:57",
+        "Isha": "19:11"
+    },
+    "02-23": {
+        "Fajr": "05:15",
+        "Sunrise": "06:36",
+        "Dhuhr": "12:21",
+        "Asr": "15:29",
+        "Maghrib": "17:58",
+        "Isha": "19:12"
+    },
+    "02-24": {
+        "Fajr": "05:14",
+        "Sunrise": "06:35",
+        "Dhuhr": "12:21",
+        "Asr": "15:29",
+        "Maghrib": "17:59",
+        "Isha": "19:13"
+    },
+    "02-25": {
+        "Fajr": "05:13",
+        "Sunrise": "06:34",
+        "Dhuhr": "12:20",
+        "Asr": "15:30",
+        "Maghrib": "17:59",
+        "Isha": "19:14"
+    },
+    "02-26": {
+        "Fajr": "05:11",
+        "Sunrise": "06:33",
+        "Dhuhr": "12:20",
+        "Asr": "15:30",
+        "Maghrib": "18:00",
+        "Isha": "19:15"
+    },
+    "02-27": {
+        "Fajr": "05:10",
+        "Sunrise": "06:31",
+        "Dhuhr": "12:20",
+        "Asr": "15:31",
+        "Maghrib": "18:01",
+        "Isha": "19:16"
+    },
+    "02-28": {
+        "Fajr": "05:09",
+        "Sunrise": "06:30",
+        "Dhuhr": "12:20",
+        "Asr": "15:32",
+        "Maghrib": "18:02",
+        "Isha": "19:17"
+    },
+    "03-01": {
+        "Fajr": "05:08",
+        "Sunrise": "06:29",
+        "Dhuhr": "12:20",
+        "Asr": "15:32",
+        "Maghrib": "18:03",
+        "Isha": "19:17"
+    },
+    "03-02": {
+        "Fajr": "05:06",
+        "Sunrise": "06:28",
+        "Dhuhr": "12:20",
+        "Asr": "15:33",
+        "Maghrib": "18:04",
+        "Isha": "19:18"
+    },
+    "03-03": {
+        "Fajr": "05:05",
+        "Sunrise": "06:26",
+        "Dhuhr": "12:19",
+        "Asr": "15:33",
+        "Maghrib": "18:05",
+        "Isha": "19:19"
+    },
+    "03-04": {
+        "Fajr": "05:04",
+        "Sunrise": "06:25",
+        "Dhuhr": "12:19",
+        "Asr": "15:34",
+        "Maghrib": "18:06",
+        "Isha": "19:20"
+    },
+    "03-05": {
+        "Fajr": "05:03",
+        "Sunrise": "06:24",
+        "Dhuhr": "12:19",
+        "Asr": "15:34",
+        "Maghrib": "18:07",
+        "Isha": "19:21"
+    },
+    "03-06": {
+        "Fajr": "05:01",
+        "Sunrise": "06:22",
+        "Dhuhr": "12:19",
+        "Asr": "15:35",
+        "Maghrib": "18:08",
+        "Isha": "19:22"
+    },
+    "03-07": {
+        "Fajr": "05:00",
+        "Sunrise": "06:21",
+        "Dhuhr": "12:18",
+        "Asr": "15:35",
+        "Maghrib": "18:08",
+        "Isha": "19:23"
+    },
+    "03-08": {
+        "Fajr": "04:59",
+        "Sunrise": "06:20",
+        "Dhuhr": "12:18",
+        "Asr": "15:36",
+        "Maghrib": "18:09",
+        "Isha": "19:24"
+    },
+    "03-09": {
+        "Fajr": "04:57",
+        "Sunrise": "06:18",
+        "Dhuhr": "12:18",
+        "Asr": "15:36",
+        "Maghrib": "18:10",
+        "Isha": "19:24"
+    },
+    "03-10": {
+        "Fajr": "04:56",
+        "Sunrise": "06:17",
+        "Dhuhr": "12:18",
+        "Asr": "15:36",
+        "Maghrib": "18:11",
+        "Isha": "19:25"
+    },
+    "03-11": {
+        "Fajr": "04:54",
+        "Sunrise": "06:15",
+        "Dhuhr": "12:17",
+        "Asr": "15:37",
+        "Maghrib": "18:12",
+        "Isha": "19:26"
+    },
+    "03-12": {
+        "Fajr": "04:53",
+        "Sunrise": "06:14",
+        "Dhuhr": "12:17",
+        "Asr": "15:37",
+        "Maghrib": "18:13",
+        "Isha": "19:27"
+    },
+    "03-13": {
+        "Fajr": "04:52",
+        "Sunrise": "06:13",
+        "Dhuhr": "12:17",
+        "Asr": "15:38",
+        "Maghrib": "18:14",
+        "Isha": "19:28"
+    },
+    "03-14": {
+        "Fajr": "04:50",
+        "Sunrise": "06:11",
+        "Dhuhr": "12:17",
+        "Asr": "15:38",
+        "Maghrib": "18:14",
+        "Isha": "19:29"
+    },
+    "03-15": {
+        "Fajr": "04:49",
+        "Sunrise": "06:10",
+        "Dhuhr": "12:16",
+        "Asr": "15:38",
+        "Maghrib": "18:15",
+        "Isha": "19:30"
+    },
+    "03-16": {
+        "Fajr": "04:47",
+        "Sunrise": "06:08",
+        "Dhuhr": "12:16",
+        "Asr": "15:39",
+        "Maghrib": "18:16",
+        "Isha": "19:31"
+    },
+    "03-17": {
+        "Fajr": "04:46",
+        "Sunrise": "06:07",
+        "Dhuhr": "12:16",
+        "Asr": "15:39",
+        "Maghrib": "18:17",
+        "Isha": "19:32"
+    },
+    "03-18": {
+        "Fajr": "04:44",
+        "Sunrise": "06:06",
+        "Dhuhr": "12:15",
+        "Asr": "15:40",
+        "Maghrib": "18:18",
+        "Isha": "19:32"
+    },
+    "03-19": {
+        "Fajr": "04:43",
+        "Sunrise": "06:04",
+        "Dhuhr": "12:15",
+        "Asr": "15:40",
+        "Maghrib": "18:19",
+        "Isha": "19:33"
+    },
+    "03-20": {
+        "Fajr": "04:41",
+        "Sunrise": "06:03",
+        "Dhuhr": "12:15",
+        "Asr": "15:40",
+        "Maghrib": "18:20",
+        "Isha": "19:34"
+    },
+    "03-21": {
+        "Fajr": "04:40",
+        "Sunrise": "06:01",
+        "Dhuhr": "12:15",
+        "Asr": "15:40",
+        "Maghrib": "18:20",
+        "Isha": "19:35"
+    },
+    "03-22": {
+        "Fajr": "04:38",
+        "Sunrise": "06:00",
+        "Dhuhr": "12:14",
+        "Asr": "15:41",
+        "Maghrib": "18:21",
+        "Isha": "19:36"
+    },
+    "03-23": {
+        "Fajr": "04:37",
+        "Sunrise": "05:59",
+        "Dhuhr": "12:14",
+        "Asr": "15:41",
+        "Maghrib": "18:22",
+        "Isha": "19:37"
+    },
+    "03-24": {
+        "Fajr": "04:35",
+        "Sunrise": "05:57",
+        "Dhuhr": "12:14",
+        "Asr": "15:41",
+        "Maghrib": "18:23",
+        "Isha": "19:38"
+    },
+    "03-25": {
+        "Fajr": "04:34",
+        "Sunrise": "05:56",
+        "Dhuhr": "12:13",
+        "Asr": "15:42",
+        "Maghrib": "18:24",
+        "Isha": "19:39"
+    },
+    "03-26": {
+        "Fajr": "04:32",
+        "Sunrise": "05:54",
+        "Dhuhr": "12:13",
+        "Asr": "15:42",
+        "Maghrib": "18:24",
+        "Isha": "19:40"
+    },
+    "03-27": {
+        "Fajr": "04:30",
+        "Sunrise": "05:53",
+        "Dhuhr": "12:13",
+        "Asr": "15:42",
+        "Maghrib": "18:25",
+        "Isha": "19:41"
+    },
+    "03-28": {
+        "Fajr": "04:29",
+        "Sunrise": "05:51",
+        "Dhuhr": "12:12",
+        "Asr": "15:42",
+        "Maghrib": "18:26",
+        "Isha": "19:42"
+    },
+    "03-29": {
+        "Fajr": "04:27",
+        "Sunrise": "05:50",
+        "Dhuhr": "12:12",
+        "Asr": "15:43",
+        "Maghrib": "18:27",
+        "Isha": "19:43"
+    },
+    "03-30": {
+        "Fajr": "04:26",
+        "Sunrise": "05:49",
+        "Dhuhr": "12:12",
+        "Asr": "15:43",
+        "Maghrib": "18:28",
+        "Isha": "19:44"
+    },
+    "03-31": {
+        "Fajr": "04:24",
+        "Sunrise": "05:47",
+        "Dhuhr": "12:12",
+        "Asr": "15:43",
+        "Maghrib": "18:29",
+        "Isha": "19:45"
+    },
+    "04-01": {
+        "Fajr": "04:23",
+        "Sunrise": "05:46",
+        "Dhuhr": "12:11",
+        "Asr": "15:43",
+        "Maghrib": "18:29",
+        "Isha": "19:46"
+    },
+    "04-02": {
+        "Fajr": "04:21",
+        "Sunrise": "05:44",
+        "Dhuhr": "12:11",
+        "Asr": "15:44",
+        "Maghrib": "18:30",
+        "Isha": "19:47"
+    },
+    "04-03": {
+        "Fajr": "04:19",
+        "Sunrise": "05:43",
+        "Dhuhr": "12:11",
+        "Asr": "15:44",
+        "Maghrib": "18:31",
+        "Isha": "19:48"
+    },
+    "04-04": {
+        "Fajr": "04:18",
+        "Sunrise": "05:42",
+        "Dhuhr": "12:10",
+        "Asr": "15:44",
+        "Maghrib": "18:32",
+        "Isha": "19:49"
+    },
+    "04-05": {
+        "Fajr": "04:16",
+        "Sunrise": "05:40",
+        "Dhuhr": "12:10",
+        "Asr": "15:44",
+        "Maghrib": "18:33",
+        "Isha": "19:50"
+    },
+    "04-06": {
+        "Fajr": "04:15",
+        "Sunrise": "05:39",
+        "Dhuhr": "12:10",
+        "Asr": "15:44",
+        "Maghrib": "18:33",
+        "Isha": "19:51"
+    },
+    "04-07": {
+        "Fajr": "04:13",
+        "Sunrise": "05:37",
+        "Dhuhr": "12:10",
+        "Asr": "15:44",
+        "Maghrib": "18:34",
+        "Isha": "19:52"
+    },
+    "04-08": {
+        "Fajr": "04:12",
+        "Sunrise": "05:36",
+        "Dhuhr": "12:09",
+        "Asr": "15:45",
+        "Maghrib": "18:35",
+        "Isha": "19:53"
+    },
+    "04-09": {
+        "Fajr": "04:10",
+        "Sunrise": "05:35",
+        "Dhuhr": "12:09",
+        "Asr": "15:45",
+        "Maghrib": "18:36",
+        "Isha": "19:54"
+    },
+    "04-10": {
+        "Fajr": "04:08",
+        "Sunrise": "05:33",
+        "Dhuhr": "12:09",
+        "Asr": "15:45",
+        "Maghrib": "18:37",
+        "Isha": "19:55"
+    },
+    "04-11": {
+        "Fajr": "04:07",
+        "Sunrise": "05:32",
+        "Dhuhr": "12:08",
+        "Asr": "15:45",
+        "Maghrib": "18:38",
+        "Isha": "19:56"
+    },
+    "04-12": {
+        "Fajr": "04:05",
+        "Sunrise": "05:31",
+        "Dhuhr": "12:08",
+        "Asr": "15:45",
+        "Maghrib": "18:38",
+        "Isha": "19:57"
+    },
+    "04-13": {
+        "Fajr": "04:04",
+        "Sunrise": "05:29",
+        "Dhuhr": "12:08",
+        "Asr": "15:45",
+        "Maghrib": "18:39",
+        "Isha": "19:58"
+    },
+    "04-14": {
+        "Fajr": "04:02",
+        "Sunrise": "05:28",
+        "Dhuhr": "12:08",
+        "Asr": "15:45",
+        "Maghrib": "18:40",
+        "Isha": "19:59"
+    },
+    "04-15": {
+        "Fajr": "04:00",
+        "Sunrise": "05:27",
+        "Dhuhr": "12:07",
+        "Asr": "15:46",
+        "Maghrib": "18:41",
+        "Isha": "20:00"
+    },
+    "04-16": {
+        "Fajr": "03:59",
+        "Sunrise": "05:25",
+        "Dhuhr": "12:07",
+        "Asr": "15:46",
+        "Maghrib": "18:42",
+        "Isha": "20:01"
+    },
+    "04-17": {
+        "Fajr": "03:57",
+        "Sunrise": "05:24",
+        "Dhuhr": "12:07",
+        "Asr": "15:46",
+        "Maghrib": "18:43",
+        "Isha": "20:02"
+    },
+    "04-18": {
+        "Fajr": "03:56",
+        "Sunrise": "05:23",
+        "Dhuhr": "12:07",
+        "Asr": "15:46",
+        "Maghrib": "18:43",
+        "Isha": "20:03"
+    },
+    "04-19": {
+        "Fajr": "03:54",
+        "Sunrise": "05:21",
+        "Dhuhr": "12:07",
+        "Asr": "15:46",
+        "Maghrib": "18:44",
+        "Isha": "20:04"
+    },
+    "04-20": {
+        "Fajr": "03:53",
+        "Sunrise": "05:20",
+        "Dhuhr": "12:06",
+        "Asr": "15:46",
+        "Maghrib": "18:45",
+        "Isha": "20:05"
+    },
+    "04-21": {
+        "Fajr": "03:51",
+        "Sunrise": "05:19",
+        "Dhuhr": "12:06",
+        "Asr": "15:46",
+        "Maghrib": "18:46",
+        "Isha": "20:06"
+    },
+    "04-22": {
+        "Fajr": "03:50",
+        "Sunrise": "05:18",
+        "Dhuhr": "12:06",
+        "Asr": "15:46",
+        "Maghrib": "18:47",
+        "Isha": "20:07"
+    },
+    "04-23": {
+        "Fajr": "03:48",
+        "Sunrise": "05:17",
+        "Dhuhr": "12:06",
+        "Asr": "15:47",
+        "Maghrib": "18:48",
+        "Isha": "20:09"
+    },
+    "04-24": {
+        "Fajr": "03:47",
+        "Sunrise": "05:15",
+        "Dhuhr": "12:06",
+        "Asr": "15:47",
+        "Maghrib": "18:48",
+        "Isha": "20:10"
+    },
+    "04-25": {
+        "Fajr": "03:45",
+        "Sunrise": "05:14",
+        "Dhuhr": "12:05",
+        "Asr": "15:47",
+        "Maghrib": "18:49",
+        "Isha": "20:11"
+    },
+    "04-26": {
+        "Fajr": "03:44",
+        "Sunrise": "05:13",
+        "Dhuhr": "12:05",
+        "Asr": "15:47",
+        "Maghrib": "18:50",
+        "Isha": "20:12"
+    },
+    "04-27": {
+        "Fajr": "03:42",
+        "Sunrise": "05:12",
+        "Dhuhr": "12:05",
+        "Asr": "15:47",
+        "Maghrib": "18:51",
+        "Isha": "20:13"
+    },
+    "04-28": {
+        "Fajr": "03:41",
+        "Sunrise": "05:11",
+        "Dhuhr": "12:05",
+        "Asr": "15:47",
+        "Maghrib": "18:52",
+        "Isha": "20:14"
+    },
+    "04-29": {
+        "Fajr": "03:39",
+        "Sunrise": "05:10",
+        "Dhuhr": "12:05",
+        "Asr": "15:47",
+        "Maghrib": "18:53",
+        "Isha": "20:15"
+    },
+    "04-30": {
+        "Fajr": "03:38",
+        "Sunrise": "05:08",
+        "Dhuhr": "12:05",
+        "Asr": "15:47",
+        "Maghrib": "18:53",
+        "Isha": "20:17"
+    },
+    "05-01": {
+        "Fajr": "03:36",
+        "Sunrise": "05:07",
+        "Dhuhr": "12:05",
+        "Asr": "15:47",
+        "Maghrib": "18:54",
+        "Isha": "20:18"
+    },
+    "05-02": {
+        "Fajr": "03:35",
+        "Sunrise": "05:06",
+        "Dhuhr": "12:04",
+        "Asr": "15:48",
+        "Maghrib": "18:55",
+        "Isha": "20:19"
+    },
+    "05-03": {
+        "Fajr": "03:34",
+        "Sunrise": "05:05",
+        "Dhuhr": "12:04",
+        "Asr": "15:48",
+        "Maghrib": "18:56",
+        "Isha": "20:20"
+    },
+    "05-04": {
+        "Fajr": "03:32",
+        "Sunrise": "05:04",
+        "Dhuhr": "12:04",
+        "Asr": "15:48",
+        "Maghrib": "18:57",
+        "Isha": "20:21"
+    },
+    "05-05": {
+        "Fajr": "03:31",
+        "Sunrise": "05:03",
+        "Dhuhr": "12:04",
+        "Asr": "15:48",
+        "Maghrib": "18:58",
+        "Isha": "20:22"
+    },
+    "05-06": {
+        "Fajr": "03:29",
+        "Sunrise": "05:02",
+        "Dhuhr": "12:04",
+        "Asr": "15:48",
+        "Maghrib": "18:58",
+        "Isha": "20:23"
+    },
+    "05-07": {
+        "Fajr": "03:28",
+        "Sunrise": "05:01",
+        "Dhuhr": "12:04",
+        "Asr": "15:48",
+        "Maghrib": "18:59",
+        "Isha": "20:25"
+    },
+    "05-08": {
+        "Fajr": "03:27",
+        "Sunrise": "05:00",
+        "Dhuhr": "12:04",
+        "Asr": "15:48",
+        "Maghrib": "19:00",
+        "Isha": "20:26"
+    },
+    "05-09": {
+        "Fajr": "03:26",
+        "Sunrise": "04:59",
+        "Dhuhr": "12:04",
+        "Asr": "15:48",
+        "Maghrib": "19:01",
+        "Isha": "20:27"
+    },
+    "05-10": {
+        "Fajr": "03:24",
+        "Sunrise": "04:58",
+        "Dhuhr": "12:04",
+        "Asr": "15:48",
+        "Maghrib": "19:02",
+        "Isha": "20:28"
+    },
+    "05-11": {
+        "Fajr": "03:23",
+        "Sunrise": "04:58",
+        "Dhuhr": "12:04",
+        "Asr": "15:49",
+        "Maghrib": "19:03",
+        "Isha": "20:29"
+    },
+    "05-12": {
+        "Fajr": "03:22",
+        "Sunrise": "04:57",
+        "Dhuhr": "12:04",
+        "Asr": "15:49",
+        "Maghrib": "19:03",
+        "Isha": "20:30"
+    },
+    "05-13": {
+        "Fajr": "03:21",
+        "Sunrise": "04:56",
+        "Dhuhr": "12:04",
+        "Asr": "15:49",
+        "Maghrib": "19:04",
+        "Isha": "20:31"
+    },
+    "05-14": {
+        "Fajr": "03:19",
+        "Sunrise": "04:55",
+        "Dhuhr": "12:04",
+        "Asr": "15:49",
+        "Maghrib": "19:05",
+        "Isha": "20:33"
+    },
+    "05-15": {
+        "Fajr": "03:18",
+        "Sunrise": "04:54",
+        "Dhuhr": "12:04",
+        "Asr": "15:49",
+        "Maghrib": "19:06",
+        "Isha": "20:34"
+    },
+    "05-16": {
+        "Fajr": "03:17",
+        "Sunrise": "04:53",
+        "Dhuhr": "12:04",
+        "Asr": "15:49",
+        "Maghrib": "19:07",
+        "Isha": "20:35"
+    },
+    "05-17": {
+        "Fajr": "03:16",
+        "Sunrise": "04:53",
+        "Dhuhr": "12:04",
+        "Asr": "15:49",
+        "Maghrib": "19:07",
+        "Isha": "20:36"
+    },
+    "05-18": {
+        "Fajr": "03:15",
+        "Sunrise": "04:52",
+        "Dhuhr": "12:04",
+        "Asr": "15:50",
+        "Maghrib": "19:08",
+        "Isha": "20:37"
+    },
+    "05-19": {
+        "Fajr": "03:14",
+        "Sunrise": "04:51",
+        "Dhuhr": "12:04",
+        "Asr": "15:50",
+        "Maghrib": "19:09",
+        "Isha": "20:38"
+    },
+    "05-20": {
+        "Fajr": "03:13",
+        "Sunrise": "04:51",
+        "Dhuhr": "12:04",
+        "Asr": "15:50",
+        "Maghrib": "19:10",
+        "Isha": "20:39"
+    },
+    "05-21": {
+        "Fajr": "03:12",
+        "Sunrise": "04:50",
+        "Dhuhr": "12:04",
+        "Asr": "15:50",
+        "Maghrib": "19:11",
+        "Isha": "20:40"
+    },
+    "05-22": {
+        "Fajr": "03:11",
+        "Sunrise": "04:49",
+        "Dhuhr": "12:04",
+        "Asr": "15:50",
+        "Maghrib": "19:11",
+        "Isha": "20:41"
+    },
+    "05-23": {
+        "Fajr": "03:10",
+        "Sunrise": "04:49",
+        "Dhuhr": "12:04",
+        "Asr": "15:50",
+        "Maghrib": "19:12",
+        "Isha": "20:42"
+    },
+    "05-24": {
+        "Fajr": "03:09",
+        "Sunrise": "04:48",
+        "Dhuhr": "12:04",
+        "Asr": "15:50",
+        "Maghrib": "19:13",
+        "Isha": "20:43"
+    },
+    "05-25": {
+        "Fajr": "03:08",
+        "Sunrise": "04:48",
+        "Dhuhr": "12:04",
+        "Asr": "15:51",
+        "Maghrib": "19:13",
+        "Isha": "20:44"
+    },
+    "05-26": {
+        "Fajr": "03:07",
+        "Sunrise": "04:47",
+        "Dhuhr": "12:05",
+        "Asr": "15:51",
+        "Maghrib": "19:14",
+        "Isha": "20:45"
+    },
+    "05-27": {
+        "Fajr": "03:07",
+        "Sunrise": "04:47",
+        "Dhuhr": "12:05",
+        "Asr": "15:51",
+        "Maghrib": "19:15",
+        "Isha": "20:46"
+    },
+    "05-28": {
+        "Fajr": "03:06",
+        "Sunrise": "04:46",
+        "Dhuhr": "12:05",
+        "Asr": "15:51",
+        "Maghrib": "19:16",
+        "Isha": "20:47"
+    },
+    "05-29": {
+        "Fajr": "03:05",
+        "Sunrise": "04:46",
+        "Dhuhr": "12:05",
+        "Asr": "15:51",
+        "Maghrib": "19:16",
+        "Isha": "20:48"
+    },
+    "05-30": {
+        "Fajr": "03:04",
+        "Sunrise": "04:45",
+        "Dhuhr": "12:05",
+        "Asr": "15:51",
+        "Maghrib": "19:17",
+        "Isha": "20:49"
+    },
+    "05-31": {
+        "Fajr": "03:04",
+        "Sunrise": "04:45",
+        "Dhuhr": "12:05",
+        "Asr": "15:52",
+        "Maghrib": "19:18",
+        "Isha": "20:50"
+    },
+    "06-01": {
+        "Fajr": "03:03",
+        "Sunrise": "04:45",
+        "Dhuhr": "12:05",
+        "Asr": "15:52",
+        "Maghrib": "19:18",
+        "Isha": "20:51"
+    },
+    "06-02": {
+        "Fajr": "03:03",
+        "Sunrise": "04:44",
+        "Dhuhr": "12:05",
+        "Asr": "15:52",
+        "Maghrib": "19:19",
+        "Isha": "20:52"
+    },
+    "06-03": {
+        "Fajr": "03:02",
+        "Sunrise": "04:44",
+        "Dhuhr": "12:06",
+        "Asr": "15:52",
+        "Maghrib": "19:19",
+        "Isha": "20:53"
+    },
+    "06-04": {
+        "Fajr": "03:02",
+        "Sunrise": "04:44",
+        "Dhuhr": "12:06",
+        "Asr": "15:52",
+        "Maghrib": "19:20",
+        "Isha": "20:53"
+    },
+    "06-05": {
+        "Fajr": "03:01",
+        "Sunrise": "04:44",
+        "Dhuhr": "12:06",
+        "Asr": "15:53",
+        "Maghrib": "19:21",
+        "Isha": "20:54"
+    },
+    "06-06": {
+        "Fajr": "03:01",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:06",
+        "Asr": "15:53",
+        "Maghrib": "19:21",
+        "Isha": "20:55"
+    },
+    "06-07": {
+        "Fajr": "03:00",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:06",
+        "Asr": "15:53",
+        "Maghrib": "19:22",
+        "Isha": "20:56"
+    },
+    "06-08": {
+        "Fajr": "03:00",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:07",
+        "Asr": "15:53",
+        "Maghrib": "19:22",
+        "Isha": "20:56"
+    },
+    "06-09": {
+        "Fajr": "03:00",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:07",
+        "Asr": "15:54",
+        "Maghrib": "19:23",
+        "Isha": "20:57"
+    },
+    "06-10": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:07",
+        "Asr": "15:54",
+        "Maghrib": "19:23",
+        "Isha": "20:58"
+    },
+    "06-11": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:07",
+        "Asr": "15:54",
+        "Maghrib": "19:24",
+        "Isha": "20:58"
+    },
+    "06-12": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:07",
+        "Asr": "15:54",
+        "Maghrib": "19:24",
+        "Isha": "20:59"
+    },
+    "06-13": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:08",
+        "Asr": "15:54",
+        "Maghrib": "19:24",
+        "Isha": "20:59"
+    },
+    "06-14": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:08",
+        "Asr": "15:55",
+        "Maghrib": "19:25",
+        "Isha": "21:00"
+    },
+    "06-15": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:08",
+        "Asr": "15:55",
+        "Maghrib": "19:25",
+        "Isha": "21:00"
+    },
+    "06-16": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:08",
+        "Asr": "15:55",
+        "Maghrib": "19:26",
+        "Isha": "21:01"
+    },
+    "06-17": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:08",
+        "Asr": "15:55",
+        "Maghrib": "19:26",
+        "Isha": "21:01"
+    },
+    "06-18": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:09",
+        "Asr": "15:55",
+        "Maghrib": "19:26",
+        "Isha": "21:01"
+    },
+    "06-19": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:09",
+        "Asr": "15:56",
+        "Maghrib": "19:26",
+        "Isha": "21:02"
+    },
+    "06-20": {
+        "Fajr": "02:59",
+        "Sunrise": "04:43",
+        "Dhuhr": "12:09",
+        "Asr": "15:56",
+        "Maghrib": "19:27",
+        "Isha": "21:02"
+    },
+    "06-21": {
+        "Fajr": "02:59",
+        "Sunrise": "04:44",
+        "Dhuhr": "12:09",
+        "Asr": "15:56",
+        "Maghrib": "19:27",
+        "Isha": "21:02"
+    },
+    "06-22": {
+        "Fajr": "02:59",
+        "Sunrise": "04:44",
+        "Dhuhr": "12:09",
+        "Asr": "15:56",
+        "Maghrib": "19:27",
+        "Isha": "21:02"
+    },
+    "06-23": {
+        "Fajr": "03:00",
+        "Sunrise": "04:44",
+        "Dhuhr": "12:10",
+        "Asr": "15:57",
+        "Maghrib": "19:27",
+        "Isha": "21:02"
+    },
+    "06-24": {
+        "Fajr": "03:00",
+        "Sunrise": "04:44",
+        "Dhuhr": "12:10",
+        "Asr": "15:57",
+        "Maghrib": "19:27",
+        "Isha": "21:02"
+    },
+    "06-25": {
+        "Fajr": "03:00",
+        "Sunrise": "04:45",
+        "Dhuhr": "12:10",
+        "Asr": "15:57",
+        "Maghrib": "19:27",
+        "Isha": "21:03"
+    },
+    "06-26": {
+        "Fajr": "03:01",
+        "Sunrise": "04:45",
+        "Dhuhr": "12:10",
+        "Asr": "15:57",
+        "Maghrib": "19:28",
+        "Isha": "21:03"
+    },
+    "06-27": {
+        "Fajr": "03:01",
+        "Sunrise": "04:45",
+        "Dhuhr": "12:11",
+        "Asr": "15:57",
+        "Maghrib": "19:28",
+        "Isha": "21:03"
+    },
+    "06-28": {
+        "Fajr": "03:02",
+        "Sunrise": "04:46",
+        "Dhuhr": "12:11",
+        "Asr": "15:58",
+        "Maghrib": "19:28",
+        "Isha": "21:02"
+    },
+    "06-29": {
+        "Fajr": "03:02",
+        "Sunrise": "04:46",
+        "Dhuhr": "12:11",
+        "Asr": "15:58",
+        "Maghrib": "19:28",
+        "Isha": "21:02"
+    },
+    "06-30": {
+        "Fajr": "03:03",
+        "Sunrise": "04:47",
+        "Dhuhr": "12:11",
+        "Asr": "15:58",
+        "Maghrib": "19:28",
+        "Isha": "21:02"
+    },
+    "07-01": {
+        "Fajr": "03:03",
+        "Sunrise": "04:47",
+        "Dhuhr": "12:11",
+        "Asr": "15:58",
+        "Maghrib": "19:28",
+        "Isha": "21:02"
+    },
+    "07-02": {
+        "Fajr": "03:04",
+        "Sunrise": "04:47",
+        "Dhuhr": "12:12",
+        "Asr": "15:58",
+        "Maghrib": "19:27",
+        "Isha": "21:02"
+    },
+    "07-03": {
+        "Fajr": "03:04",
+        "Sunrise": "04:48",
+        "Dhuhr": "12:12",
+        "Asr": "15:58",
+        "Maghrib": "19:27",
+        "Isha": "21:01"
+    },
+    "07-04": {
+        "Fajr": "03:05",
+        "Sunrise": "04:48",
+        "Dhuhr": "12:12",
+        "Asr": "15:59",
+        "Maghrib": "19:27",
+        "Isha": "21:01"
+    },
+    "07-05": {
+        "Fajr": "03:06",
+        "Sunrise": "04:49",
+        "Dhuhr": "12:12",
+        "Asr": "15:59",
+        "Maghrib": "19:27",
+        "Isha": "21:01"
+    },
+    "07-06": {
+        "Fajr": "03:07",
+        "Sunrise": "04:49",
+        "Dhuhr": "12:12",
+        "Asr": "15:59",
+        "Maghrib": "19:27",
+        "Isha": "21:00"
+    },
+    "07-07": {
+        "Fajr": "03:07",
+        "Sunrise": "04:50",
+        "Dhuhr": "12:12",
+        "Asr": "15:59",
+        "Maghrib": "19:27",
+        "Isha": "21:00"
+    },
+    "07-08": {
+        "Fajr": "03:08",
+        "Sunrise": "04:51",
+        "Dhuhr": "12:13",
+        "Asr": "15:59",
+        "Maghrib": "19:26",
+        "Isha": "21:00"
+    },
+    "07-09": {
+        "Fajr": "03:09",
+        "Sunrise": "04:51",
+        "Dhuhr": "12:13",
+        "Asr": "15:59",
+        "Maghrib": "19:26",
+        "Isha": "20:59"
+    },
+    "07-10": {
+        "Fajr": "03:10",
+        "Sunrise": "04:52",
+        "Dhuhr": "12:13",
+        "Asr": "15:59",
+        "Maghrib": "19:26",
+        "Isha": "20:58"
+    },
+    "07-11": {
+        "Fajr": "03:11",
+        "Sunrise": "04:52",
+        "Dhuhr": "12:13",
+        "Asr": "15:59",
+        "Maghrib": "19:25",
+        "Isha": "20:58"
+    },
+    "07-12": {
+        "Fajr": "03:12",
+        "Sunrise": "04:53",
+        "Dhuhr": "12:13",
+        "Asr": "16:00",
+        "Maghrib": "19:25",
+        "Isha": "20:57"
+    },
+    "07-13": {
+        "Fajr": "03:12",
+        "Sunrise": "04:54",
+        "Dhuhr": "12:13",
+        "Asr": "16:00",
+        "Maghrib": "19:25",
+        "Isha": "20:57"
+    },
+    "07-14": {
+        "Fajr": "03:13",
+        "Sunrise": "04:54",
+        "Dhuhr": "12:13",
+        "Asr": "16:00",
+        "Maghrib": "19:24",
+        "Isha": "20:56"
+    },
+    "07-15": {
+        "Fajr": "03:14",
+        "Sunrise": "04:55",
+        "Dhuhr": "12:13",
+        "Asr": "16:00",
+        "Maghrib": "19:24",
+        "Isha": "20:55"
+    },
+    "07-16": {
+        "Fajr": "03:15",
+        "Sunrise": "04:56",
+        "Dhuhr": "12:14",
+        "Asr": "16:00",
+        "Maghrib": "19:23",
+        "Isha": "20:54"
+    },
+    "07-17": {
+        "Fajr": "03:16",
+        "Sunrise": "04:56",
+        "Dhuhr": "12:14",
+        "Asr": "16:00",
+        "Maghrib": "19:23",
+        "Isha": "20:54"
+    },
+    "07-18": {
+        "Fajr": "03:17",
+        "Sunrise": "04:57",
+        "Dhuhr": "12:14",
+        "Asr": "16:00",
+        "Maghrib": "19:22",
+        "Isha": "20:53"
+    },
+    "07-19": {
+        "Fajr": "03:18",
+        "Sunrise": "04:58",
+        "Dhuhr": "12:14",
+        "Asr": "16:00",
+        "Maghrib": "19:22",
+        "Isha": "20:52"
+    },
+    "07-20": {
+        "Fajr": "03:19",
+        "Sunrise": "04:58",
+        "Dhuhr": "12:14",
+        "Asr": "16:00",
+        "Maghrib": "19:21",
+        "Isha": "20:51"
+    },
+    "07-21": {
+        "Fajr": "03:20",
+        "Sunrise": "04:59",
+        "Dhuhr": "12:14",
+        "Asr": "16:00",
+        "Maghrib": "19:20",
+        "Isha": "20:50"
+    },
+    "07-22": {
+        "Fajr": "03:21",
+        "Sunrise": "05:00",
+        "Dhuhr": "12:14",
+        "Asr": "16:00",
+        "Maghrib": "19:20",
+        "Isha": "20:49"
+    },
+    "07-23": {
+        "Fajr": "03:22",
+        "Sunrise": "05:00",
+        "Dhuhr": "12:14",
+        "Asr": "16:00",
+        "Maghrib": "19:19",
+        "Isha": "20:48"
+    },
+    "07-24": {
+        "Fajr": "03:24",
+        "Sunrise": "05:01",
+        "Dhuhr": "12:14",
+        "Asr": "15:59",
+        "Maghrib": "19:18",
+        "Isha": "20:47"
+    },
+    "07-25": {
+        "Fajr": "03:25",
+        "Sunrise": "05:02",
+        "Dhuhr": "12:14",
+        "Asr": "15:59",
+        "Maghrib": "19:18",
+        "Isha": "20:46"
+    },
+    "07-26": {
+        "Fajr": "03:26",
+        "Sunrise": "05:03",
+        "Dhuhr": "12:14",
+        "Asr": "15:59",
+        "Maghrib": "19:17",
+        "Isha": "20:45"
+    },
+    "07-27": {
+        "Fajr": "03:27",
+        "Sunrise": "05:03",
+        "Dhuhr": "12:14",
+        "Asr": "15:59",
+        "Maghrib": "19:16",
+        "Isha": "20:44"
+    },
+    "07-28": {
+        "Fajr": "03:28",
+        "Sunrise": "05:04",
+        "Dhuhr": "12:14",
+        "Asr": "15:59",
+        "Maghrib": "19:15",
+        "Isha": "20:43"
+    },
+    "07-29": {
+        "Fajr": "03:29",
+        "Sunrise": "05:05",
+        "Dhuhr": "12:14",
+        "Asr": "15:59",
+        "Maghrib": "19:14",
+        "Isha": "20:42"
+    },
+    "07-30": {
+        "Fajr": "03:30",
+        "Sunrise": "05:06",
+        "Dhuhr": "12:14",
+        "Asr": "15:59",
+        "Maghrib": "19:14",
+        "Isha": "20:40"
+    },
+    "07-31": {
+        "Fajr": "03:31",
+        "Sunrise": "05:06",
+        "Dhuhr": "12:14",
+        "Asr": "15:59",
+        "Maghrib": "19:13",
+        "Isha": "20:39"
+    },
+    "08-01": {
+        "Fajr": "03:32",
+        "Sunrise": "05:07",
+        "Dhuhr": "12:14",
+        "Asr": "15:58",
+        "Maghrib": "19:12",
+        "Isha": "20:38"
+    },
+    "08-02": {
+        "Fajr": "03:34",
+        "Sunrise": "05:08",
+        "Dhuhr": "12:14",
+        "Asr": "15:58",
+        "Maghrib": "19:11",
+        "Isha": "20:37"
+    },
+    "08-03": {
+        "Fajr": "03:35",
+        "Sunrise": "05:09",
+        "Dhuhr": "12:14",
+        "Asr": "15:58",
+        "Maghrib": "19:10",
+        "Isha": "20:36"
+    },
+    "08-04": {
+        "Fajr": "03:36",
+        "Sunrise": "05:10",
+        "Dhuhr": "12:14",
+        "Asr": "15:58",
+        "Maghrib": "19:09",
+        "Isha": "20:34"
+    },
+    "08-05": {
+        "Fajr": "03:37",
+        "Sunrise": "05:10",
+        "Dhuhr": "12:13",
+        "Asr": "15:57",
+        "Maghrib": "19:08",
+        "Isha": "20:33"
+    },
+    "08-06": {
+        "Fajr": "03:38",
+        "Sunrise": "05:11",
+        "Dhuhr": "12:13",
+        "Asr": "15:57",
+        "Maghrib": "19:07",
+        "Isha": "20:32"
+    },
+    "08-07": {
+        "Fajr": "03:39",
+        "Sunrise": "05:12",
+        "Dhuhr": "12:13",
+        "Asr": "15:57",
+        "Maghrib": "19:06",
+        "Isha": "20:30"
+    },
+    "08-08": {
+        "Fajr": "03:40",
+        "Sunrise": "05:13",
+        "Dhuhr": "12:13",
+        "Asr": "15:56",
+        "Maghrib": "19:05",
+        "Isha": "20:29"
+    },
+    "08-09": {
+        "Fajr": "03:42",
+        "Sunrise": "05:14",
+        "Dhuhr": "12:13",
+        "Asr": "15:56",
+        "Maghrib": "19:04",
+        "Isha": "20:28"
+    },
+    "08-10": {
+        "Fajr": "03:43",
+        "Sunrise": "05:14",
+        "Dhuhr": "12:13",
+        "Asr": "15:56",
+        "Maghrib": "19:03",
+        "Isha": "20:26"
+    },
+    "08-11": {
+        "Fajr": "03:44",
+        "Sunrise": "05:15",
+        "Dhuhr": "12:13",
+        "Asr": "15:55",
+        "Maghrib": "19:02",
+        "Isha": "20:25"
+    },
+    "08-12": {
+        "Fajr": "03:45",
+        "Sunrise": "05:16",
+        "Dhuhr": "12:12",
+        "Asr": "15:55",
+        "Maghrib": "19:01",
+        "Isha": "20:23"
+    },
+    "08-13": {
+        "Fajr": "03:46",
+        "Sunrise": "05:17",
+        "Dhuhr": "12:12",
+        "Asr": "15:54",
+        "Maghrib": "18:59",
+        "Isha": "20:22"
+    },
+    "08-14": {
+        "Fajr": "03:47",
+        "Sunrise": "05:17",
+        "Dhuhr": "12:12",
+        "Asr": "15:54",
+        "Maghrib": "18:58",
+        "Isha": "20:20"
+    },
+    "08-15": {
+        "Fajr": "03:48",
+        "Sunrise": "05:18",
+        "Dhuhr": "12:12",
+        "Asr": "15:54",
+        "Maghrib": "18:57",
+        "Isha": "20:19"
+    },
+    "08-16": {
+        "Fajr": "03:49",
+        "Sunrise": "05:19",
+        "Dhuhr": "12:12",
+        "Asr": "15:53",
+        "Maghrib": "18:56",
+        "Isha": "20:17"
+    },
+    "08-17": {
+        "Fajr": "03:50",
+        "Sunrise": "05:20",
+        "Dhuhr": "12:11",
+        "Asr": "15:53",
+        "Maghrib": "18:55",
+        "Isha": "20:16"
+    },
+    "08-18": {
+        "Fajr": "03:51",
+        "Sunrise": "05:21",
+        "Dhuhr": "12:11",
+        "Asr": "15:52",
+        "Maghrib": "18:53",
+        "Isha": "20:14"
+    },
+    "08-19": {
+        "Fajr": "03:53",
+        "Sunrise": "05:21",
+        "Dhuhr": "12:11",
+        "Asr": "15:52",
+        "Maghrib": "18:52",
+        "Isha": "20:13"
+    },
+    "08-20": {
+        "Fajr": "03:54",
+        "Sunrise": "05:22",
+        "Dhuhr": "12:11",
+        "Asr": "15:51",
+        "Maghrib": "18:51",
+        "Isha": "20:11"
+    },
+    "08-21": {
+        "Fajr": "03:55",
+        "Sunrise": "05:23",
+        "Dhuhr": "12:11",
+        "Asr": "15:50",
+        "Maghrib": "18:50",
+        "Isha": "20:10"
+    },
+    "08-22": {
+        "Fajr": "03:56",
+        "Sunrise": "05:24",
+        "Dhuhr": "12:10",
+        "Asr": "15:50",
+        "Maghrib": "18:48",
+        "Isha": "20:08"
+    },
+    "08-23": {
+        "Fajr": "03:57",
+        "Sunrise": "05:24",
+        "Dhuhr": "12:10",
+        "Asr": "15:49",
+        "Maghrib": "18:47",
+        "Isha": "20:07"
+    },
+    "08-24": {
+        "Fajr": "03:58",
+        "Sunrise": "05:25",
+        "Dhuhr": "12:10",
+        "Asr": "15:49",
+        "Maghrib": "18:46",
+        "Isha": "20:05"
+    },
+    "08-25": {
+        "Fajr": "03:59",
+        "Sunrise": "05:26",
+        "Dhuhr": "12:10",
+        "Asr": "15:48",
+        "Maghrib": "18:44",
+        "Isha": "20:04"
+    },
+    "08-26": {
+        "Fajr": "04:00",
+        "Sunrise": "05:27",
+        "Dhuhr": "12:09",
+        "Asr": "15:47",
+        "Maghrib": "18:43",
+        "Isha": "20:02"
+    },
+    "08-27": {
+        "Fajr": "04:01",
+        "Sunrise": "05:27",
+        "Dhuhr": "12:09",
+        "Asr": "15:47",
+        "Maghrib": "18:42",
+        "Isha": "20:01"
+    },
+    "08-28": {
+        "Fajr": "04:02",
+        "Sunrise": "05:28",
+        "Dhuhr": "12:09",
+        "Asr": "15:46",
+        "Maghrib": "18:40",
+        "Isha": "19:59"
+    },
+    "08-29": {
+        "Fajr": "04:03",
+        "Sunrise": "05:29",
+        "Dhuhr": "12:08",
+        "Asr": "15:45",
+        "Maghrib": "18:39",
+        "Isha": "19:57"
+    },
+    "08-30": {
+        "Fajr": "04:04",
+        "Sunrise": "05:30",
+        "Dhuhr": "12:08",
+        "Asr": "15:45",
+        "Maghrib": "18:38",
+        "Isha": "19:56"
+    },
+    "08-31": {
+        "Fajr": "04:05",
+        "Sunrise": "05:31",
+        "Dhuhr": "12:08",
+        "Asr": "15:44",
+        "Maghrib": "18:36",
+        "Isha": "19:54"
+    },
+    "09-01": {
+        "Fajr": "04:06",
+        "Sunrise": "05:31",
+        "Dhuhr": "12:07",
+        "Asr": "15:43",
+        "Maghrib": "18:35",
+        "Isha": "19:53"
+    },
+    "09-02": {
+        "Fajr": "04:07",
+        "Sunrise": "05:32",
+        "Dhuhr": "12:07",
+        "Asr": "15:43",
+        "Maghrib": "18:34",
+        "Isha": "19:51"
+    },
+    "09-03": {
+        "Fajr": "04:08",
+        "Sunrise": "05:33",
+        "Dhuhr": "12:07",
+        "Asr": "15:42",
+        "Maghrib": "18:32",
+        "Isha": "19:49"
+    },
+    "09-04": {
+        "Fajr": "04:09",
+        "Sunrise": "05:34",
+        "Dhuhr": "12:06",
+        "Asr": "15:41",
+        "Maghrib": "18:31",
+        "Isha": "19:48"
+    },
+    "09-05": {
+        "Fajr": "04:10",
+        "Sunrise": "05:34",
+        "Dhuhr": "12:06",
+        "Asr": "15:40",
+        "Maghrib": "18:29",
+        "Isha": "19:46"
+    },
+    "09-06": {
+        "Fajr": "04:11",
+        "Sunrise": "05:35",
+        "Dhuhr": "12:06",
+        "Asr": "15:39",
+        "Maghrib": "18:28",
+        "Isha": "19:45"
+    },
+    "09-07": {
+        "Fajr": "04:12",
+        "Sunrise": "05:36",
+        "Dhuhr": "12:05",
+        "Asr": "15:39",
+        "Maghrib": "18:26",
+        "Isha": "19:43"
+    },
+    "09-08": {
+        "Fajr": "04:13",
+        "Sunrise": "05:37",
+        "Dhuhr": "12:05",
+        "Asr": "15:38",
+        "Maghrib": "18:25",
+        "Isha": "19:41"
+    },
+    "09-09": {
+        "Fajr": "04:14",
+        "Sunrise": "05:37",
+        "Dhuhr": "12:05",
+        "Asr": "15:37",
+        "Maghrib": "18:24",
+        "Isha": "19:40"
+    },
+    "09-10": {
+        "Fajr": "04:15",
+        "Sunrise": "05:38",
+        "Dhuhr": "12:04",
+        "Asr": "15:36",
+        "Maghrib": "18:22",
+        "Isha": "19:38"
+    },
+    "09-11": {
+        "Fajr": "04:15",
+        "Sunrise": "05:39",
+        "Dhuhr": "12:04",
+        "Asr": "15:35",
+        "Maghrib": "18:21",
+        "Isha": "19:37"
+    },
+    "09-12": {
+        "Fajr": "04:16",
+        "Sunrise": "05:40",
+        "Dhuhr": "12:04",
+        "Asr": "15:34",
+        "Maghrib": "18:19",
+        "Isha": "19:35"
+    },
+    "09-13": {
+        "Fajr": "04:17",
+        "Sunrise": "05:40",
+        "Dhuhr": "12:03",
+        "Asr": "15:34",
+        "Maghrib": "18:18",
+        "Isha": "19:33"
+    },
+    "09-14": {
+        "Fajr": "04:18",
+        "Sunrise": "05:41",
+        "Dhuhr": "12:03",
+        "Asr": "15:33",
+        "Maghrib": "18:16",
+        "Isha": "19:32"
+    },
+    "09-15": {
+        "Fajr": "04:19",
+        "Sunrise": "05:42",
+        "Dhuhr": "12:03",
+        "Asr": "15:32",
+        "Maghrib": "18:15",
+        "Isha": "19:30"
+    },
+    "09-16": {
+        "Fajr": "04:20",
+        "Sunrise": "05:43",
+        "Dhuhr": "12:02",
+        "Asr": "15:31",
+        "Maghrib": "18:13",
+        "Isha": "19:29"
+    },
+    "09-17": {
+        "Fajr": "04:21",
+        "Sunrise": "05:43",
+        "Dhuhr": "12:02",
+        "Asr": "15:30",
+        "Maghrib": "18:12",
+        "Isha": "19:27"
+    },
+    "09-18": {
+        "Fajr": "04:22",
+        "Sunrise": "05:44",
+        "Dhuhr": "12:02",
+        "Asr": "15:29",
+        "Maghrib": "18:11",
+        "Isha": "19:26"
+    },
+    "09-19": {
+        "Fajr": "04:23",
+        "Sunrise": "05:45",
+        "Dhuhr": "12:01",
+        "Asr": "15:28",
+        "Maghrib": "18:09",
+        "Isha": "19:24"
+    },
+    "09-20": {
+        "Fajr": "04:23",
+        "Sunrise": "05:46",
+        "Dhuhr": "12:01",
+        "Asr": "15:27",
+        "Maghrib": "18:08",
+        "Isha": "19:22"
+    },
+    "09-21": {
+        "Fajr": "04:24",
+        "Sunrise": "05:46",
+        "Dhuhr": "12:00",
+        "Asr": "15:26",
+        "Maghrib": "18:06",
+        "Isha": "19:21"
+    },
+    "09-22": {
+        "Fajr": "04:25",
+        "Sunrise": "05:47",
+        "Dhuhr": "12:00",
+        "Asr": "15:25",
+        "Maghrib": "18:05",
+        "Isha": "19:19"
+    },
+    "09-23": {
+        "Fajr": "04:26",
+        "Sunrise": "05:48",
+        "Dhuhr": "12:00",
+        "Asr": "15:24",
+        "Maghrib": "18:03",
+        "Isha": "19:18"
+    },
+    "09-24": {
+        "Fajr": "04:27",
+        "Sunrise": "05:49",
+        "Dhuhr": "11:59",
+        "Asr": "15:23",
+        "Maghrib": "18:02",
+        "Isha": "19:16"
+    },
+    "09-25": {
+        "Fajr": "04:28",
+        "Sunrise": "05:49",
+        "Dhuhr": "11:59",
+        "Asr": "15:22",
+        "Maghrib": "18:00",
+        "Isha": "19:15"
+    },
+    "09-26": {
+        "Fajr": "04:29",
+        "Sunrise": "05:50",
+        "Dhuhr": "11:59",
+        "Asr": "15:21",
+        "Maghrib": "17:59",
+        "Isha": "19:13"
+    },
+    "09-27": {
+        "Fajr": "04:29",
+        "Sunrise": "05:51",
+        "Dhuhr": "11:58",
+        "Asr": "15:20",
+        "Maghrib": "17:57",
+        "Isha": "19:12"
+    },
+    "09-28": {
+        "Fajr": "04:30",
+        "Sunrise": "05:52",
+        "Dhuhr": "11:58",
+        "Asr": "15:19",
+        "Maghrib": "17:56",
+        "Isha": "19:10"
+    },
+    "09-29": {
+        "Fajr": "04:31",
+        "Sunrise": "05:52",
+        "Dhuhr": "11:58",
+        "Asr": "15:18",
+        "Maghrib": "17:55",
+        "Isha": "19:09"
+    },
+    "09-30": {
+        "Fajr": "04:32",
+        "Sunrise": "05:53",
+        "Dhuhr": "11:57",
+        "Asr": "15:17",
+        "Maghrib": "17:53",
+        "Isha": "19:07"
+    },
+    "10-01": {
+        "Fajr": "04:33",
+        "Sunrise": "05:54",
+        "Dhuhr": "11:57",
+        "Asr": "15:16",
+        "Maghrib": "17:52",
+        "Isha": "19:06"
+    },
+    "10-02": {
+        "Fajr": "04:33",
+        "Sunrise": "05:55",
+        "Dhuhr": "11:57",
+        "Asr": "15:15",
+        "Maghrib": "17:50",
+        "Isha": "19:04"
+    },
+    "10-03": {
+        "Fajr": "04:34",
+        "Sunrise": "05:56",
+        "Dhuhr": "11:56",
+        "Asr": "15:15",
+        "Maghrib": "17:49",
+        "Isha": "19:03"
+    },
+    "10-04": {
+        "Fajr": "04:35",
+        "Sunrise": "05:56",
+        "Dhuhr": "11:56",
+        "Asr": "15:14",
+        "Maghrib": "17:47",
+        "Isha": "19:02"
+    },
+    "10-05": {
+        "Fajr": "04:36",
+        "Sunrise": "05:57",
+        "Dhuhr": "11:56",
+        "Asr": "15:13",
+        "Maghrib": "17:46",
+        "Isha": "19:00"
+    },
+    "10-06": {
+        "Fajr": "04:37",
+        "Sunrise": "05:58",
+        "Dhuhr": "11:56",
+        "Asr": "15:12",
+        "Maghrib": "17:45",
+        "Isha": "18:59"
+    },
+    "10-07": {
+        "Fajr": "04:38",
+        "Sunrise": "05:59",
+        "Dhuhr": "11:55",
+        "Asr": "15:11",
+        "Maghrib": "17:43",
+        "Isha": "18:57"
+    },
+    "10-08": {
+        "Fajr": "04:38",
+        "Sunrise": "06:00",
+        "Dhuhr": "11:55",
+        "Asr": "15:10",
+        "Maghrib": "17:42",
+        "Isha": "18:56"
+    },
+    "10-09": {
+        "Fajr": "04:39",
+        "Sunrise": "06:00",
+        "Dhuhr": "11:55",
+        "Asr": "15:09",
+        "Maghrib": "17:41",
+        "Isha": "18:55"
+    },
+    "10-10": {
+        "Fajr": "04:40",
+        "Sunrise": "06:01",
+        "Dhuhr": "11:54",
+        "Asr": "15:08",
+        "Maghrib": "17:39",
+        "Isha": "18:53"
+    },
+    "10-11": {
+        "Fajr": "04:41",
+        "Sunrise": "06:02",
+        "Dhuhr": "11:54",
+        "Asr": "15:07",
+        "Maghrib": "17:38",
+        "Isha": "18:52"
+    },
+    "10-12": {
+        "Fajr": "04:42",
+        "Sunrise": "06:03",
+        "Dhuhr": "11:54",
+        "Asr": "15:06",
+        "Maghrib": "17:36",
+        "Isha": "18:51"
+    },
+    "10-13": {
+        "Fajr": "04:42",
+        "Sunrise": "06:04",
+        "Dhuhr": "11:54",
+        "Asr": "15:05",
+        "Maghrib": "17:35",
+        "Isha": "18:49"
+    },
+    "10-14": {
+        "Fajr": "04:43",
+        "Sunrise": "06:04",
+        "Dhuhr": "11:53",
+        "Asr": "15:04",
+        "Maghrib": "17:34",
+        "Isha": "18:48"
+    },
+    "10-15": {
+        "Fajr": "04:44",
+        "Sunrise": "06:05",
+        "Dhuhr": "11:53",
+        "Asr": "15:03",
+        "Maghrib": "17:33",
+        "Isha": "18:47"
+    },
+    "10-16": {
+        "Fajr": "04:45",
+        "Sunrise": "06:06",
+        "Dhuhr": "11:53",
+        "Asr": "15:02",
+        "Maghrib": "17:31",
+        "Isha": "18:46"
+    },
+    "10-17": {
+        "Fajr": "04:46",
+        "Sunrise": "06:07",
+        "Dhuhr": "11:53",
+        "Asr": "15:01",
+        "Maghrib": "17:30",
+        "Isha": "18:44"
+    },
+    "10-18": {
+        "Fajr": "04:46",
+        "Sunrise": "06:08",
+        "Dhuhr": "11:53",
+        "Asr": "15:00",
+        "Maghrib": "17:29",
+        "Isha": "18:43"
+    },
+    "10-19": {
+        "Fajr": "04:47",
+        "Sunrise": "06:09",
+        "Dhuhr": "11:52",
+        "Asr": "14:59",
+        "Maghrib": "17:28",
+        "Isha": "18:42"
+    },
+    "10-20": {
+        "Fajr": "04:48",
+        "Sunrise": "06:10",
+        "Dhuhr": "11:52",
+        "Asr": "14:58",
+        "Maghrib": "17:26",
+        "Isha": "18:41"
+    },
+    "10-21": {
+        "Fajr": "04:49",
+        "Sunrise": "06:11",
+        "Dhuhr": "11:52",
+        "Asr": "14:57",
+        "Maghrib": "17:25",
+        "Isha": "18:40"
+    },
+    "10-22": {
+        "Fajr": "04:50",
+        "Sunrise": "06:11",
+        "Dhuhr": "11:52",
+        "Asr": "14:56",
+        "Maghrib": "17:24",
+        "Isha": "18:39"
+    },
+    "10-23": {
+        "Fajr": "04:51",
+        "Sunrise": "06:12",
+        "Dhuhr": "11:52",
+        "Asr": "14:55",
+        "Maghrib": "17:23",
+        "Isha": "18:38"
+    },
+    "10-24": {
+        "Fajr": "04:51",
+        "Sunrise": "06:13",
+        "Dhuhr": "11:52",
+        "Asr": "14:54",
+        "Maghrib": "17:22",
+        "Isha": "18:36"
+    },
+    "10-25": {
+        "Fajr": "04:52",
+        "Sunrise": "06:14",
+        "Dhuhr": "11:52",
+        "Asr": "14:53",
+        "Maghrib": "17:20",
+        "Isha": "18:35"
+    },
+    "10-26": {
+        "Fajr": "04:53",
+        "Sunrise": "06:15",
+        "Dhuhr": "11:51",
+        "Asr": "14:53",
+        "Maghrib": "17:19",
+        "Isha": "18:34"
+    },
+    "10-27": {
+        "Fajr": "04:54",
+        "Sunrise": "06:16",
+        "Dhuhr": "11:51",
+        "Asr": "14:52",
+        "Maghrib": "17:18",
+        "Isha": "18:33"
+    },
+    "10-28": {
+        "Fajr": "04:55",
+        "Sunrise": "06:17",
+        "Dhuhr": "11:51",
+        "Asr": "14:51",
+        "Maghrib": "17:17",
+        "Isha": "18:32"
+    },
+    "10-29": {
+        "Fajr": "04:55",
+        "Sunrise": "06:18",
+        "Dhuhr": "11:51",
+        "Asr": "14:50",
+        "Maghrib": "17:16",
+        "Isha": "18:31"
+    },
+    "10-30": {
+        "Fajr": "04:56",
+        "Sunrise": "06:19",
+        "Dhuhr": "11:51",
+        "Asr": "14:49",
+        "Maghrib": "17:15",
+        "Isha": "18:30"
+    },
+    "10-31": {
+        "Fajr": "04:57",
+        "Sunrise": "06:20",
+        "Dhuhr": "11:51",
+        "Asr": "14:48",
+        "Maghrib": "17:14",
+        "Isha": "18:30"
+    },
+    "11-01": {
+        "Fajr": "04:58",
+        "Sunrise": "06:21",
+        "Dhuhr": "11:51",
+        "Asr": "14:48",
+        "Maghrib": "17:13",
+        "Isha": "18:29"
+    },
+    "11-02": {
+        "Fajr": "04:59",
+        "Sunrise": "06:22",
+        "Dhuhr": "11:51",
+        "Asr": "14:47",
+        "Maghrib": "17:12",
+        "Isha": "18:28"
+    },
+    "11-03": {
+        "Fajr": "05:00",
+        "Sunrise": "06:23",
+        "Dhuhr": "11:51",
+        "Asr": "14:46",
+        "Maghrib": "17:11",
+        "Isha": "18:27"
+    },
+    "11-04": {
+        "Fajr": "05:00",
+        "Sunrise": "06:23",
+        "Dhuhr": "11:51",
+        "Asr": "14:45",
+        "Maghrib": "17:10",
+        "Isha": "18:26"
+    },
+    "11-05": {
+        "Fajr": "05:01",
+        "Sunrise": "06:24",
+        "Dhuhr": "11:51",
+        "Asr": "14:45",
+        "Maghrib": "17:09",
+        "Isha": "18:25"
+    },
+    "11-06": {
+        "Fajr": "05:02",
+        "Sunrise": "06:25",
+        "Dhuhr": "11:51",
+        "Asr": "14:44",
+        "Maghrib": "17:08",
+        "Isha": "18:25"
+    },
+    "11-07": {
+        "Fajr": "05:03",
+        "Sunrise": "06:26",
+        "Dhuhr": "11:51",
+        "Asr": "14:43",
+        "Maghrib": "17:07",
+        "Isha": "18:24"
+    },
+    "11-08": {
+        "Fajr": "05:04",
+        "Sunrise": "06:27",
+        "Dhuhr": "11:51",
+        "Asr": "14:43",
+        "Maghrib": "17:07",
+        "Isha": "18:23"
+    },
+    "11-09": {
+        "Fajr": "05:05",
+        "Sunrise": "06:28",
+        "Dhuhr": "11:51",
+        "Asr": "14:42",
+        "Maghrib": "17:06",
+        "Isha": "18:22"
+    },
+    "11-10": {
+        "Fajr": "05:06",
+        "Sunrise": "06:29",
+        "Dhuhr": "11:51",
+        "Asr": "14:41",
+        "Maghrib": "17:05",
+        "Isha": "18:22"
+    },
+    "11-11": {
+        "Fajr": "05:06",
+        "Sunrise": "06:30",
+        "Dhuhr": "11:51",
+        "Asr": "14:41",
+        "Maghrib": "17:04",
+        "Isha": "18:21"
+    },
+    "11-12": {
+        "Fajr": "05:07",
+        "Sunrise": "06:31",
+        "Dhuhr": "11:52",
+        "Asr": "14:40",
+        "Maghrib": "17:04",
+        "Isha": "18:21"
+    },
+    "11-13": {
+        "Fajr": "05:08",
+        "Sunrise": "06:32",
+        "Dhuhr": "11:52",
+        "Asr": "14:40",
+        "Maghrib": "17:03",
+        "Isha": "18:20"
+    },
+    "11-14": {
+        "Fajr": "05:09",
+        "Sunrise": "06:33",
+        "Dhuhr": "11:52",
+        "Asr": "14:39",
+        "Maghrib": "17:02",
+        "Isha": "18:19"
+    },
+    "11-15": {
+        "Fajr": "05:10",
+        "Sunrise": "06:34",
+        "Dhuhr": "11:52",
+        "Asr": "14:39",
+        "Maghrib": "17:02",
+        "Isha": "18:19"
+    },
+    "11-16": {
+        "Fajr": "05:11",
+        "Sunrise": "06:35",
+        "Dhuhr": "11:52",
+        "Asr": "14:38",
+        "Maghrib": "17:01",
+        "Isha": "18:18"
+    },
+    "11-17": {
+        "Fajr": "05:11",
+        "Sunrise": "06:36",
+        "Dhuhr": "11:52",
+        "Asr": "14:38",
+        "Maghrib": "17:00",
+        "Isha": "18:18"
+    },
+    "11-18": {
+        "Fajr": "05:12",
+        "Sunrise": "06:37",
+        "Dhuhr": "11:53",
+        "Asr": "14:37",
+        "Maghrib": "17:00",
+        "Isha": "18:18"
+    },
+    "11-19": {
+        "Fajr": "05:13",
+        "Sunrise": "06:38",
+        "Dhuhr": "11:53",
+        "Asr": "14:37",
+        "Maghrib": "16:59",
+        "Isha": "18:17"
+    },
+    "11-20": {
+        "Fajr": "05:14",
+        "Sunrise": "06:39",
+        "Dhuhr": "11:53",
+        "Asr": "14:37",
+        "Maghrib": "16:59",
+        "Isha": "18:17"
+    },
+    "11-21": {
+        "Fajr": "05:15",
+        "Sunrise": "06:40",
+        "Dhuhr": "11:53",
+        "Asr": "14:36",
+        "Maghrib": "16:58",
+        "Isha": "18:16"
+    },
+    "11-22": {
+        "Fajr": "05:16",
+        "Sunrise": "06:41",
+        "Dhuhr": "11:54",
+        "Asr": "14:36",
+        "Maghrib": "16:58",
+        "Isha": "18:16"
+    },
+    "11-23": {
+        "Fajr": "05:17",
+        "Sunrise": "06:42",
+        "Dhuhr": "11:54",
+        "Asr": "14:36",
+        "Maghrib": "16:57",
+        "Isha": "18:16"
+    },
+    "11-24": {
+        "Fajr": "05:17",
+        "Sunrise": "06:43",
+        "Dhuhr": "11:54",
+        "Asr": "14:35",
+        "Maghrib": "16:57",
+        "Isha": "18:16"
+    },
+    "11-25": {
+        "Fajr": "05:18",
+        "Sunrise": "06:44",
+        "Dhuhr": "11:54",
+        "Asr": "14:35",
+        "Maghrib": "16:57",
+        "Isha": "18:15"
+    },
+    "11-26": {
+        "Fajr": "05:19",
+        "Sunrise": "06:45",
+        "Dhuhr": "11:55",
+        "Asr": "14:35",
+        "Maghrib": "16:56",
+        "Isha": "18:15"
+    },
+    "11-27": {
+        "Fajr": "05:20",
+        "Sunrise": "06:46",
+        "Dhuhr": "11:55",
+        "Asr": "14:35",
+        "Maghrib": "16:56",
+        "Isha": "18:15"
+    },
+    "11-28": {
+        "Fajr": "05:21",
+        "Sunrise": "06:47",
+        "Dhuhr": "11:55",
+        "Asr": "14:35",
+        "Maghrib": "16:56",
+        "Isha": "18:15"
+    },
+    "11-29": {
+        "Fajr": "05:21",
+        "Sunrise": "06:48",
+        "Dhuhr": "11:56",
+        "Asr": "14:34",
+        "Maghrib": "16:56",
+        "Isha": "18:15"
+    },
+    "11-30": {
+        "Fajr": "05:22",
+        "Sunrise": "06:48",
+        "Dhuhr": "11:56",
+        "Asr": "14:34",
+        "Maghrib": "16:56",
+        "Isha": "18:15"
+    },
+    "12-01": {
+        "Fajr": "05:23",
+        "Sunrise": "06:49",
+        "Dhuhr": "11:56",
+        "Asr": "14:34",
+        "Maghrib": "16:55",
+        "Isha": "18:15"
+    },
+    "12-02": {
+        "Fajr": "05:24",
+        "Sunrise": "06:50",
+        "Dhuhr": "11:57",
+        "Asr": "14:34",
+        "Maghrib": "16:55",
+        "Isha": "18:15"
+    },
+    "12-03": {
+        "Fajr": "05:25",
+        "Sunrise": "06:51",
+        "Dhuhr": "11:57",
+        "Asr": "14:34",
+        "Maghrib": "16:55",
+        "Isha": "18:15"
+    },
+    "12-04": {
+        "Fajr": "05:25",
+        "Sunrise": "06:52",
+        "Dhuhr": "11:58",
+        "Asr": "14:34",
+        "Maghrib": "16:55",
+        "Isha": "18:15"
+    },
+    "12-05": {
+        "Fajr": "05:26",
+        "Sunrise": "06:53",
+        "Dhuhr": "11:58",
+        "Asr": "14:34",
+        "Maghrib": "16:55",
+        "Isha": "18:15"
+    },
+    "12-06": {
+        "Fajr": "05:27",
+        "Sunrise": "06:54",
+        "Dhuhr": "11:58",
+        "Asr": "14:34",
+        "Maghrib": "16:55",
+        "Isha": "18:15"
+    },
+    "12-07": {
+        "Fajr": "05:28",
+        "Sunrise": "06:55",
+        "Dhuhr": "11:59",
+        "Asr": "14:34",
+        "Maghrib": "16:55",
+        "Isha": "18:15"
+    },
+    "12-08": {
+        "Fajr": "05:28",
+        "Sunrise": "06:55",
+        "Dhuhr": "11:59",
+        "Asr": "14:35",
+        "Maghrib": "16:55",
+        "Isha": "18:15"
+    },
+    "12-09": {
+        "Fajr": "05:29",
+        "Sunrise": "06:56",
+        "Dhuhr": "12:00",
+        "Asr": "14:35",
+        "Maghrib": "16:55",
+        "Isha": "18:15"
+    },
+    "12-10": {
+        "Fajr": "05:30",
+        "Sunrise": "06:57",
+        "Dhuhr": "12:00",
+        "Asr": "14:35",
+        "Maghrib": "16:56",
+        "Isha": "18:16"
+    },
+    "12-11": {
+        "Fajr": "05:30",
+        "Sunrise": "06:58",
+        "Dhuhr": "12:01",
+        "Asr": "14:35",
+        "Maghrib": "16:56",
+        "Isha": "18:16"
+    },
+    "12-12": {
+        "Fajr": "05:31",
+        "Sunrise": "06:58",
+        "Dhuhr": "12:01",
+        "Asr": "14:35",
+        "Maghrib": "16:56",
+        "Isha": "18:16"
+    },
+    "12-13": {
+        "Fajr": "05:32",
+        "Sunrise": "06:59",
+        "Dhuhr": "12:02",
+        "Asr": "14:36",
+        "Maghrib": "16:56",
+        "Isha": "18:16"
+    },
+    "12-14": {
+        "Fajr": "05:32",
+        "Sunrise": "07:00",
+        "Dhuhr": "12:02",
+        "Asr": "14:36",
+        "Maghrib": "16:56",
+        "Isha": "18:17"
+    },
+    "12-15": {
+        "Fajr": "05:33",
+        "Sunrise": "07:00",
+        "Dhuhr": "12:03",
+        "Asr": "14:36",
+        "Maghrib": "16:57",
+        "Isha": "18:17"
+    },
+    "12-16": {
+        "Fajr": "05:34",
+        "Sunrise": "07:01",
+        "Dhuhr": "12:03",
+        "Asr": "14:37",
+        "Maghrib": "16:57",
+        "Isha": "18:17"
+    },
+    "12-17": {
+        "Fajr": "05:34",
+        "Sunrise": "07:02",
+        "Dhuhr": "12:04",
+        "Asr": "14:37",
+        "Maghrib": "16:57",
+        "Isha": "18:18"
+    },
+    "12-18": {
+        "Fajr": "05:35",
+        "Sunrise": "07:02",
+        "Dhuhr": "12:04",
+        "Asr": "14:37",
+        "Maghrib": "16:58",
+        "Isha": "18:18"
+    },
+    "12-19": {
+        "Fajr": "05:35",
+        "Sunrise": "07:03",
+        "Dhuhr": "12:05",
+        "Asr": "14:38",
+        "Maghrib": "16:58",
+        "Isha": "18:19"
+    },
+    "12-20": {
+        "Fajr": "05:36",
+        "Sunrise": "07:03",
+        "Dhuhr": "12:05",
+        "Asr": "14:38",
+        "Maghrib": "16:59",
+        "Isha": "18:19"
+    },
+    "12-21": {
+        "Fajr": "05:36",
+        "Sunrise": "07:04",
+        "Dhuhr": "12:06",
+        "Asr": "14:39",
+        "Maghrib": "16:59",
+        "Isha": "18:20"
+    },
+    "12-22": {
+        "Fajr": "05:37",
+        "Sunrise": "07:04",
+        "Dhuhr": "12:06",
+        "Asr": "14:39",
+        "Maghrib": "17:00",
+        "Isha": "18:20"
+    },
+    "12-23": {
+        "Fajr": "05:37",
+        "Sunrise": "07:05",
+        "Dhuhr": "12:07",
+        "Asr": "14:40",
+        "Maghrib": "17:00",
+        "Isha": "18:21"
+    },
+    "12-24": {
+        "Fajr": "05:38",
+        "Sunrise": "07:05",
+        "Dhuhr": "12:07",
+        "Asr": "14:40",
+        "Maghrib": "17:01",
+        "Isha": "18:21"
+    },
+    "12-25": {
+        "Fajr": "05:38",
+        "Sunrise": "07:06",
+        "Dhuhr": "12:08",
+        "Asr": "14:41",
+        "Maghrib": "17:01",
+        "Isha": "18:22"
+    },
+    "12-26": {
+        "Fajr": "05:39",
+        "Sunrise": "07:06",
+        "Dhuhr": "12:08",
+        "Asr": "14:42",
+        "Maghrib": "17:02",
+        "Isha": "18:22"
+    },
+    "12-27": {
+        "Fajr": "05:39",
+        "Sunrise": "07:06",
+        "Dhuhr": "12:09",
+        "Asr": "14:42",
+        "Maghrib": "17:03",
+        "Isha": "18:23"
+    },
+    "12-28": {
+        "Fajr": "05:39",
+        "Sunrise": "07:07",
+        "Dhuhr": "12:09",
+        "Asr": "14:43",
+        "Maghrib": "17:03",
+        "Isha": "18:24"
+    },
+    "12-29": {
+        "Fajr": "05:40",
+        "Sunrise": "07:07",
+        "Dhuhr": "12:10",
+        "Asr": "14:44",
+        "Maghrib": "17:04",
+        "Isha": "18:24"
+    },
+    "12-30": {
+        "Fajr": "05:40",
+        "Sunrise": "07:07",
+        "Dhuhr": "12:10",
+        "Asr": "14:44",
+        "Maghrib": "17:05",
+        "Isha": "18:25"
+    },
+    "12-31": {
+        "Fajr": "05:40",
+        "Sunrise": "07:08",
+        "Dhuhr": "12:10",
+        "Asr": "14:45",
+        "Maghrib": "17:05",
+        "Isha": "18:26"
+    }
+};
+
+
+
+    // from constants.ts
+    const prayerNamesArabic = {
+      Fajr: 'الفجر',
+      Sunrise: 'الشروق',
+      Dhuhr: 'الظهر',
+      Asr: 'العصر',
+      Maghrib: 'المغرب',
+      Isha: 'العشاء',
+    };
+    const prayerOrder = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+    const prayerOrderForList = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+
+    // from utils/time.ts
+    const getTodaysDateKey = (date = new Date()) => {
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${month}-${day}`;
+    };
+    const formatTo12Hour = (timeString) => {
+      if (!timeString || !timeString.includes(':')) return timeString;
+      const [hour, minute] = timeString.split(':');
+      let h = parseInt(hour, 10);
+      h = h % 12;
+      h = h ? h : 12; // The hour '0' should be '12'
+      const hourStr = String(h).padStart(1, '0');
+      return `${hourStr}:${minute}`;
+    };
+
+    // Helper to calculate time differences
+    const addMinutesToTimeStr = (timeStr, minutes) => {
+      if (!timeStr || !timeStr.includes(':')) return timeStr;
+      const [h, m] = timeStr.split(':').map(Number);
+      const d = new Date();
+      d.setHours(h, m, 0, 0);
+      d.setMinutes(d.getMinutes() + minutes);
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    };
+
+    const getPrayerOffsets = () => {
+      try {
+        return JSON.parse(localStorage.getItem('prayerOffsets') || '{}');
+      } catch {
+        return {};
+      }
+    };
+
+    const applyOffsets = (timings) => {
+      if (!timings) return timings;
+      const offsets = getPrayerOffsets();
+      const adjusted = { ...timings };
+      Object.keys(offsets).forEach(prayer => {
+        if (adjusted[prayer]) {
+          adjusted[prayer] = addMinutesToTimeStr(adjusted[prayer], offsets[prayer]);
+        }
+      });
+      return adjusted;
+    };
+
+    const DEFAULT_PRAYER_TIMES = {
+      Fajr: "03:37",
+      Sunrise: "05:16",
+      Dhuhr: "12:08",
+      Asr: "15:54",
+      Maghrib: "19:00",
+      Isha: "20:30"
+    };
+
+    // from hooks/usePrayerTimes.ts
+    const usePrayerTimes = (currentTime) => {
+      const todayKey = React.useMemo(() => getTodaysDateKey(currentTime), [currentTime]);
+      
+      const [basePrayerTimes, setBasePrayerTimes] = React.useState(() => {
+        const cached = localStorage.getItem(`cachedPrayerTimes_${todayKey}`);
+        return cached ? JSON.parse(cached) : DEFAULT_PRAYER_TIMES;
+      });
+
+      const [prayerTimes, setPrayerTimes] = React.useState(() => applyOffsets(basePrayerTimes));
+      const [loading, setLoading] = React.useState(false);
+      const [error, setError] = React.useState(null);
+      const [nextPrayerCountdown, setNextPrayerCountdown] = React.useState(0);
+      const [countdownMode, setCountdownMode] = React.useState('normal');
+
+      const fetchPrayerTimes = React.useCallback(() => {
+        if (localStorage.getItem(`customPrayerTimes_${todayKey}`)) {
+            setPrayerTimes(JSON.parse(localStorage.getItem(`customPrayerTimes_${todayKey}`)));
+            setLoading(false);
+            return;
+        }
+        if (typeof PRAYER_DATABASE !== 'undefined' && PRAYER_DATABASE[todayKey]) {
+            setPrayerTimes(PRAYER_DATABASE[todayKey]);
+            setLoading(false);
+            return;
+        }
+        setLoading(false);
+      }, [todayKey]);
+
+      React.useEffect(() => {
+        fetchPrayerTimes();
+        window.addEventListener('online', fetchPrayerTimes);
+        return () => window.removeEventListener('online', fetchPrayerTimes);
+      }, [fetchPrayerTimes]);
+
+      // Calculate Next Prayer and Countdown
+      React.useEffect(() => {
+        if (!prayerTimes) return;
+
+        const now = currentTime || new Date();
+
+        const prayerDates = prayerOrder.map(name => {
+          const timeStr = prayerTimes[name];
+          if (!timeStr) return null;
+          
+          const parts = timeStr.split(':');
+          if (parts.length >= 2) {
+              const h = parseInt(parts[0], 10);
+              const m = parseInt(parts[1], 10);
+              const date = new Date(now);
+              date.setHours(h, m, 0, 0);
+              return { name, date };
+          }
+          return null;
+        }).filter(p => p !== null);
+
+        let elapsedPrayer = null;
+        for (const prayer of prayerDates) {
+            const diff = now.getTime() - prayer.date.getTime();
+            if (diff >= 0 && diff <= 20 * 60 * 1000) {
+                elapsedPrayer = diff;
+                break;
+            }
+        }
+
+        if (elapsedPrayer !== null) {
+            setCountdownMode('elapsed');
+            setNextPrayerCountdown(elapsedPrayer);
+            return;
+        }
+
+        let nextPrayerTime = null;
+        for (const prayer of prayerDates) {
+          if (prayer.date > now) {
+            nextPrayerTime = prayer.date;
+            break;
+          }
+        }
+
+        if (!nextPrayerTime && prayerDates.length > 0) {
+          nextPrayerTime = new Date(prayerDates[0].date);
+          nextPrayerTime.setDate(nextPrayerTime.getDate() + 1);
+        }
+
+        if (nextPrayerTime) {
+          const diff = nextPrayerTime.getTime() - now.getTime();
+          setNextPrayerCountdown(diff);
+          setCountdownMode(diff <= 5 * 60 * 1000 ? 'imminent' : 'normal');
+        }
+
+      }, [currentTime, prayerTimes]);
+
+      const handleSavePrayerTimes = React.useCallback((newTimes) => {
+        // Calculate new offsets based on the base API times
+        if (!basePrayerTimes) return; // Prevent saving if no base internet times
+        
+        const offsets = getPrayerOffsets();
+        
+        Object.keys(newTimes).forEach(prayer => {
+          const base = basePrayerTimes[prayer];
+          const updated = newTimes[prayer];
+          if (base && updated) {
+            const [h1, m1] = base.split(':').map(Number);
+            const [h2, m2] = updated.split(':').map(Number);
+            const diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+            if (diff !== 0) {
+              offsets[prayer] = diff;
+            } else {
+              delete offsets[prayer];
+            }
+          }
+        });
+        
+        localStorage.setItem('prayerOffsets', JSON.stringify(offsets));
+        setPrayerTimes(applyOffsets(basePrayerTimes));
+      }, [basePrayerTimes]);
+
+      const countdownParts = React.useMemo(() => {
+        const totalSeconds = Math.max(0, Math.floor(nextPrayerCountdown / 1000));
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+
+        return {
+            hours: String(hrs),
+            minutes: String(mins).padStart(2, '0'),
+            seconds: String(secs).padStart(2, '0'),
+            totalSeconds,
+            mode: countdownMode
+        };
+      }, [nextPrayerCountdown, countdownMode]);
+
+      return {
+        prayerTimes,
+        loading,
+        error,
+        countdownParts,
+        handleSavePrayerTimes,
+        todayKey
+      };
+    };
+
+    // from components/icons/SettingsIcon.tsx
+    const SettingsIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
+      </svg>
+    );
+
+    // from components/DigitalClock.tsx
+    const DigitalClock = ({ time, dateInfo, showSeconds = true }) => {
+      const hours = time.getHours();
+      const minutes = time.getMinutes();
+      const seconds = time.getSeconds();
+      
+      const formatNumber = (num) => String(num).padStart(2, '0');
+      const displayHours = hours % 12 || 12;
+      const formattedHours = displayHours < 10 ? ` ${displayHours}` : `${displayHours}`;
+      const formattedMins = formatNumber(minutes);
+
+      return (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          width: '100%',
+          fontFamily: "'DSEG7 Classic', 'VT323', 'Orbitron', monospace",
+          color: '#0e180e',
+          direction: 'ltr',
+          position: 'relative'
+        }}>
+          <div style={{
+            fontSize: '12rem',
+            fontWeight: 'bold',
+            lineHeight: '0.78',
+            display: 'flex',
+            alignItems: 'baseline',
+            
+            position: 'relative',
+            textShadow: '0 1px 2px rgba(0,0,0,0.2)'
+          }}>
+            <span style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              opacity: 0.08,
+              color: '#0e180e',
+              userSelect: 'none',
+              pointerEvents: 'none',
+              whiteSpace: 'nowrap'
+            }}>
+              88:88
+            </span>
+            <span style={{ whiteSpace: 'pre' }}>{formattedHours}</span>
+            <span style={{ margin: '0 0.4rem', opacity: seconds % 2 === 0 ? 1 : 0.15 }}>:</span>
+            <span>{formattedMins}</span>
+          </div>
+        </div>
+      );
+    };
+
+    // from components/PrayerList.tsx
+    const PrayerList = ({ prayerTimes, prayerOrder, nextPrayer }) => {
+      return (
+        <div className="prayer-list">
+          {prayerOrder.map(name => {
+            const isNext = nextPrayer === name;
+            return (
+              <div key={name} className={`prayer-card ${isNext ? 'next-prayer' : ''}`}>
+                <span className="prayer-card-name">{prayerNamesArabic[name]}</span>
+                <span className="prayer-card-time">
+                  {formatTo12Hour(prayerTimes[name])}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    };
+
+    // from components/Countdown.tsx
+    const Countdown = ({ countdownParts, large = false }) => {
+        const { mode, hours, minutes, seconds } = countdownParts;
+
+        let color = 'var(--text-accent)';
+        let displayTime = '';
+        let isMinutesOnly = false;
+
+        const h = parseInt(hours, 10);
+        const m = parseInt(minutes, 10);
+
+        if (mode === 'imminent') {
+            color = '#ff4444'; // Bright Red
+            displayTime = `${m}`;
+            isMinutesOnly = true;
+        } else if (mode === 'elapsed') {
+            color = '#22c55e'; // Green
+            displayTime = `${m}`;
+            isMinutesOnly = true;
+        } else {
+            // Normal
+            if (h === 0) {
+                // أظهر الدقائق فقط بدون الساعة عندما يكون الوقت المتبقي أقل من ساعة
+                displayTime = `${m}`;
+                isMinutesOnly = true;
+            } else {
+                // ساعة أو أكثر -> أظهر H:MM
+                displayTime = `${h}:${minutes}`;
+                isMinutesOnly = false;
+            }
+        }
+
+        if (large) {
+            return (
+                <div className="digital-countdown-large">
+                    <span className={`curr-time ${isMinutesOnly ? 'minutes-only' : ''}`} style={{ color }}>
+                        {displayTime}
+                    </span>
+                </div>
+            );
+        }
+
+        return (
+            <div className="countdown-container">
+                <div className="digital-countdown" style={{ color }}>
+                    <div className="time-part hours">
+                        <span className="value">{isMinutesOnly ? m : h}</span>
+                        <span className="label">{isMinutesOnly ? 'دقيقة' : 'ساعة'}</span>
+                    </div>
+                    {!isMinutesOnly && (
+                        <div className="time-part minutes">
+                            <span className="value">{minutes}</span>
+                            <span className="label">دقيقة</span>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    // from components/DateDisplay.tsx
+    const DateDisplay = ({ dateInfo }) => {
+      return (
+        <React.Fragment>
+          <div className="date-weekday">{dateInfo.weekday}</div>
+          <div className="date-gregorian">{dateInfo.gregorian}</div>
+          <div className="date-hijri">{dateInfo.hijri}</div>
+        </React.Fragment>
+      );
+    };
+
+    // Weather Component
+    const WeatherDisplay = () => {
+      const cacheKey = 'cachedWeather_kirkuk_v2';
+      const [weather, setWeather] = React.useState(() => {
+        const cached = localStorage.getItem(cacheKey);
+        return cached ? JSON.parse(cached) : null;
+      });
+
+      const fetchWeather = React.useCallback(async () => {
+        try {
+          if (!navigator.onLine && weather) return;
+
+          // Kirkuk, Iraq (Latitude: 35.4681, Longitude: 44.3922)
+          const res = await fetch(
+            "https://api.open-meteo.com/v1/forecast?latitude=35.4681&longitude=44.3922&current=temperature_2m,weather_code&timezone=Asia%2FBaghdad"
+          );
+          if (!res.ok) throw new Error('Weather fetch failed');
+          const data = await res.json();
+          setWeather(data.current);
+          localStorage.setItem(cacheKey, JSON.stringify(data.current));
+        } catch (error) {
+          console.warn("Using offline weather data:", error);
+        }
+      }, [weather]);
+
+      React.useEffect(() => {
+        fetchWeather();
+        const timer = setInterval(fetchWeather, 1800000); // 30 mins
+        window.addEventListener('online', fetchWeather);
+        return () => {
+          clearInterval(timer);
+          window.removeEventListener('online', fetchWeather);
+        };
+      }, [fetchWeather]);
+
+      // WMO Weather interpretation codes (simplified)
+      const getWeatherStyle = (code) => {
+        let className = "wi wi-day-sunny";
+        let color = "#FFD700"; // Default Yellow Sun
+        
+        if (code === 0) { className = "wi wi-day-sunny"; color = "#FFD700"; }
+        else if (code <= 3) { className = "wi wi-day-cloudy"; color = "#87CEEB"; } // Blue Cloud
+        else if (code <= 48) { className = "wi wi-fog"; color = "#D3D3D3"; }
+        else if (code <= 67) { className = "wi wi-rain"; color = "#4682B4"; }
+        else if (code <= 77) { className = "wi wi-snow"; color = "#FFFFFF"; }
+        else if (code <= 82) { className = "wi wi-showers"; color = "#1E90FF"; }
+        else if (code <= 99) { className = "wi wi-thunderstorm"; color = "#8A2BE2"; }
+
+        return { className, color };
+      };
+
+      const wStyle = getWeatherStyle(weather ? weather.weather_code : 0);
+      const tempVal = weather ? Math.round(weather.temperature_2m) : 24;
+
+      return (
+        <div className="weather-area">
+          <span style={{ color: '#00ddff', fontFamily: 'Lemonada, cursive', fontSize: 'clamp(1.1rem, 1.6vw, 2rem)', fontWeight: '700' }}></span>
+          <i className={`weather-icon ${wStyle.className}`} style={{ color: wStyle.color }}></i>
+          <div className="weather-temp">{tempVal}°</div>
+        </div>
+      );
+    };
+
+    // from components/EditTimesModal.tsx
+    const EditTimesModal = ({ isOpen, onClose, initialTimes, onSave, todayKey, hijriAdjustment, onSaveAdjustment, isRotated, onToggleRotation }) => {
+      const [editedTimes, setEditedTimes] = React.useState(initialTimes);
+      const [editedAdjustment, setEditedAdjustment] = React.useState(hijriAdjustment);
+
+      React.useEffect(() => {
+        if (isOpen) {
+          setEditedTimes(initialTimes);
+          setEditedAdjustment(hijriAdjustment);
+        }
+      }, [isOpen]);
+
+      if (!isOpen) return null;
+
+      const handleInputChange = (prayerName, value) => {
+        setEditedTimes(prev => ({ ...prev, [prayerName]: value }));
+      };
+
+      const handleSave = () => {
+        onSave(editedTimes);
+        onSaveAdjustment(editedAdjustment);
+        onClose();
+      };
+
+      return (
+        <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-[1000] text-base" onClick={onClose}>
+          <div className="bg-white p-10 rounded-2xl border-4 border-[#2C2C2C] text-[#2C2C2C] w-[min(90vw,400px)] text-center max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <header className="text-2xl font-bold mb-8">الإعدادات</header>
+
+            <div className="mb-8">
+              <h3 className="text-xl font-bold mb-4 border-b pb-2">أوقات الصلاة</h3>
+              <div className="space-y-4">
+                {prayerOrder.map(name => (
+                  <div key={name} className="flex justify-between items-center">
+                    <label htmlFor={`time-${name}`} className="text-lg font-semibold">{prayerNamesArabic[name]}</label>
+                    <input
+                      type="time"
+                      id={`time-${name}`}
+                      value={editedTimes[name]}
+                      onChange={(e) => handleInputChange(name, e.target.value)}
+                      className="font-['Changa'] text-lg p-3 border-2 border-gray-300 rounded-xl"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-8 border-t pt-6">
+              <h3 className="text-xl font-bold mb-4">تعديل التاريخ الهجري</h3>
+              <p className="text-gray-600 mb-4 text-sm">يمكنك زيادة أو نقصان أيام من التاريخ الهجري</p>
+              <div className="flex justify-center items-center gap-6">
+                <button
+                  onClick={() => setEditedAdjustment(prev => prev - 1)}
+                  className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full text-2xl font-bold transition-colors"
+                >
+                  -
+                </button>
+                <div className="flex flex-col">
+                  <span className="text-3xl font-bold text-[#3A5A40]">
+                    {editedAdjustment > 0 ? `+${editedAdjustment}` : editedAdjustment}
+                  </span>
+                  <span className="text-xs text-gray-500">يوم</span>
+                </div>
+                <button
+                  onClick={() => setEditedAdjustment(prev => prev + 1)}
+                  className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full text-2xl font-bold transition-colors"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-8 border-t pt-6">
+              <h3 className="text-xl font-bold mb-4">اتجاه الشاشة</h3>
+              <button
+                onClick={onToggleRotation}
+                className="w-full bg-blue-600 text-white p-4 rounded-xl text-lg font-bold hover:bg-blue-700 transition-colors"
+              >
+                {isRotated ? "إلغاء قلب الشاشة (90 درجة)" : "قلب الشاشة (90 درجة)"}
+              </button>
+            </div>
+
+            <div className="mt-8 flex justify-center gap-4">
+              <button onClick={handleSave} className="flex-1 py-4 font-['Changa'] text-lg rounded-2xl cursor-pointer border-none bg-[#3A5A40] text-white font-bold hover:bg-[#2F4934] transition-colors">حفظ التغييرات</button>
+              <button onClick={onClose} className="flex-1 py-4 font-['Changa'] text-lg rounded-2xl cursor-pointer border-none bg-gray-200 text-gray-800 font-bold hover:bg-gray-300 transition-colors">إلغاء</button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // from App.tsx
+    const App = () => {
+      const [time, setTime] = React.useState(new Date());
+      const [bgIndex, setBgIndex] = React.useState(() => parseInt(localStorage.getItem('selectedBgIndex') || '0', 10));
+
+      React.useEffect(() => {
+        const root = document.documentElement;
+        const colorPalettes = [
+          { start: '#0f2027', mid: '#203a43', end: '#2c5364' }, // Slate Dark
+          { start: '#0B0C10', mid: '#1F2833', end: '#121212' }, // Obsidian
+          { start: '#062C1B', mid: '#0B4F2C', end: '#021B0E' }, // Dark Emerald
+          { start: '#09152B', mid: '#122543', end: '#1C315E' }, // Sapphire Night
+          { start: '#1A0B2E', mid: '#2B1055', end: '#16002C' }, // Royal Purple
+          { start: '#2A080C', mid: '#4A0E17', end: '#1B0306' }, // Dark Ruby
+          { start: '#051A2E', mid: '#0A2E4D', end: '#020C17' }, // Deep Abyss
+          { start: '#1C100B', mid: '#2D1B13', end: '#0F0906' }, // Dark Espresso
+          { start: '#111827', mid: '#1F2937', end: '#0D1B2A' }, // Charcoal Petrol
+          { start: '#13001E', mid: '#2A0040', end: '#0A0012' }, // Dark Violet
+          { start: '#24140E', mid: '#3D2016', end: '#140A07' }, // Dark Copper
+          { start: '#000000', mid: '#0D0D0D', end: '#1A1A1A' }  // OLED Black
+        ];
+        const current = colorPalettes[bgIndex % colorPalettes.length];
+        root.style.setProperty('--bg-gradient-start', current.start);
+        root.style.setProperty('--bg-gradient-mid', current.mid);
+        root.style.setProperty('--bg-gradient-end', current.end);
+        localStorage.setItem('selectedBgIndex', bgIndex.toString());
+      }, [bgIndex]);
+
+      const handleBgChange = () => setBgIndex(prev => prev + 1);
+      const [isModalOpen, setIsModalOpen] = React.useState(false);
+      const [hijriAdjustment, setHijriAdjustment] = React.useState(() => {
+        return parseInt(localStorage.getItem('hijriAdjustment') || '0', 10);
+      });
+
+      const [hijriInfo, setHijriInfo] = React.useState(() => {
+        const cached = localStorage.getItem('cachedHijri');
+        if (cached) return JSON.parse(cached);
+        const today = new Date();
+        const adj = parseInt(localStorage.getItem('hijriAdjustment') || '0', 10);
+        const adjustedDate = new Date(today);
+        adjustedDate.setDate(adjustedDate.getDate() + adj);
+        const formatted = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { day: 'numeric', month: 'long' }).format(adjustedDate);
+        return { formatted, day: adjustedDate.getDate(), bidRemaining: null };
+      });
+
+      const [isRotated, setIsRotated] = React.useState(() => {
+        return localStorage.getItem('isRotated') !== 'false';
+      });
+
+      const handleToggleRotation = () => {
+        setIsRotated(prev => {
+          const next = !prev;
+          localStorage.setItem('isRotated', next.toString());
+          return next;
+        });
+      };
+
+      const fetchHijri = React.useCallback(async () => {
+        try {
+          if (!navigator.onLine && hijriInfo.day) return;
+          const adjustedDate = new Date();
+          adjustedDate.setDate(adjustedDate.getDate() + hijriAdjustment);
+          const dateStr = adjustedDate.toLocaleDateString('en-GB').replace(/\//g, '-');
+          const res = await fetch("https://api.aladhan.com/v1/gToH?date=" + dateStr);
+          const data = await res.json();
+          if (data.code === 200) {
+            const h = data.data.hijri;
+            const currentDay = parseInt(h.day, 10);
+            const daysInMonth = parseInt(h.month.days, 10);
+
+            // Calculate Bid Days Counter (Days until 13th)
+            // If day 13, 14, 15: we are IN them.
+            // Let's show "Now" or just 0? User said "number only". 
+            // I'll show 1, 2, 3 for the sequence or just days until start.
+            let bidRem = null;
+            if (currentDay < 13) {
+              bidRem = 13 - currentDay;
+            } else if (currentDay >= 13 && currentDay <= 15) {
+              bidRem = 0; // Currently in Bid days
+            } else {
+              // After the 15th, count until next month's 13th
+              bidRem = (daysInMonth - currentDay) + 13;
+            }
+
+            const info = {
+              formatted: `${h.day} ${h.month.ar}`, // Removed year/هـ as requested
+              day: currentDay,
+              bidRemaining: bidRem
+            };
+            setHijriInfo(info);
+            localStorage.setItem('cachedHijri', JSON.stringify(info));
+          }
+        } catch (e) {
+          console.warn("Hijri API failed");
+        }
+      }, [hijriInfo.day, hijriAdjustment]);
+
+      const handleSaveAdjustment = React.useCallback((newAdjustment) => {
+        setHijriAdjustment(newAdjustment);
+        localStorage.setItem('hijriAdjustment', newAdjustment.toString());
+        localStorage.removeItem('cachedHijri');
+      }, []);
+
+      const {
+        prayerTimes,
+        loading: prayerLoading,
+        error,
+        countdownParts,
+        handleSavePrayerTimes,
+        todayKey,
+      } = usePrayerTimes(time);
+
+      React.useEffect(() => {
+        const timerId = setInterval(() => setTime(new Date()), 1000);
+        fetchHijri();
+        window.addEventListener('online', fetchHijri);
+        return () => {
+          clearInterval(timerId);
+          window.removeEventListener('online', fetchHijri);
+        };
+      }, [fetchHijri]);
+
+      const dateInfo = React.useMemo(() => {
+        const today = time;
+        const parts = (hijriInfo.formatted || '').split(' ');
+        const hijriDay = parts[0] || '';
+        const hijriMonth = parts.slice(1).join(' ') || '';
+
+        return {
+          weekday: new Intl.DateTimeFormat('ar-EG', { weekday: 'long' }).format(today),
+          hijriDay,
+          hijriMonth,
+          hijri: hijriInfo.formatted,
+          gregorian: `${today.getDate()} / ${today.getMonth() + 1}`,
+        };
+      }, [time, hijriInfo]);
+
+      // Identify next prayer
+      const nextPrayerInfo = React.useMemo(() => {
+        if (!prayerTimes) return null;
+        const now = time;
+        const times = prayerOrderForList.map(name => {
+          const t = prayerTimes[name];
+          if (!t) return null;
+          const [h, m] = t.split(':').map(Number);
+          const d = new Date(now);
+          d.setHours(h, m, 0, 0);
+          return { name, date: d };
+        }).filter(x => x);
+
+        // Find first prayer that is after now
+        const next = times.find(p => p.date > now);
+
+        if (next) return next;
+
+        // If none found, return Fajr (conceptually tomorrow, but for clock display today's Fajr time is fine)
+        const fajr = times.find(p => p.name === 'Fajr');
+        return fajr;
+      }, [time, prayerTimes]);
+
+      const nextPrayerName = nextPrayerInfo ? nextPrayerInfo.name : null;
+
+      if (!prayerTimes && prayerLoading) return <div id="app-loading">جاري التحميل...</div>;
+      if (!prayerTimes && error) return <div className="text-white text-center">خطأ: {error}</div>;
+
+      return (
+        <div className={`app-container ${isRotated ? 'rotated-90' : ''}`}>
+          <main className="main-panel">
+            {/* الشريط العلوي الأفقي: التاريخ الميلادي على اليمين | التاريخ الهجري على اليسار */}
+            <div className="top-banner-row">
+              {/* 1. التاريخ الميلادي (على اليمين في RTL) */}
+              <div className="top-info-card gregorian-date-card">
+                <span className="date-weekday-text">{dateInfo.weekday}</span>
+                <span className="date-gregorian-text">{dateInfo.gregorian}</span>
+              </div>
+
+              {/* 2. التاريخ الهجري (على اليسار في RTL) */}
+              <div className="top-info-card hijri-date-card">
+                <div className="hijri-date-box">
+                  <span className="hijri-day-text">{dateInfo.hijriDay}</span>
+                  <span className="hijri-month-text">{dateInfo.hijriMonth}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* القسم السفلي: شبكة 3 أعمدة (صلوات يمين | عداد وسط | صلوات يسار) */}
+            <div className="bottom-dashboard-grid">
+              {/* الجهة اليمنى: 3 صلوات (الفجر، الشروق، الظهر) */}
+              <div className="side-prayers-panel">
+                {prayerTimes && ['Fajr', 'Sunrise', 'Dhuhr'].map(name => {
+                  const isNext = nextPrayerName === name;
+                  return (
+                    <div key={name} className={`prayer-card ${isNext ? 'next-prayer' : ''}`}>
+                      <span className="prayer-card-name">{prayerNamesArabic[name]}</span>
+                      <span className="prayer-card-time">
+                        {formatTo12Hour(prayerTimes[name])}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* الوسط: عداد الصلاة القادمة والطقس بداخله */}
+              <div className="center-countdown-panel">
+                <div className="next-prayer-countdown-card">
+                  {/* الطقس داخل بطاقة الصلاة القادمة */}
+                  <div className="weather-badge-inside">
+                    <WeatherDisplay />
+                  </div>
+
+                  <div className="next-prayer-label">
+                  {nextPrayerName ? prayerNamesArabic[nextPrayerName] : ''}
+                  </div>
+                  <div className="countdown-wrapper">
+                    <Countdown countdownParts={countdownParts} large={true} />
+                  </div>
+                </div>
+              </div>
+
+              {/* الجهة اليسرى: 3 صلوات (العصر، المغرب، العشاء) */}
+              <div className="side-prayers-panel">
+                {prayerTimes && ['Asr', 'Maghrib', 'Isha'].map(name => {
+                  const isNext = nextPrayerName === name;
+                  return (
+                    <div key={name} className={`prayer-card ${isNext ? 'next-prayer' : ''}`}>
+                      <span className="prayer-card-name">{prayerNamesArabic[name]}</span>
+                      <span className="prayer-card-time">
+                        {formatTo12Hour(prayerTimes[name])}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {hijriInfo.bidRemaining !== null && (
+              <div className="bid-counter-circle" onClick={handleBgChange} style={{ cursor: 'pointer', zIndex: 100 }} title="تغيير لون الخلفية">
+                <span className="bid-counter-value">{hijriInfo.bidRemaining}</span>
+                <span className="bid-counter-label">البيض</span>
+              </div>
+            )}
+
+            <button
+              className="settings-button"
+              onClick={() => setIsModalOpen(true)}
+              aria-label="Settings"
+            >
+              <SettingsIcon />
+            </button>
+
+            {prayerTimes && (
+              <EditTimesModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                initialTimes={prayerTimes}
+                onSave={handleSavePrayerTimes}
+                todayKey={todayKey}
+                hijriAdjustment={hijriAdjustment}
+                onSaveAdjustment={handleSaveAdjustment}
+                isRotated={isRotated}
+                onToggleRotation={handleToggleRotation}
+              />
+            )}
+          </main>
+        </div>
+      );
+    };
+
+    // from index.tsx
+    const rootElement = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sira/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
